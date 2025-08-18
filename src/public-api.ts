@@ -10,16 +10,16 @@ export * from './lib/common/utils';
 export * from './lib/common/entity-utils';
 
 /** services */
-export * from './lib/services/sz-message-bundle.service';
+//export * from './lib/services/sz-message-bundle.service';
 export * from './lib/services/sz-configuration.service';
 export * from './lib/services/sz-datamart.service';
-export { SzAdminService } from './lib/services/sz-admin.service';
-export { SzBulkDataService } from './lib/services/sz-bulk-data.service';
+//export { SzAdminService } from './lib/services/sz-admin.service';
+//export { SzBulkDataService } from './lib/services/sz-bulk-data.service';
 
 export * from './lib/services/sz-datasources.service';
 export * from './lib/services/sz-configuration.service';
 export * from './lib/services/sz-folios.service';
-export * from './lib/services/sz-message-bundle.service';
+//export * from './lib/services/sz-message-bundle.service';
 export { SzPrefsService, SzSdkPrefsModel} from './lib/services/sz-prefs.service';
 export * from './lib/services/sz-search.service';  // updated to use rest
 export * from './lib/services/sz-ui.service';

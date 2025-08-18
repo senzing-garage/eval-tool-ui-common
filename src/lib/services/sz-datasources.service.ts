@@ -8,8 +8,10 @@ import {
   SzDataSourcesResponse,
   SzDataSourcesResponseData
 } from '@senzing/rest-api-client-ng';
-import { Observable } from 'rxjs';
-import { tap, map } from 'rxjs/operators';
+import { Observable, Subject } from 'rxjs';
+import { takeUntil, take, tap } from 'rxjs/operators';
+import { SzGrpcConfigManagerService } from './grpc/configManager.service';
+import { SzSdkDataSource } from '../models/grpc/config';
 
 /**
  * Provides access to the /datasources api path.
@@ -21,32 +23,51 @@ import { tap, map } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class SzDataSourcesService {
+  /** subscription to notify subscribers to unbind */
+  public unsubscribe$ = new Subject<void>();
   private _dataSourceDetails: SzDataSourcesResponseData | undefined;
 
   constructor(
-    private configService: ConfigService) {}
+      private configManagerService: SzGrpcConfigManagerService
+  ) {}
+
+  public getDataSources(debugPath?: string) {
+    let retVal = new Subject<SzSdkDataSource[]>();
+    this.configManagerService.config.then((conf)=> {
+      conf.dataSources.pipe(
+        takeUntil(this.unsubscribe$),
+        take(1),
+        tap( (data) => {
+          console.log(`listDataSources(): ${debugPath ? debugPath : ''}`, data);
+        })
+      ).subscribe((dsResp: SzSdkDataSource[]) =>{
+        retVal.next(dsResp);
+      })
+    });
+    return retVal.asObservable();
+  }
 
   /**
    * get an array of datasources.
    *
    * @memberof SzDataSourcesService
    */
-  public listDataSources(debugPath?: string): Observable<string[]> {
+  /*public listDataSources(debugPath?: string): Observable<string[]> {
     // get attributes
-    return this.configService.getDataSources()
+    return this.configManagerService.()
     .pipe(
       map( (resp: SzDataSourcesResponse) => resp.data.dataSources ),
       tap( (data) => {
         console.log(`listDataSources(): ${debugPath ? debugPath : ''}`, data);
       })
     );
-  }
+  }*/
   /**
    * get an array of datasources.
    *
    * @memberof SzDataSourcesService
    */
-  public listDataSourcesDetails(debugPath?: string): Observable<SzDataSourcesResponseData> {
+  /*public listDataSourcesDetails(debugPath?: string): Observable<SzDataSourcesResponseData> {
     // get attributes
     return this.configService.getDataSources()
     .pipe(
@@ -56,14 +77,14 @@ export class SzDataSourcesService {
         console.log(`listDataSourcesDetails: ${debugPath ? debugPath : ''}`, data);
       })
     );
-  }
+  }*/
   /**
    * add datasources and return a array of datasources after the operation.
    */
-  public addDataSources(dataSources: string[]): Observable<string[]> {
+  /*public addDataSources(dataSources: string[]): Observable<string[]> {
     return this.configService.addDataSources(dataSources)
     .pipe(
       map( (resp: SzDataSourcesResponse) => resp.data.dataSources )
     )
-  }
+  }*/
 }

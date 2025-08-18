@@ -1,13 +1,17 @@
 import { Component, Inject, inject, OnDestroy, OnInit } from "@angular/core";
+import { CommonModule } from "@angular/common";
 import { SzGrpcWebEnvironment, SzGrpcWebEnvironmentOptions } from "@senzing/sz-sdk-typescript-grpc-web";
 import { Subject, take } from "rxjs";
 import { SzGrpcProductService } from "../../services/grpc/product.service";
-import { SzAdminService } from "../../services/sz-admin.service";
+import { Configuration as SzRestConfiguration } from "@senzing/rest-api-client-ng";
 
 @Component({
     selector: 'sz-product-info',
     styleUrl: 'sz-product-info.component.scss',
     templateUrl: 'sz-product-info.component.html',
+    imports: [
+      CommonModule
+    ],
     providers:[
         { provide: SzGrpcProductService, useClass: SzGrpcProductService}
     ]
@@ -24,6 +28,7 @@ export class SzProductInfoComponent implements OnDestroy {
         this.result = JSON.stringify(result, undefined, 4);
       })
     }
+    /*
     getRestVersion(event: MouseEvent) {
       console.log(`getting version from grpc...`);
       this.adminService.getVersionInfo().pipe(
@@ -33,6 +38,7 @@ export class SzProductInfoComponent implements OnDestroy {
         this.result = JSON.stringify(result, undefined, 4);
       })
     }
+    */
   
     getLicense(event: MouseEvent) {
       console.log(`getting license from grpc...`);
@@ -56,8 +62,8 @@ export class SzProductInfoComponent implements OnDestroy {
 
     constructor(
       @Inject('GRPC_ENVIRONMENT') private SdkEnvironment: SzGrpcWebEnvironment,
-      private productService: SzGrpcProductService,
-      private adminService: SzAdminService
+      @Inject('REST_ENVIRONMENT') readonly RestConfiguration: SzRestConfiguration,
+      private productService: SzGrpcProductService
     ) {
 
     }

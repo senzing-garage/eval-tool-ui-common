@@ -2,7 +2,6 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
     name: 'SzDecimalPercent',
-    standalone: false
 })
   export class SzDecimalPercentPipe implements PipeTransform {
     transform(percent: number, precision: number = 1): any {

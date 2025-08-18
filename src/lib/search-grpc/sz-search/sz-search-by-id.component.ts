@@ -1,15 +1,16 @@
 import { Component, EventEmitter, Input, OnInit, Output, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Observable, Subject  } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 
 import {
-  Configuration as SzRestConfiguration,
-  ConfigurationParameters as SzRestConfigurationParameters,
-  SzEntityRecord,
-  EntityDataService as SzEntityDataService,
-  SzEntityData
+  //Configuration as SzRestConfiguration,
+  //ConfigurationParameters as SzRestConfigurationParameters,
+  //SzEntityRecord,
+  //EntityDataService as SzEntityDataService,
+  //SzEntityData
 } from '@senzing/rest-api-client-ng';
 import { SzEntitySearchParams } from '../../models/entity-search';
 import { SzSearchService } from '../../services/sz-search.service';
@@ -17,7 +18,8 @@ import { JSONScrubber } from '../../common/utils';
 import { SzConfigurationService } from '../../services/sz-configuration.service';
 import { SzPrefsService } from '../../services/sz-prefs.service';
 import { SzDataSourcesService } from '../../services/sz-datasources.service';
-import { CommonModule } from '@angular/common';
+import { SzSdkEntityRecord, SzSdkEntityResponse, SzSdkResolvedEntity } from '../../models/grpc/engine';
+import { SzSdkDataSource } from 'src/lib/models/grpc/config';
 
 /** @internal */
 export interface SzSearchByIdFormParams {
@@ -137,12 +139,12 @@ export class SzSearchByIdGrpcComponent implements OnInit, OnDestroy {
    * emmitted when the search results have been changed.
    * @memberof SzSearchByIdComponent
    */
-  @Output() resultChange: EventEmitter<SzEntityRecord> = new EventEmitter<SzEntityRecord>();
+  @Output() resultChange: EventEmitter<SzSdkEntityRecord> = new EventEmitter<SzSdkEntityRecord>();
 
   /** the result of the get "by entity id" submitSearch query. */
-  private _entity: SzEntityData;
+  private _entity: SzSdkResolvedEntity;
   /** event emmiter for when the _entity property has changed */
-  @Output() entityChange: EventEmitter<SzEntityData> = new EventEmitter<SzEntityData>();
+  @Output() entityChange: EventEmitter<SzSdkResolvedEntity> = new EventEmitter<SzSdkResolvedEntity>();
 
   /**
    * emmitted when parameters of the search have been changed.
@@ -159,7 +161,7 @@ export class SzSearchByIdGrpcComponent implements OnInit, OnDestroy {
   /**
    * @ignore
    */
-  public _result: SzEntityRecord;
+  public _result: SzSdkEntityRecord;
 
   /* start tag input setters */
 
@@ -187,7 +189,9 @@ export class SzSearchByIdGrpcComponent implements OnInit, OnDestroy {
    */
   private disableDataSourceOption(value: string) {
     value = value.trim();
-    const optionIndex = this._datasources.indexOf(value);
+    const optionIndex = this._datasources.findIndex((ds)=>{
+      return ds.DSRC_CODE == value;
+    });
     if(optionIndex > -1) {
       this._datasources.splice(optionIndex, 1);
     }
@@ -292,7 +296,7 @@ export class SzSearchByIdGrpcComponent implements OnInit, OnDestroy {
     return this._layoutClasses;
   }
   /** the datasources available to user */
-  public _datasources: string[] = [];
+  public _datasources: SzSdkDataSource[] = [];
   /** the currently selected datasource */
   private _dataSource: string;
   /** the currently selected datasource */
@@ -322,7 +326,7 @@ export class SzSearchByIdGrpcComponent implements OnInit, OnDestroy {
    * @internal
    * @returns SzAttributeType[]
    */
-  public orderedDataSources(): string[] {
+  public orderedDataSources(): SzSdkDataSource[] {
     if(this._datasources && this._datasources.sort){
       const matchingDataSources =  this._datasources.sort((a, b) => {
         let returnVal = 0;
@@ -339,10 +343,10 @@ export class SzSearchByIdGrpcComponent implements OnInit, OnDestroy {
    * @internal
    * @returns SzAttributeType[]
    */
-  public get filteredDataSources(): string[] {
+  public get filteredDataSources(): SzSdkDataSource[] {
     if(this._datasources && this._datasources.filter && this.hiddenDataSources && this.hiddenDataSources.length > 0){
       const matchingDataSources =  this._datasources.filter((datasrc) => {
-        return this.hiddenDataSources.indexOf(datasrc) === -1;
+        return this.hiddenDataSources.indexOf(datasrc.DSRC_CODE) === -1;
       });
       return matchingDataSources;
     }
@@ -354,7 +358,8 @@ export class SzSearchByIdGrpcComponent implements OnInit, OnDestroy {
     private fb: UntypedFormBuilder,
     private dataSourcesService: SzDataSourcesService,
     private cd: ChangeDetectorRef,
-    private apiConfigService: SzConfigurationService,
+    //private apiConfigService: SzConfigurationService,
+    //private appConfigService: SzEnvironmentConfigurationService,
     private searchService: SzSearchService,
     public breakpointObserver: BreakpointObserver) {}
 
@@ -391,7 +396,8 @@ export class SzSearchByIdGrpcComponent implements OnInit, OnDestroy {
    */
   public ngOnInit(): void {
     this.createEntitySearchForm();
-    this.apiConfigService.parametersChanged.pipe(
+    /*
+    this.appConfigService.parametersChanged.pipe(
       takeUntil(this.unsubscribe$),
       filter( () => {
         return this.getDataSourcesOnConfigChange;
@@ -401,7 +407,7 @@ export class SzSearchByIdGrpcComponent implements OnInit, OnDestroy {
         //console.info('@senzing/sdk-components-grpc-web/sz-search[ngOnInit]->apiConfigService.parametersChanged: ', cfg);
         this.updateDataSources();
       }
-    );
+    );*/
     // make immediate request
     if(!this.waitForConfigChange){
       this.updateDataSources();
@@ -462,12 +468,15 @@ export class SzSearchByIdGrpcComponent implements OnInit, OnDestroy {
    */
   @Input()
   public updateDataSources = (): void => {
-    this.dataSourcesService.listDataSources('sz-search-by-id').subscribe((dataSrc: string[]) => {
-      this._datasources = dataSrc;
-      this.cd.markForCheck();
-      this.cd.detectChanges();
-    }, (err)=> {
-      this.exception.next( err );
+    this.dataSourcesService.getDataSources('sz-search-by-id').subscribe({
+      next: (dataSources: SzSdkDataSource[]) => {
+        this._datasources = dataSources;
+        this.cd.markForCheck();
+        this.cd.detectChanges();
+      }, 
+      error: (err)=> {
+        this.exception.next( err );
+      }
     });
   }
 
@@ -554,7 +563,7 @@ export class SzSearchByIdGrpcComponent implements OnInit, OnDestroy {
     ) {
       // emit search start
       this.searchStart.emit(searchParams);
-      let observableCall: Observable<SzEntityData>;
+      let observableCall: Observable<SzSdkEntityResponse>;
       // decide which endpoint to hit
       if(searchParams.entityId != undefined && searchParams.entityId != null) {
         // just go by entity id
@@ -570,17 +579,20 @@ export class SzSearchByIdGrpcComponent implements OnInit, OnDestroy {
       observableCall.pipe(
         takeUntil(this.unsubscribe$)
       ).
-      subscribe((res: SzEntityData) => {
-        // console.log('sz-search-by-id.submitSearch.by-ent: ', res);
-        if (res && res.resolvedEntity) {
-          this._entity = res;
-          this.entityChange.emit(res);
+      subscribe({
+        next: (res: SzSdkEntityResponse) => {
+          // console.log('sz-search-by-id.submitSearch.by-ent: ', res);
+          if (res && res) {
+            this._entity = res.RESOLVED_ENTITY;
+            this.entityChange.emit(res.RESOLVED_ENTITY);
+          }
+          const totalResults = res && res.RESOLVED_ENTITY ? 1 : 0;
+          this.searchEnd.emit(totalResults);
+        },
+        error:(err)=> {
+          //this.requestEnd.emit( err );
+          this.exception.next( err );
         }
-        const totalResults = res && res.resolvedEntity ? 1 : 0;
-        this.searchEnd.emit(totalResults);
-      }, (err)=> {
-        //this.requestEnd.emit( err );
-        this.exception.next( err );
       });
 
     } else {

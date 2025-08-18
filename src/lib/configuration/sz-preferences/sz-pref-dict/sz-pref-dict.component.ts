@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit, Inject, Input, Output, EventEmitter } from '@angular/core';
 import { Configuration as SzRestConfiguration } from '@senzing/rest-api-client-ng';
 
@@ -11,7 +12,9 @@ import { Configuration as SzRestConfiguration } from '@senzing/rest-api-client-n
     selector: 'sz-pref-dict',
     templateUrl: './sz-pref-dict.component.html',
     styleUrls: ['./sz-pref-dict.component.scss'],
-    standalone: false
+    imports: [
+      CommonModule
+    ]
 })
 export class SzPrefDictComponent implements OnInit {
 
@@ -123,7 +126,9 @@ export class SzPrefDictComponent implements OnInit {
     }
   }
 
-  constructor(@Inject(SzRestConfiguration) public apiConfiguration: SzRestConfiguration) {}
+  constructor(
+    @Inject('REST_ENVIRONMENT') public apiConfiguration: SzRestConfiguration
+  ) {}
 
   public getPropsAsArray(): object[] {
     // Step 1. Get all the object keys.

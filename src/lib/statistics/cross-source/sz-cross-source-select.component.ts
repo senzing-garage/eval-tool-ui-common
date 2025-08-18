@@ -1,14 +1,18 @@
 import { Component, Input, Output, OnInit, OnDestroy, EventEmitter, ElementRef, ChangeDetectorRef, AfterContentInit, AfterViewInit, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MatButtonModule, MatIconButton } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
 import { SzGraphPrefs, SzPrefsService } from '../../services/sz-prefs.service';
 import { take, takeUntil, tap } from 'rxjs/operators';
 import { Observable, Subject } from 'rxjs';
-import { camelToKebabCase, underscoresToDashes, getMapKeyByValue } from '../../common/utils';
-import { SzCrossSourceSummary, SzDataSourcesResponseData, SzSourceSummary, SzSummaryStats } from '@senzing/rest-api-client-ng';
-import { isValueTypeOfArray, parseBool, parseNumber, parseSzIdentifier, sortDataSourcesByIndex } from '../../common/utils';
+//import { camelToKebabCase, underscoresToDashes, getMapKeyByValue } from '../../common/utils';
+import { SzCrossSourceSummary, SzSummaryStats } from '@senzing/rest-api-client-ng';
+//import { isValueTypeOfArray, parseBool, parseNumber, parseSzIdentifier, sortDataSourcesByIndex } from '../../common/utils';
 import { SzCrossSourceSummaryCategoryType, SzCrossSourceSummaryCategoryTypeToMatchLevel, SzCrossSourceSummarySelectionEvent, SzRecordCountDataSource } from '../../models/stats';
 import { SzDataMartService } from '../../services/sz-datamart.service';
 import { SzDataSourcesService } from '../../services/sz-datasources.service';
 import { SzCSSClassService } from '../../services/sz-css-class.service';
+import { SzSdkDataSource } from '../../models/grpc/config';
 
 /**
  * pull down menus for selecting what datasources to show in other components.
@@ -22,14 +26,20 @@ import { SzCSSClassService } from '../../services/sz-css-class.service';
     selector: 'sz-cross-source-select',
     templateUrl: './sz-cross-source-select.component.html',
     styleUrls: ['./sz-cross-source-select.component.scss'],
-    standalone: false
+    imports: [
+      CommonModule,
+      MatIconButton,
+      MatMenuModule,
+      MatButtonModule
+    ],
+    standalone: true
 })
 export class SzCrossSourceSelectComponent implements OnInit, AfterViewInit, OnDestroy {
   /** subscription to notify subscribers to unbind */
   public unsubscribe$ = new Subject<void>();
   private _defaultFromDataSource: string | undefined;
   private _defaultToDataSource: string | undefined;
-  private _dataSources : string[] = [];
+  private _dataSources : SzSdkDataSource[] = [];
   private _fromDataSources: {name: string, connectionCount: number}[] = [];
   private _toDataSources: {name: string, connectionCount: number}[]   = [];
   private dataSourceLookup : { [code: string]: string } = {};
@@ -44,7 +54,7 @@ export class SzCrossSourceSelectComponent implements OnInit, AfterViewInit, OnDe
     return this._summaryLookup;
   }
 
-  public get dataSources() : string[] {
+  public get dataSources() : SzSdkDataSource[] {
     return this._dataSources;
   }
 
@@ -60,8 +70,14 @@ export class SzCrossSourceSelectComponent implements OnInit, AfterViewInit, OnDe
     return this.dataMartService.dataSource1;
   }
 
-  public set fromDataSource(value: string | undefined) {
-    this.dataMartService.dataSource1 = value;
+  public set fromDataSource(value: string | SzSdkDataSource | undefined) {
+    if(value && (value as SzSdkDataSource).DSRC_CODE) {
+      this.dataMartService.dataSource1 = (value as SzSdkDataSource).DSRC_CODE;
+    } else if(value) {
+      this.dataMartService.dataSource1 = value as string;
+    } else {
+      this.dataMartService.dataSource1 = undefined
+    }
   }
 
   public get defaultFromDataSource() : string {
@@ -78,8 +94,14 @@ export class SzCrossSourceSelectComponent implements OnInit, AfterViewInit, OnDe
     return this.dataMartService.dataSource2;
   }
 
-  public set toDataSource(value: string | undefined) {
-    this.dataMartService.dataSource2 = value;
+  public set toDataSource(value: string | SzSdkDataSource | undefined) {
+    if(value && (value as SzSdkDataSource).DSRC_CODE) {
+      this.dataMartService.dataSource2 = (value as SzSdkDataSource).DSRC_CODE;
+    } else if(value) {
+      this.dataMartService.dataSource2 = value as string;
+    } else {
+      this.dataMartService.dataSource2 = undefined
+    }
   }
 
   public get defaultToDataSource() : string {
@@ -115,7 +137,7 @@ export class SzCrossSourceSelectComponent implements OnInit, AfterViewInit, OnDe
   public getDataSourceName(code: string) : string {
     let obs = this.dataSourceLookup[code];
     if (!obs) {
-      obs = this._dataSources.find((dcode)=>{ return dcode === code;})
+      obs = this._dataSources.find((ds)=>{ return ds.DSRC_CODE === code;}).DSRC_CODE
       this.dataSourceLookup[code] = obs;
     }
     return obs;
@@ -133,8 +155,8 @@ export class SzCrossSourceSelectComponent implements OnInit, AfterViewInit, OnDe
         takeUntil(this.unsubscribe$),
         take(1)
       ).subscribe({
-        next: (dataSources: SzDataSourcesResponseData)=>{
-          this._dataSources = dataSources.dataSources;
+        next: (dataSources: SzSdkDataSource[])=>{
+          this._dataSources = dataSources;
           console.log(`got datasources: `, this._dataSources);
           if(this.dataMartService.summaryStatistics && (this.fromDataSource || this.toDataSource)) {
             this.regenerateDataSourceLists(this._dataSources);
@@ -197,19 +219,19 @@ export class SzCrossSourceSelectComponent implements OnInit, AfterViewInit, OnDe
       //console.warn(`SzCrossSourceSelectComponent.onDataSourceSelectionChanged: no summary statistics yet`);
     }
   }
-  private regenerateDataSourceLists(value: string[]) {
+  private regenerateDataSourceLists(value: SzSdkDataSource[]) {
     // regenerate toDataSources
-    this._toDataSources = value.map((ds: string) => {
+    this._toDataSources = value.map((ds: SzSdkDataSource) => {
       return {
-        name: ds,
-        connectionCount: this.getDiscoveredConnectionCount(ds, this.fromDataSource)
+        name: ds.DSRC_CODE,
+        connectionCount: this.getDiscoveredConnectionCount(ds.DSRC_CODE, this.fromDataSource)
       }
     });
     // regenerate fromDataSources
-    this._fromDataSources = value.map((ds: string) => {
+    this._fromDataSources = value.map((ds: SzSdkDataSource) => {
       return {
-        name: ds,
-        connectionCount: this.getDiscoveredConnectionCount(ds, this.toDataSource)
+        name: ds.DSRC_CODE,
+        connectionCount: this.getDiscoveredConnectionCount(ds.DSRC_CODE, this.toDataSource)
       }
     });
     console.log(`regenerateDataSourceLists(${this.fromDataSource}, ${this.toDataSource})`,this._fromDataSources, this._toDataSources, value);
@@ -225,16 +247,27 @@ export class SzCrossSourceSelectComponent implements OnInit, AfterViewInit, OnDe
   private onLoadedStatsChanged(stats) {
     console.info('on Count Stats: ', stats);
   }
+
+  private static dataSourcesInclude(dataSource: string | SzSdkDataSource, collection: SzSdkDataSource[]) {
+    let retVal = false;
+    let dataSourceCode = dataSource && (dataSource as SzSdkDataSource).DSRC_CODE ? (dataSource as SzSdkDataSource).DSRC_CODE : dataSource as string;
+    if(dataSourceCode && collection && collection.find) {
+      retVal = collection.some((ds)=>{
+        return ds.DSRC_CODE === dataSourceCode;
+      })
+    }
+    return retVal;
+  }
   private onSummaryStatsChanged(stats: SzSummaryStats) {
     console.info('onSummaryStatsChanged: ', stats, this.dataMartService);
     if(!this.dataMartService.dataSource1) {
       // select a default
       if(this._defaultFromDataSource || this._defaultToDataSource) { 
         if(this._dataSources) {
-          if(this._defaultFromDataSource && this._dataSources.includes(this._defaultFromDataSource)) {
+          if(this._defaultFromDataSource && SzCrossSourceSelectComponent.dataSourcesInclude(this._defaultFromDataSource, this._dataSources)) {
             this.dataMartService.dataSource1 = this._defaultFromDataSource;
           }
-          if(this._defaultToDataSource &&  this._dataSources.includes(this._defaultToDataSource)) {
+          if(this._defaultToDataSource &&  SzCrossSourceSelectComponent.dataSourcesInclude(this._defaultToDataSource, this._dataSources)) {
             this.dataMartService.dataSource2 = this._defaultToDataSource;
           }
           let _parametersEvt: SzCrossSourceSummarySelectionEvent = {
@@ -368,8 +401,8 @@ export class SzCrossSourceSelectComponent implements OnInit, AfterViewInit, OnDe
               : (this.fromAuditInfo.discoveredConnectionCount)*/
   }
 
-  private getDataSources(): Observable<SzDataSourcesResponseData> {
-    return this.dataSourcesService.listDataSourcesDetails('sz-cross-source-select')
+  private getDataSources(): Observable<SzSdkDataSource[]> {
+    return this.dataSourcesService.getDataSources('sz-cross-source-select')
   }
 
   public getFormattedConnectionCount(dataSource1: string, dataSource2: string) {
@@ -432,7 +465,9 @@ export class SzCrossSourceSelectComponent implements OnInit, AfterViewInit, OnDe
       return;
     }
 
-    let index = sources.indexOf(fromDS) + (backwards ? -1 : 1);
+    let index = sources.findIndex((_ds)=>{
+      _ds.DSRC_CODE === fromDS;
+    }) + (backwards ? -1 : 1);
     const length = sources.length;
 
     if (index < 0) {
@@ -466,7 +501,9 @@ export class SzCrossSourceSelectComponent implements OnInit, AfterViewInit, OnDe
         index = 0;
       }
     } else {
-      index = sources.indexOf(this.toDataSource) + (backwards ? -1 : 1);
+      index = sources.findIndex((_ds)=>{
+        _ds.DSRC_CODE === this.toDataSource;
+      }) + (backwards ? -1 : 1);
     }
 
     if (index < 0) {
@@ -475,12 +512,12 @@ export class SzCrossSourceSelectComponent implements OnInit, AfterViewInit, OnDe
       index = index % length;
     }
     this.setToDataSource(sources[index]);
-    this.stepFromNone = sources[index] === this.fromDataSource;
+    this.stepFromNone = sources[index].DSRC_CODE === this.fromDataSource;
   }
 
-  private setBothDataSources(dataSource: string) {
+  private setBothDataSources(dataSource: SzSdkDataSource) {
     setTimeout(() => {
-      if (this.dataSources && this.dataSources.indexOf(dataSource) >= 0)
+      if (this.dataSources && SzCrossSourceSelectComponent.dataSourcesInclude(dataSource, this.dataSources))
       {
         this.fromDataSource  = dataSource;
         this.toDataSource    = dataSource;
@@ -491,9 +528,9 @@ export class SzCrossSourceSelectComponent implements OnInit, AfterViewInit, OnDe
     });
   }
 
-  public setFromDataSource(dataSource: string) {
+  public setFromDataSource(dataSource: string | SzSdkDataSource) {
     setTimeout(() => {
-      if (this.dataSources && this.dataSources.indexOf(dataSource) >= 0) {
+      if (this.dataSources && SzCrossSourceSelectComponent.dataSourcesInclude(dataSource, this.dataSources)) {
         this.fromDataSource = dataSource;
         console.log(`from datasource: ${this.fromDataSource}`);
         if (this.stepFromNone && (this.fromDataSource !== this.toDataSource)) {
@@ -505,9 +542,9 @@ export class SzCrossSourceSelectComponent implements OnInit, AfterViewInit, OnDe
     });
   }
 
-  public setToDataSource(dataSource: string) {
+  public setToDataSource(dataSource: string | SzSdkDataSource) {
     setTimeout(() => {
-      if (!dataSource || (this.dataSources.indexOf(dataSource) >= 0)) {
+      if (!dataSource || !SzCrossSourceSelectComponent.dataSourcesInclude(dataSource, this.dataSources)) {
         this.toDataSource = dataSource;
         this.stepFromNone = (this.toDataSource === this.fromDataSource);
         console.log(`to datasource: ${dataSource}|${this.toDataSource}`);

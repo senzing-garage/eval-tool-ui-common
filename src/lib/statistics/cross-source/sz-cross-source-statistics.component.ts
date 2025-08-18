@@ -7,6 +7,12 @@ import { SzDataMartService } from '../../services/sz-datamart.service';
 import { SzCrossSourceSummaryCategoryType, SzCrossSourceSummarySelectionEvent, SzCrossSourceSummarySelectionClickEvent, SzStatsSampleTableLoadingEvent, SzCrossSourceSummaryCategoryTypeToMatchLevel } from '../../models/stats';
 import { SzEntitiesPage, SzEntityData, SzEntityIdentifier, SzSourceSummary } from '@senzing/rest-api-client-ng';
 import { SzDataTableCellEvent } from '../../models/stats';
+import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
+import { SzCrossSourceResultsDataTable } from '../../statistics/cross-source/sz-cross-source-results.data-table';
+import { SzCrossSourceSelectComponent } from '../../statistics/cross-source/sz-cross-source-select.component';
+import { SzCrossSourceSummaryComponent } from '../../summary/cross-source/sz-cross-source-summary.component';
+import { MatButtonModule } from '@angular/material/button';
 
 export interface dataSourceSelectionChangeEvent {
   dataSource1?: string,
@@ -29,7 +35,14 @@ export interface dataSourceSelectionChangeEvent {
     selector: 'sz-cross-source-statistics',
     templateUrl: './sz-cross-source-statistics.component.html',
     styleUrls: ['./sz-cross-source-statistics.component.scss'],
-    standalone: false
+    imports: [
+      CommonModule,
+      MatIconModule, MatButtonModule,
+      SzCrossSourceSummaryComponent,
+      SzCrossSourceSelectComponent,
+      SzCrossSourceResultsDataTable
+    ],
+    standalone: true
 })
 export class SzCrossSourceStatistics implements OnInit, AfterViewInit, OnDestroy {
   /** subscription to notify subscribers to unbind */

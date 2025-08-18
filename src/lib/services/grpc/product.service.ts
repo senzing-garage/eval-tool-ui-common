@@ -15,11 +15,13 @@ export class SzGrpcProductService {
   public "COMPATIBILITY_VERSION" = signal<{
     "CONFIG_VERSION": string
   }>(undefined);
+  
   public "SCHEMA_VERSION" = signal<{
     "ENGINE_SCHEMA_VERSION": string,
     "MINIMUM_REQUIRED_SCHEMA_VERSION": string,
     "MAXIMUM_REQUIRED_SCHEMA_VERSION": string
   }>(undefined);
+
   public "LICENSE" = signal<{
     "customer"?: string,
     "contract"?: string,

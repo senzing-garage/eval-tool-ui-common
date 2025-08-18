@@ -1,8 +1,8 @@
+import { CommonModule } from '@angular/common';
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-    name: 'SzShortNumber',
-    standalone: false
+    name: 'SzShortNumber'
 })
 export class SzShortNumberPipe implements PipeTransform {
   transform(number: number, args?: any): any {

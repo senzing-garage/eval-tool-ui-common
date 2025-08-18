@@ -4,7 +4,7 @@ import { Component, HostBinding, Input, OnInit, AfterViewInit,
 import { SzPrefsService, SzSdkPrefsModel } from '../services/sz-prefs.service';
 import { SzDataSourcesService } from '../services/sz-datasources.service';
 import { takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { UntypedFormBuilder, UntypedFormGroup, UntypedFormArray, UntypedFormControl, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CdkDrag, CdkDragDrop, moveItemInArray, DragDropModule } from '@angular/cdk/drag-drop';
 import { Overlay, OverlayRef } from '@angular/cdk/overlay';
@@ -23,6 +23,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatBadgeModule } from '@angular/material/badge';
 import { CdkAccordionModule } from '@angular/cdk/accordion';
 import { CdkMenuModule } from '@angular/cdk/menu';
+import { SzSdkDataSource } from '../models/grpc/config';
 
 /**
  * Control Component allowing UI friendly changes
@@ -859,7 +860,7 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
 
   /** initializes filter form controls */
   private initializeDataSourceFormControls() {
-    this.getDataSources().subscribe((dataSrc: string[]) => {
+    this.getDataSources().subscribe((dataSources: SzSdkDataSource[]) => {
       // lets create a quick lookup map
       let _datasourceColorsMap  = {};
       if(this._dataSourceColors && this._dataSourceColors.forEach) {
@@ -869,15 +870,15 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
       }
       // now lets make sure that the current local _dataSources var
       // is up to date with what came from the api
-      this._dataSources = dataSrc.map((_dsStr: string) => {
+      this._dataSources = dataSources.map((_ds: SzSdkDataSource) => {
         let retVal = {
-          name: _dsStr,
+          name: _ds.DSRC_CODE,
           index: 0
         };
         // check to see if we have entry for this in prefs
         // if we do use the state meta data from that(index, color, etc)
-        if( _datasourceColorsMap && _datasourceColorsMap[ _dsStr ]) {
-          retVal  = _datasourceColorsMap[ _dsStr ];
+        if( _datasourceColorsMap && _datasourceColorsMap[ _ds.DSRC_CODE ]) {
+          retVal  = _datasourceColorsMap[ _ds.DSRC_CODE ];
         }
         return retVal;
       });
@@ -916,8 +917,8 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   /** helper method for retrieving list of datasources */
-  public getDataSources() {
-    return this.dataSourcesService.listDataSources('sz-graph-filter.component');
+  public getDataSources(): Observable<SzSdkDataSource[]> {
+    return this.dataSourcesService.getDataSources('sz-graph-filter.component');
   }
   /** if "showDataSources" array is specified, check that string name is present in list */
   public shouldDataSourceBeDisplayed( dsName: string) {

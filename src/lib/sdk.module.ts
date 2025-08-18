@@ -15,7 +15,7 @@ import {
 import { SzSdkMaterialModule } from './sdk.material.module';
 
 /** services */
-import { SzMessageBundleService } from './services/sz-message-bundle.service';
+//import { SzMessageBundleService } from './services/sz-message-bundle.service';
 import { SzSearchService } from './services/sz-search.service';
 import { SzConfigurationService } from './services/sz-configuration.service';
 import { SzDataMartService } from './services/sz-datamart.service';
@@ -23,15 +23,15 @@ import { SzFoliosService } from './services/sz-folios.service';
 import { SzUIEventService } from './services/sz-ui.service';
 import { SzPrefsService } from './services/sz-prefs.service';
 import { SzDataSourcesService } from './services/sz-datasources.service';
-import { SzAdminService } from './services/sz-admin.service';
-import { SzBulkDataService } from './services/sz-bulk-data.service';
+//import { SzAdminService } from './services/sz-admin.service';
+//import { SzBulkDataService } from './services/sz-bulk-data.service';
 import { SzCSSClassService } from './services/sz-css-class.service';
 //import { SzConfigDataService } from './services/sz-config-data.service';
 import { SzElementResizeService } from './services/sz-element-resize-listener.service';
 /** pipes */
-import { SzShortNumberPipe } from './pipes/shortnumber.pipe'
-import { SzDecimalPercentPipe } from './pipes/decimalpercent.pipe';
-import { SzOrderedMapEntries } from './pipes/mapentries.pipe';
+//import { SzShortNumberPipe } from './pipes/shortnumber.pipe'
+//import { SzDecimalPercentPipe } from './pipes/decimalpercent.pipe';
+//import { SzOrderedMapEntries } from './pipes/mapentries.pipe';
 /** directives */
 import { SzElementResizeObserverDirective } from './directives/sz-element-resize-observer.directive';
 import { SzTooltipComponent } from './directives/sz-tooltip.component';
@@ -39,25 +39,25 @@ import { SzTooltipDirective } from './directives/sz-tooltip.directive';
 /** common */
 import { SzDataTable } from './shared/data-table/sz-data-table.component';
 /** charts */
-import { SzRecordStatsDonutChart } from './charts/records-by-datasources/sz-donut.component';
-import { SzVennDiagramsComponent } from './charts/versus/sz-venn-diagram.component';
+//import { SzRecordStatsDonutChart } from './charts/records-by-datasources/sz-donut.component';
+//import { SzVennDiagramsComponent } from './charts/versus/sz-venn-diagram.component';
 /** statistics */
-import { SzCrossSourcePagingComponent } from './statistics/cross-source/sz-cross-source-results.pager';
-import { SzCrossSourceResultsDataTable } from './statistics/cross-source/sz-cross-source-results.data-table'
-import { SzCrossSourceStatistics } from './statistics/cross-source/sz-cross-source-statistics.component';
-import { SzCrossSourceSummaryComponent } from './summary/cross-source/sz-cross-source-summary.component';
-import { SzCrossSourceSummaryMatchKeyPickerDialog } from './summary/cross-source/sz-cross-source-matchkey-picker.component';
+//import { SzCrossSourcePagingComponent } from './statistics/cross-source/sz-cross-source-results.pager';
+//import { SzCrossSourceResultsDataTable } from './statistics/cross-source/sz-cross-source-results.data-table'
+//import { SzCrossSourceStatistics } from './statistics/cross-source/sz-cross-source-statistics.component';
+//port { SzCrossSourceSummaryComponent } from './summary/cross-source/sz-cross-source-summary.component';
+//import { SzCrossSourceSummaryMatchKeyPickerDialog } from './summary/cross-source/sz-cross-source-matchkey-picker.component';
 
 /** components */
 import { SzAlertMessageDialog } from './shared/alert-dialog/sz-alert-dialog.component';
 import { SzConfigurationAboutComponent } from './configuration/sz-configuration-about/sz-configuration-about.component';
 import { SzRestConfigurationComponent } from './configuration/sz-rest-configuration/sz-rest-configuration.component';
-import { SzCrossSourceSelectComponent } from './statistics/cross-source/sz-cross-source-select.component';
-import { SzLicenseInfoComponent } from './configuration/sz-license/sz-license.component';
+//import { SzCrossSourceSelectComponent } from './statistics/cross-source/sz-cross-source-select.component';
+//import { SzLicenseInfoComponent } from './configuration/sz-license/sz-license.component';
 //import { SzMultiSelectButtonComponent } from './shared/multi-select-button/multi-select-button.component';
 import { SzPoweredByComponent } from './sz-powered-by/sz-powered-by.component';
 import { SzPreferencesComponent } from './configuration/sz-preferences/sz-preferences.component';
-import { SzPrefDictComponent } from './configuration/sz-preferences/sz-pref-dict/sz-pref-dict.component';
+//import { SzPrefDictComponent } from './configuration/sz-preferences/sz-pref-dict/sz-pref-dict.component';
 /** entity resume related */
 //import { SzEntityDetailComponent } from './entity/detail/sz-entity-detail.component';
 //import { SzEntityDetailHeaderComponent } from './entity/detail/sz-entity-detail-header/header.component';
@@ -161,13 +161,13 @@ const SzGrpcEnvInjector = new InjectionToken<SzGrpcWebEnvironment>("SzGrpcWebEnv
         SzConfigurationAboutComponent,
         SzRestConfigurationComponent,
         SzDataTable,
-        SzCrossSourcePagingComponent,
-        SzCrossSourceResultsDataTable,
-        SzCrossSourceSelectComponent,
-        SzCrossSourceStatistics,
-        SzCrossSourceSummaryComponent,
-        SzCrossSourceSummaryMatchKeyPickerDialog,
-        SzDecimalPercentPipe,
+        //SzCrossSourcePagingComponent,
+        //SzCrossSourceResultsDataTable,
+        //SzCrossSourceSelectComponent,
+        //SzCrossSourceStatistics,
+        //SzCrossSourceSummaryComponent,
+        //SzCrossSourceSummaryMatchKeyPickerDialog,
+        //SzDecimalPercentPipe,
         //SzEntityDetailComponent,
         //SzEntityDetailGraphControlComponent,
         //SzEntityDetailGraphComponent,
@@ -196,13 +196,13 @@ const SzGrpcEnvInjector = new InjectionToken<SzGrpcWebEnvironment>("SzGrpcWebEnv
         SzHowStepStackComponent,
         SzHowVirtualEntityCardComponent,
         SzHowVirtualEntityDialog,
-        SzLicenseInfoComponent,
-        SzOrderedMapEntries,
+        //SzLicenseInfoComponent,
+        //SzOrderedMapEntries,
         //SzMultiSelectButtonComponent,
         SzPoweredByComponent,
         SzPreferencesComponent,
-        SzPrefDictComponent,
-        SzRecordStatsDonutChart,
+        //SzPrefDictComponent,
+        //SzRecordStatsDonutChart,
         //SzRelationshipNetworkComponent,
         //SzRelationshipNetworkInputComponent,
         //SzRelationshipNetworkLookupComponent,
@@ -216,11 +216,11 @@ const SzGrpcEnvInjector = new InjectionToken<SzGrpcWebEnvironment>("SzGrpcWebEnv
         //SzSearchResultCardComponent,
         //SzSearchResultCardContentComponent,
         //SzSearchResultCardHeaderComponent,
-        SzShortNumberPipe,
+        //SzShortNumberPipe,
         //SzStandaloneGraphComponent,
         SzTooltipComponent,
         SzTooltipDirective,
-        SzVennDiagramsComponent,
+        //SzVennDiagramsComponent,
         SzWhyEntitiesComparisonComponent,
         SzWhyEntityComponent,
         SzWhyEntitiesDialog,
@@ -232,11 +232,11 @@ const SzGrpcEnvInjector = new InjectionToken<SzGrpcWebEnvironment>("SzGrpcWebEnv
         SzRestConfigurationComponent,
         SzConfigurationAboutComponent,
         SzDataTable,
-        SzCrossSourceResultsDataTable,
-        SzCrossSourceSelectComponent,
-        SzCrossSourceStatistics,
-        SzCrossSourceSummaryComponent,
-        SzDecimalPercentPipe,
+        //SzCrossSourceResultsDataTable,
+        //SzCrossSourceSelectComponent,
+        //SzCrossSourceStatistics,
+        //SzCrossSourceSummaryComponent,
+        //SzDecimalPercentPipe,
         //SzEntityDetailGraphComponent,
         //SzEntityDetailComponent,
         //SzEntityDetailHowReportComponent,
@@ -253,22 +253,22 @@ const SzGrpcEnvInjector = new InjectionToken<SzGrpcWebEnvironment>("SzGrpcWebEnv
         SzHowStepStackComponent,
         SzHowVirtualEntityCardComponent,
         SzHowVirtualEntityDialog,
-        SzLicenseInfoComponent,
-        SzOrderedMapEntries,
+        //SzLicenseInfoComponent,
+        //SzOrderedMapEntries,
         SzPoweredByComponent,
         SzPreferencesComponent,
-        SzRecordStatsDonutChart,
+        //SzRecordStatsDonutChart,
         //SzRelationshipNetworkComponent,
         //SzRelationshipNetworkInputComponent,
         //SzRelationshipNetworkLookupComponent,
         //SzRelationshipPathComponent,
-        SzShortNumberPipe,
+        //SzShortNumberPipe,
         //SzSearchComponent,
         //SzSearchByIdComponent,
         //SzSearchResultsComponent,
         //SzSearchResultCardComponent,
         //SzStandaloneGraphComponent,
-        SzVennDiagramsComponent,
+        //SzVennDiagramsComponent,
         SzWhyEntitiesComparisonComponent,
         SzWhyEntityComponent,
         SzWhyEntitiesDialog,
@@ -282,9 +282,6 @@ const SzGrpcEnvInjector = new InjectionToken<SzGrpcWebEnvironment>("SzGrpcWebEnv
         NgxJsonViewerModule,
         ApiModule,
         SzSdkMaterialModule], providers: [
-        SzMessageBundleService,
-        SzAdminService,
-        SzBulkDataService,
         //SzConfigDataService,
         SzConfigurationService,
         SzCSSClassService,

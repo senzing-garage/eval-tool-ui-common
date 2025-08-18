@@ -1,4 +1,5 @@
 import { Component, Output, OnInit, OnDestroy, EventEmitter, ChangeDetectorRef, HostBinding, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Observable, Subject, forkJoin, of } from 'rxjs';
 import { skipWhile, take, takeUntil } from 'rxjs/operators';
 
@@ -10,6 +11,7 @@ import { SzDataSourcesService } from '../../services/sz-datasources.service';
 import { parseBool } from '../../common/utils';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { SzCrossSourceSummaryMatchKeyPickerDialog } from './sz-cross-source-matchkey-picker.component';
+import { SzVennDiagramsComponent } from '../../charts/versus/sz-venn-diagram.component';
 
 /**
  * Embeddable Venn Diagrams component that illustrates:
@@ -36,8 +38,11 @@ import { SzCrossSourceSummaryMatchKeyPickerDialog } from './sz-cross-source-matc
 @Component({
     selector: 'sz-cross-source-summary',
     templateUrl: './sz-cross-source-summary.component.html',
-    styleUrls: ['./sz-cross-source-summary.component.scss'],
-    standalone: false
+    imports: [CommonModule,
+      SzVennDiagramsComponent,
+      SzCrossSourceSummaryMatchKeyPickerDialog
+    ],
+    styleUrls: ['./sz-cross-source-summary.component.scss']
 })
 export class SzCrossSourceSummaryComponent implements OnInit, OnDestroy {
   /** subscription to notify subscribers to unbind */
