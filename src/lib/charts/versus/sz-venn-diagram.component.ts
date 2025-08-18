@@ -1,4 +1,5 @@
 import { Component, Input, Output, OnInit, OnDestroy, EventEmitter, ChangeDetectorRef, HostBinding, ViewChild, ElementRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { SzPrefsService } from '../../services/sz-prefs.service';
 import { map, take, takeUntil } from 'rxjs/operators';
 import { Observable, Subject } from 'rxjs';
@@ -10,6 +11,10 @@ import { isValueTypeOfArray, parseBool, parseNumber, parseSzIdentifier, sortData
 import { SzRecordCountDataSource, SzStatCountsForDataSources } from '../../models/stats';
 import { SzDataMartService } from '../../services/sz-datamart.service';
 import { SzDataSourcesService } from '../../services/sz-datasources.service';
+import { SzShortNumberPipe } from '../../pipes/shortnumber.pipe';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { FormsModule } from '@angular/forms';
 
 /**
  * Embeddable Donut Graph showing how many 
@@ -27,7 +32,11 @@ import { SzDataSourcesService } from '../../services/sz-datasources.service';
     selector: 'sz-venn-diagram',
     templateUrl: './sz-venn-diagram.component.html',
     styleUrls: ['./sz-venn-diagram.component.scss'],
-    standalone: false
+    imports: [
+      CommonModule, FormsModule,
+      SzShortNumberPipe, 
+      MatInputModule, MatButtonModule,
+    ]
 })
 export class SzVennDiagramsComponent implements OnInit, OnDestroy {
   /** subscription to notify subscribers to unbind */

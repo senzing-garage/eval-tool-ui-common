@@ -10,6 +10,11 @@ import { isValueTypeOfArray, parseBool, parseNumber, parseSzIdentifier, sortData
 import { SzRecordCountDataSource, SzStatCountsForDataSources } from '../../models/stats';
 import { SzDataMartService } from '../../services/sz-datamart.service';
 import { SzDataSourcesService } from '../../services/sz-datasources.service';
+import { SzSdkDataSource } from '../../models/grpc/config';
+import { CommonModule } from '@angular/common';
+import { SzShortNumberPipe } from '../../pipes/shortnumber.pipe';
+import { SzDecimalPercentPipe } from '../../pipes/decimalpercent.pipe';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 /**
  * Embeddable Donut Graph showing how many 
@@ -32,8 +37,12 @@ import { SzDataSourcesService } from '../../services/sz-datasources.service';
 @Component({
     selector: 'sz-record-counts-donut',
     templateUrl: './sz-donut.component.html',
-    styleUrls: ['./sz-donut.component.scss'],
-    standalone: false
+    imports: [
+      CommonModule,
+      MatTooltipModule,
+      SzShortNumberPipe, SzDecimalPercentPipe
+    ],
+    styleUrls: ['./sz-donut.component.scss']
 })
 export class SzRecordStatsDonutChart implements OnInit, OnDestroy {
   /** subscription to notify subscribers to unbind */
@@ -41,7 +50,7 @@ export class SzRecordStatsDonutChart implements OnInit, OnDestroy {
 
   private _dataSourceCounts: SzRecordCountDataSource[];
   private _dataSourceCountsByCode: Map<string, SzRecordCountDataSource>;
-  private _dataSources: SzDataSourcesResponseData;
+  private _dataSources: SzSdkDataSource[];
   private _totalEntityCount: number;
   private _totalPendingRecordCount: number;
   private _totalRecordCount: number;
@@ -291,7 +300,7 @@ export class SzRecordStatsDonutChart implements OnInit, OnDestroy {
       takeUntil(this.unsubscribe$),
       take(1)
     ).subscribe({
-      next: (dataSources: SzDataSourcesResponseData)=>{
+      next: (dataSources: SzSdkDataSource[])=>{
         this._dataSources = dataSources;
         if(this._dataSourceCounts && this._dataSources) {
           this.dataChanged.next(this._dataSourceCounts);
@@ -528,8 +537,11 @@ export class SzRecordStatsDonutChart implements OnInit, OnDestroy {
 
     public getDataSourceName(dsCode: string) {
       if(this._dataSources) {
-        if(this._dataSources[dsCode] && this._dataSources[dsCode].dataSourceName) {
-          return this._dataSources[dsCode].dataSourceName
+        let _ds = this._dataSources.find((_dataSource)=>{
+          return _dataSource.DSRC_CODE === dsCode;
+        })
+        if(_ds) {
+          return _ds.DSRC_CODE;
         } 
       }
       return dsCode
@@ -559,8 +571,8 @@ export class SzRecordStatsDonutChart implements OnInit, OnDestroy {
         })
       );
     }
-    private getDataSources(): Observable<SzDataSourcesResponseData> {
-      return this.dataSourcesService.listDataSourcesDetails()
+    private getDataSources(): Observable<SzSdkDataSource[]> {
+      return this.dataSourcesService.getDataSources()
     }
     getTotalsFromCounts(data: SzRecordCountDataSource[]): { totalEntityCount: number, totalRecordCount: number} 
     {

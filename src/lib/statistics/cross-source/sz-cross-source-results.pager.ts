@@ -1,4 +1,11 @@
 import { Component, Input, Output, OnInit, OnDestroy, EventEmitter, ElementRef, ChangeDetectorRef, AfterContentInit, AfterViewInit, ViewChild, HostBinding } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatMenu, MatMenuModule } from '@angular/material/menu';
+import { MatSelect, MatSelectChange, MatSelectModule } from '@angular/material/select';
+import { SzBoundType } from '@senzing/rest-api-client-ng';
 import { SzGraphPrefs, SzPrefsService } from '../../services/sz-prefs.service';
 import { take, takeUntil } from 'rxjs/operators';
 import { Observable, Subject } from 'rxjs';
@@ -8,9 +15,7 @@ import { SzRecordCountDataSource, SzStatSampleSetPageChangeEvent } from '../../m
 import { SzDataMartService } from '../../services/sz-datamart.service';
 import { SzDataSourcesService } from '../../services/sz-datasources.service';
 import { SzCSSClassService } from '../../services/sz-css-class.service';
-import { MatSelect, MatSelectChange } from '@angular/material/select';
-import { MatMenu } from '@angular/material/menu';
-import { SzBoundType } from '@senzing/rest-api-client-ng';
+
 
 /**
  * paging component for navigating through the sampling data table results.
@@ -24,7 +29,15 @@ import { SzBoundType } from '@senzing/rest-api-client-ng';
     selector: 'sz-cross-source-pager',
     templateUrl: './sz-cross-source-results.pager.html',
     styleUrls: ['./sz-cross-source-results.pager.scss'],
-    standalone: false
+    imports: [
+      CommonModule,
+      MatButtonModule,
+      MatIconModule,
+      MatInputModule,
+      MatMenuModule,
+      MatSelectModule,
+    ],
+    standalone: true
 })
 export class SzCrossSourcePagingComponent implements OnDestroy {
     /** subscription to notify subscribers to unbind */

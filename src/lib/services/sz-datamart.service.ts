@@ -32,6 +32,7 @@ import { SzCountStatsForDataSourcesResponse, SzCrossSourceCount, SzDataTableEnti
 import { SzPrefsService } from '../services/sz-prefs.service';
 import { SzDataSourcesService } from './sz-datasources.service';
 import { SzCrossSourceSummaryCategoryType } from '../models/stats';
+import { SzSdkDataSource } from '../models/grpc/config';
 
 /**
  * Represents an object of a sampling dataset. When a user clicks on a venn diagram a number of 
@@ -804,9 +805,9 @@ export class SzStatSampleSet {
 export class SzDataMartService {
     // --------------------------------- internal variables ---------------------------------
     /** @internal */
-    private _dataSources: string[] | undefined;
+    private _dataSources: SzSdkDataSource[] | undefined;
     /** @internal */
-    private _dataSourceDetails: SzDataSourcesResponseData | undefined;
+    //private _dataSourceDetails: SzDataSourcesResponseData | undefined;
     /** @internal */
     private _dataSourcesInFlight: boolean                   = false;
     /** @internal */
@@ -882,14 +883,14 @@ export class SzDataMartService {
         ).subscribe();
         return this._dataSources;
     }
-    public get dataSourceDetails() {
+    /*public get dataSourceDetails() {
         if(this._dataSourceDetails){ return this._dataSourceDetails; }
         // if we dont have any datasources init
         this.getDataSourceDetails().pipe(
             take(1)
         ).subscribe();
         return this._dataSourceDetails;
-    }
+    }*/
     /** we store the last known match key counts for present selection for filtering menu */
     public get matchKeyCounts() {
         return this._matchKeyCounts;
@@ -1134,10 +1135,12 @@ export class SzDataMartService {
         private dataSourcesService: SzDataSourcesService,
         private entityDataService: EntityDataService,
         private statsService: SzStatisticsService) {
-        if(!this._dataSourceDetails){
-            this.getDataSourceDetails()
-            .subscribe((dsDetails) => {
-                this._dataSourceDetails = dsDetails.dataSourceDetails;
+        if(!this._dataSources){
+            this.getDataSources()
+            .subscribe((dataSources) => {
+                if(dataSources) {
+                    this._dataSources = dataSources as SzSdkDataSource[];
+                }
             })
         }
         /*this.onSampleRequest.subscribe((isLoading)=>{
@@ -1330,18 +1333,18 @@ export class SzDataMartService {
         return undefined;
     }
     /** get the list of datasources with their datasource code and id's from the api surface */
-    public getDataSourceDetails() {
+    /*public getDataSourceDetails() {
         return this.dataSourcesService.listDataSourcesDetails().pipe(
             tap((ds: SzDataSourcesResponseData) => {
-                this._dataSourceDetails = ds.dataSourceDetails;
+                this._dataSources = ds.dataSourceDetails;
             })
         );
-    }
+    }*/
     /** get the list of datasources from the api surface */
     public getDataSources() {
         this._dataSourcesInFlight = true;
-        return this.dataSourcesService.listDataSources('sz-datamart.service.getDataSources').pipe(
-            tap((ds: string[]) => {
+        return this.dataSourcesService.getDataSources('sz-datamart.service.getDataSources').pipe(
+            tap((ds: SzSdkDataSource[]) => {
                 this._dataSources = ds;
                 this._dataSourcesInFlight = false;
             }),

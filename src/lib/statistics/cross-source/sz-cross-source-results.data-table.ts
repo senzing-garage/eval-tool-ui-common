@@ -1,18 +1,27 @@
 import { Component, ChangeDetectorRef, OnInit, Input, Inject, OnDestroy, Output, EventEmitter, ViewChild, HostBinding, ChangeDetectionStrategy, TemplateRef, ViewContainerRef, ElementRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Observable, Subject, Subscription, filter, fromEvent, take, takeUntil, throwError, zip } from 'rxjs';
-import {CdkMenu, CdkMenuItem, CdkContextMenuTrigger} from '@angular/cdk/menu';
+import { CdkMenuModule} from '@angular/cdk/menu';
+import { TemplatePortal } from '@angular/cdk/portal';
+import { CdkTableModule } from '@angular/cdk/table';
+import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
-
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatTableModule } from '@angular/material/table';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { SzDataTable } from '../../shared/data-table/sz-data-table.component';
 import { SzCrossSourceSummaryCategoryType, SzCrossSourceSummaryCategoryTypeToMatchLevel, SzDataTableEntity, SzDataTableRelation, SzStatSampleEntityTableItem, SzStatSampleEntityTableRow, SzStatSampleEntityTableRowType, SzStatsSampleTableLoadingEvent } from '../../models/stats';
 import { SzPrefsService } from '../../services/sz-prefs.service';
 import { SzDataMartService } from '../../services/sz-datamart.service';
 import { SzCSSClassService } from '../../services/sz-css-class.service';
-import { SzEntity, SzEntityData, SzEntityIdentifier, SzMatchedRecord, SzRecord, SzRelation } from '@senzing/rest-api-client-ng';
 import { getMapKeyByValue, interpolateTemplate, parseBool } from '../../common/utils';
 import { ConnectionPositionPair, Overlay, OverlayRef } from '@angular/cdk/overlay';
-import { TemplatePortal } from '@angular/cdk/portal';
+import { SzCrossSourcePagingComponent } from './sz-cross-source-results.pager';
 import { SzCrossSourceSummaryMatchKeyPickerDialog } from '../../summary/cross-source/sz-cross-source-matchkey-picker.component';
+import { SzOrderedMapEntries } from '../../pipes/mapentries.pipe';
+/** deprecate ? */
+import { SzEntity, SzEntityData, SzEntityIdentifier, SzMatchedRecord, SzRecord, SzRelation } from '@senzing/rest-api-client-ng';
 
 /**
  * Data Table with specific overrides and formatting for displaying 
@@ -23,7 +32,20 @@ import { SzCrossSourceSummaryMatchKeyPickerDialog } from '../../summary/cross-so
     templateUrl: './sz-cross-source-results.data-table.html',
     styleUrls: ['./sz-cross-source-results.data-table.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+    imports: [
+      CommonModule,
+      CdkMenuModule,
+      CdkTableModule,
+      MatButtonModule,
+      MatIconModule,
+      MatInputModule,
+      MatTableModule,
+      MatTooltipModule,
+      SzCrossSourcePagingComponent,
+      SzCrossSourceSummaryMatchKeyPickerDialog,
+      SzOrderedMapEntries
+    ],
+    standalone: true
 })
 export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit, OnDestroy {
 

@@ -1,14 +1,17 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit, Input, Output, EventEmitter, Inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Subject, filter, takeUntil } from 'rxjs';
-import { SzLoadedStats, SzLicenseInfo } from '@senzing/rest-api-client-ng';
+import { SzLoadedStats } from '@senzing/rest-api-client-ng';
 
 import { parseBool, parseNumber } from '../../common/utils';
-import { SzAdminService } from '../../services/sz-admin.service';
+//import { SzAdminService } from '../../services/sz-admin.service';
 import { SzDataMartService } from '../../services/sz-datamart.service';
 import { SzLicenseUpgradeType } from '../../models/data-license';
 import { SzLicenseUpgradeMouseEvent } from '../../models/event-license';
-import { SzProductLicenseResponse } from 'src/lib/models/grpc/product';
+import { SzProductLicenseResponse } from '../../models/grpc/product';
+import { SzGrpcProductService } from '../../services/grpc/product.service';
+import { SzShortNumberPipe } from '../../pipes/shortnumber.pipe';
+
 /**
  * A simple "license info" component.
  * Used for displaying the current senzing license info.
@@ -24,8 +27,11 @@ import { SzProductLicenseResponse } from 'src/lib/models/grpc/product';
 @Component({
     selector: 'sz-license',
     templateUrl: './sz-license.component.html',
+    imports: [CommonModule, SzShortNumberPipe],
     styleUrls: ['./sz-license.component.scss'],
-    standalone: false
+    providers:[
+        { provide: SzGrpcProductService, useClass: SzGrpcProductService}
+    ]
 })
 export class SzLicenseInfoComponent implements OnInit {
   /** subscription to notify subscribers to unbind */
@@ -155,9 +161,9 @@ export class SzLicenseInfoComponent implements OnInit {
 
   //@Input() format = 'small';
   constructor(
-    private adminService: SzAdminService, 
     private dmService: SzDataMartService, 
-    private router: Router) {}
+    private productService: SzGrpcProductService
+  ) {}
 
   ngOnInit() {
     this.dmService.onCountStats.pipe(filter( (val) => val !== undefined)).subscribe( (resp: SzLoadedStats) => {
@@ -166,9 +172,11 @@ export class SzLicenseInfoComponent implements OnInit {
         this._recordCount = this._countStats.totalRecordCount;
       }
     });
-    this.adminService.onLicenseInfo.subscribe( (resp: SzLicenseInfo) => {
+    this.productService.getLicense().pipe(
+       takeUntil(this.unsubscribe$)
+    ).subscribe((resp: SzProductLicenseResponse) => {
       this._licenseInfo = resp;
-    });
+    })
     // if "openUpgradeButtonLink" is true then redirect to senzing.com on click
     this.upgradeLicense.pipe(
       takeUntil(this.unsubscribe$),
