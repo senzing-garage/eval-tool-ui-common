@@ -5,7 +5,7 @@ import { HttpRequest } from '@angular/common/http';
 import { HttpHandler } from '@angular/common/http';
 import { HttpEvent } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
-import { SzConfigurationService } from '@senzing/sdk-components-ng';
+import { SzConfigurationService } from '@senzing/sdk-components-grpc-web';
 import { Observable, from } from 'rxjs';
 
 @Injectable()

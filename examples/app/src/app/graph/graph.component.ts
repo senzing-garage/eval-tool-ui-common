@@ -9,30 +9,40 @@ import { Subscription, fromEvent, Subject } from 'rxjs';
 import {
   SzEntitySearchParams,
   SzAttributeSearchResult,
-  SzEntityDetailComponent,
-  SzPdfUtilService,
+  SzEntityDetailGrpcComponent,
+  SzRelationshipNetworkComponent,
   SzResolvedEntity,
   SzRelatedEntity,
-  SzRelationshipNetworkComponent,
   SzPrefsService,
   SzSdkPrefsModel,
   SzStandaloneGraphComponent,
   SzSearchService,
-  SzEntityData,
-  SzEntityDetailGraphFilterComponent
-} from '@senzing/sdk-components-ng';
+  SzEntityDetailGraphFilterComponent,
+  SzSdkSearchResult
+} from '@senzing/sdk-components-grpc-web';
 import { UiService } from '../services/ui.service';
 import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
+import { CommonModule } from '@angular/common';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatIconModule } from '@angular/material/icon';
+import { CdkContextMenuTrigger } from '@angular/cdk/menu';
 
 @Component({
   selector: 'app-graph',
   templateUrl: './graph.component.html',
-  styleUrls: ['./graph.component.scss']
+  styleUrls: ['./graph.component.scss'],
+  imports: [ CommonModule, 
+    MatSidenavModule, MatIconModule,
+    SzStandaloneGraphComponent,
+    SzEntityDetailGrpcComponent,
+    SzEntityDetailGraphFilterComponent,
+    CdkContextMenuTrigger
+  ]
 })
 export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
   /** subscription to notify subscribers to unbind */
   public unsubscribe$ = new Subject<void>();
-  public currentSearchResults: SzAttributeSearchResult[];
+  public currentSearchResults: SzSdkSearchResult[];
   public currentlySelectedEntityId: number;
   public searchResultEntityIds: number[];
   public currentSearchParameters: SzEntitySearchParams;
@@ -105,12 +115,12 @@ export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
     relatedEntities: SzRelatedEntity[]
   };
 
-  public _showMatchKeys = false;
+  public _showLinkLabels = false;
   /** sets the visibility of edge labels on the node links */
-  @Input() public set showMatchKeys(value: boolean) {
-    this._showMatchKeys = value;
-    let prefsVal = this.prefs.graph.showMatchKeys;
-    console.log('@senzing/sdk-components-ng:sz-entity-detail-graph.showMatchKeys: ', value, prefsVal);
+  @Input() public set showLinkLabels(value: boolean) {
+    this._showLinkLabels = value;
+    let prefsVal = this.prefs.graph.showLinkLabels;
+    console.log('@senzing/sdk-components-ng:sz-entity-detail-graph.showLinkLabels: ', value, prefsVal);
   }
 
   @Input() sectionIcon: string;
@@ -137,7 +147,7 @@ export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
   // @ViewChild('searchBox') searchBox: SzSearchComponent;
   @ViewChild('graphContextMenu') graphContextMenu: TemplateRef<any>;
     /** entity detail component */
-  @ViewChild(SzEntityDetailComponent) entityDetailComponent: SzEntityDetailComponent;
+  @ViewChild(SzEntityDetailGrpcComponent) entityDetailComponent: SzEntityDetailGrpcComponent;
   /** graph component */
   @ViewChild(SzStandaloneGraphComponent) graphComponent: SzStandaloneGraphComponent;
   /** graph filters */
@@ -217,7 +227,7 @@ export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
     console.log('GraphComponent.onOptionChange: ', event);
     switch(event.name) {
       case 'showLinkLabels':
-        this.showMatchKeys = event.value;
+        this.showLinkLabels = event.value;
         break;
     }
   }
@@ -231,7 +241,6 @@ export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private search: EntitySearchService,
-    public pdfUtil: SzPdfUtilService,
     public overlay: Overlay,
     public uiService: UiService,
     public viewContainerRef: ViewContainerRef,
@@ -250,23 +259,23 @@ export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
       });
       this.route.params.subscribe(
         (params) => {
-          if(params && params.entityId) {
+          if(params && params['entityId']) {
             // if entityId has "," in it
             // assume collection of ids
-            this.graphIds = (params.entityId && params.entityId.indexOf(',')) ? params.entityId.split(',').map( (strEntId) => parseInt(strEntId, 10) ) : [parseInt(params.entityId, 10)];
+            this.graphIds = (params['entityId'] && params['entityId'].indexOf(',')) ? params['entityId'].split(',').map( (strEntId) => parseInt(strEntId, 10) ) : [parseInt(params['entityId'], 10)];
             // console.log('GraphComponent.route.params change: ', this.graphIds, params.entityId);
             this.showSearchResults = true;
-          } else if(params && params.entityIds) {
+          } else if(params && params['entityId']) {
             this.showSearchResults = true;
           }
-          if(params && params.detailId) {
-            this.currentlySelectedEntityId = params.detailId;
+          if(params && params['detailId']) {
+            this.currentlySelectedEntityId = params['detailId'];
             this.showEntityDetail = true;
             this.showFilters = false;
-          } else if(params && params.entityId) {
+          } else if(params && params['entityId']) {
             // no detail view
             // check if they have a search entityId and use that
-            this.currentlySelectedEntityId = parseInt(params.entityId, 10);
+            this.currentlySelectedEntityId = parseInt(params['entityId'], 10);
             this.showEntityDetail = false;
             this.showFilters = true;
           }
@@ -282,8 +291,8 @@ export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
     // current results
 
     // future results
-    this.search.results.subscribe((results: SzAttributeSearchResult[]) => {
-      //console.log('GraphComponent.search.results = ', results);
+    this.search.results.subscribe((results: SzSdkSearchResult[]) => {
+      console.log('GraphComponent.search.results = ', results);
     });
 
     this.prefs.prefsChanged.pipe(
@@ -349,7 +358,7 @@ export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
     .pipe(
       takeUntil(this.unsubscribe$),
     )
-    .subscribe((data: { results: SzAttributeSearchResult[], parameters: SzEntitySearchParams }) => {
+    .subscribe((data: { results: SzSdkSearchResult[], parameters: SzEntitySearchParams }) => {
       this.currentSearchParameters = data.parameters;
       this.currentSearchResults = data.results;
       // clear out any globally stored value;
@@ -359,10 +368,10 @@ export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
     // listen for global search data
     this.search.results.pipe(
       takeUntil(this.unsubscribe$),
-    ).subscribe((results: SzAttributeSearchResult[]) => {
+    ).subscribe((results: SzSdkSearchResult[]) => {
       this.currentSearchResults = results;
       if(results && results.map) {
-        this.graphIds = results.map((result: SzAttributeSearchResult) => result.entityId);
+        this.graphIds = results.map((result: SzSdkSearchResult) => result.ENTITY.RESOLVED_ENTITY.ENTITY_ID);
       }
       this.showSearchResults = (this.graphIds && this.graphIds.length > 0);
       this.uiService.spinnerActive = false;
@@ -579,7 +588,7 @@ export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
     switch(event.name) {
       case 'showLinkLabels':
         //this._showMatchKeys = event.value;
-        this.prefs.graph.showMatchKeys = event.value;
+        this.prefs.graph.showLinkLabels = event.value;
         break;
     }
   }
@@ -587,7 +596,7 @@ export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
   /** proxy handler for when prefs have changed externally */
   private onPrefsChange(prefs: any) {
     console.log('GraphComponent.onPrefsChange(): ', prefs, this.prefs.graph);
-    this._showMatchKeys = prefs.showMatchKeys;
+    this._showLinkLabels = prefs.showLinkLabels;
     this.maxDegrees = prefs.maxDegreesOfSeparation;
     this.maxEntities = prefs.maxEntities;
     this.buildOut = prefs.buildOut;

@@ -3,17 +3,6 @@ import { forkJoin, Observable, Subject } from 'rxjs';
 import { map, take, takeUntil, tap } from 'rxjs/operators';
 
 import {
-  EntityDataService,
-  ConfigService,
-  SzAttributeSearchResponse,
-  SzEntityData,
-  SzAttributeTypesResponse,
-  SzAttributeType,
-  SzAttributeSearchResult,
-  SzEntityRecord,
-  SzEntityResponse,
-  SzRecordResponse,
-  SzRecordResponseData,
   SzEntityIdentifiers,
   SzDetailLevel,
   SzEntityIdentifier
@@ -22,9 +11,10 @@ import { SzEntitySearchParams } from '../models/entity-search';
 import { SzGrpcEngineService } from './grpc/engine.service';
 import { SzGrpcConfigManagerService } from './grpc/configManager.service';
 import { SzEngineFlags } from '@senzing/sz-sdk-typescript-grpc-web';
-import { SzSdkEntityRecord, SzSdkEntityResponse, SzSdkSearchResolvedEntity, SzSdkSearchResponse, SzSdkSearchResult } from '../models/grpc/engine';
+import { SzSdkEntityRecord, SzSdkEntityResponse, SzSdkFindNetworkResponse, SzSdkRelatedEntity, SzSdkResolvedEntity, SzSdkSearchResolvedEntity, SzSdkSearchResponse, SzSdkSearchResult } from '../models/grpc/engine';
 import { SzSdkConfigAttr } from '../models/grpc/config';
-import { SzResumeEntity } from '../models/SzResumeEntity';
+import { SzResumeEntity, SzResumeRelatedEntity } from '../models/SzResumeEntity';
+import { SzNetorkGraphCompositeResponse } from '../models/SzNetworkGraph';
 
 export interface SzSearchEvent {
   params: SzEntitySearchParams,
@@ -197,6 +187,135 @@ export class SzSearchService {
     })
 
     return _retVal;
+  }
+
+  public getResumeDataByEntityId(entityId: number) : Observable<SzResumeEntity> {
+    const flags = SzEngineFlags.SZ_FIND_NETWORK_DEFAULT_FLAGS |
+    SzEngineFlags.SZ_FIND_NETWORK_INCLUDE_MATCHING_INFO | 
+    SzEngineFlags.SZ_ENTITY_INCLUDE_ALL_RELATIONS | 
+    SzEngineFlags.SZ_ENTITY_INCLUDE_ALL_FEATURES |
+    SzEngineFlags.SZ_ENTITY_INCLUDE_RECORD_DATA | 
+    SzEngineFlags.SZ_ENTITY_INCLUDE_RELATED_MATCHING_INFO |
+    //SzEngineFlags.SZ_INCLUDE_MATCH_KEY_DETAILS |
+    SzEngineFlags.SZ_ENTITY_INCLUDE_RECORD_FEATURE_DETAILS | 
+    SzEngineFlags.SZ_ENTITY_INCLUDE_RELATED_RECORD_DATA | 
+    SzEngineFlags.SZ_ENTITY_INCLUDE_RELATED_ENTITY_NAME |
+    SzEngineFlags.SZ_ENTITY_INCLUDE_DISCLOSED_RELATIONS |
+    SzEngineFlags.SZ_ENTITY_INCLUDE_POSSIBLY_RELATED_RELATIONS;
+    /*
+    SzEngineFlags.SZ_ENTITY_INCLUDE_ALL_RELATIONS | 
+    SzEngineFlags.SZ_ENTITY_INCLUDE_ENTITY_NAME |
+    SzEngineFlags.SZ_ENTITY_INCLUDE_RELATED_ENTITY_NAME |
+    SzEngineFlags.SZ_ENTITY_INCLUDE_DISCLOSED_RELATIONS |
+    SzEngineFlags.SZ_ENTITY_INCLUDE_POSSIBLY_RELATED_RELATIONS | 
+    SzEngineFlags.SZ_ENTITY_INCLUDE_RELATED_RECORD_DATA | 
+    SzEngineFlags.SZ_ENTITY_INCLUDE_ALL_FEATURES | 
+    SzEngineFlags.SZ_ENTITY_INCLUDE_RELATED_MATCHING_INFO;*/
+
+    return this.engineService.findNetworkByEntityId(entityId, 1, 1, 1000, flags).pipe(
+      take(1),
+      map((response: SzSdkFindNetworkResponse) => {
+        let result: SzResumeEntity;
+        let _primaryEntityResult = response.ENTITIES.find((item)=>{
+          return (item.RESOLVED_ENTITY && item.RESOLVED_ENTITY.ENTITY_ID === entityId) 
+        })
+        if(_primaryEntityResult) {
+          let fullRelated: SzResumeRelatedEntity[] = [];
+          _primaryEntityResult.RELATED_ENTITIES.forEach((relEnt)=>{
+            let resolvedEnt = Object.assign({
+                "MATCH_LEVEL_CODE": relEnt.MATCH_LEVEL_CODE,
+                "MATCH_KEY": relEnt.MATCH_KEY,
+                "ERRULE_CODE": relEnt.ERRULE_CODE,
+                "IS_DISCLOSED": relEnt.IS_DISCLOSED,
+                "IS_AMBIGUOUS": relEnt.IS_AMBIGUOUS
+            }, response.ENTITIES.find((expEnt)=>{
+              return expEnt.RESOLVED_ENTITY.ENTITY_ID === relEnt.ENTITY_ID
+            }).RESOLVED_ENTITY);
+            fullRelated.push(resolvedEnt);
+          })
+          result = Object.assign({
+            RELATED_ENTITIES: fullRelated,
+            _related: _primaryEntityResult.RELATED_ENTITIES
+          }, _primaryEntityResult.RESOLVED_ENTITY)
+        }
+        return result;
+      })
+    )
+  }
+
+  public getGraphNetworkData(entityIds: Array<string | number>, maxDegrees: number, buildOut: number, maxEntities: number): Observable<SzNetorkGraphCompositeResponse> {
+    console.log(`!!!!!!!!!!!!!!!!! getNetworkCompositeGrpc !!!!!!!!!!!!!!!!!`);
+    let returnSubject     = new Subject<SzNetorkGraphCompositeResponse>();
+    let returnObserveable = returnSubject.asObservable();
+    if(console.time){
+      try {
+        console.time('graph data')
+      }catch(err){}
+    }
+
+    this.engineService.getGraphEntityNetwork(entityIds,
+      maxDegrees,
+      1,
+      maxEntities
+    ).pipe(
+      tap(()=> {
+        try {
+          console.timeEnd('graph data')
+        }catch(err){}
+      }) 
+    ).subscribe((resp) => {
+      let originalData = Object.assign({}, (resp as SzNetorkGraphCompositeResponse));
+      let _data = Object.assign({ modified: true }, (resp as SzNetorkGraphCompositeResponse));
+      let primaryEntitiesById         = new Map<string | number, SzSdkResolvedEntity>();
+      let relatedEntitiesById         = new Map<string | number, SzSdkRelatedEntity>();
+      let relatedEntitiesByPrimaryId  = new Map<string | number, Map<string | number, SzSdkRelatedEntity>>();
+      
+      if(_data.ENTITY_RESPONSES && _data.ENTITY_RESPONSES.forEach) {
+        _data.ENTITY_RESPONSES.forEach((_eResp)=>{
+          if(_eResp.RESOLVED_ENTITY) {
+            primaryEntitiesById.set(_eResp.RESOLVED_ENTITY.ENTITY_ID, _eResp.RESOLVED_ENTITY);
+          }
+          if(_eResp.RELATED_ENTITIES && _eResp.RELATED_ENTITIES.forEach) {
+            let _relatedEntitiesByPrimaryId = new Map<string | number, SzSdkRelatedEntity>();
+            _eResp.RELATED_ENTITIES.forEach((relEntity)=>{
+              relatedEntitiesById.set(relEntity.ENTITY_ID, relEntity);
+              _relatedEntitiesByPrimaryId.set(relEntity.ENTITY_ID, relEntity);
+            })
+            if(_relatedEntitiesByPrimaryId && _relatedEntitiesByPrimaryId.size > 0) {
+              relatedEntitiesByPrimaryId.set(_eResp.RESOLVED_ENTITY.ENTITY_ID, _relatedEntitiesByPrimaryId);
+            }
+          }
+        });
+      }
+      if(_data.NETWORK_RESPONSES && _data.NETWORK_RESPONSES.forEach) {
+        _data.NETWORK_RESPONSES.forEach((_nResp)=>{
+          if(_nResp.ENTITIES && _nResp.ENTITIES.forEach) {
+            _nResp.ENTITIES = _nResp.ENTITIES.map((netEntity) => {
+              if(primaryEntitiesById.has(netEntity.RESOLVED_ENTITY.ENTITY_ID)) {
+                // this is a primary entity
+                // SUPERSIZE IT!
+                netEntity.RESOLVED_ENTITY   = Object.assign(netEntity.RESOLVED_ENTITY, primaryEntitiesById.get(netEntity.RESOLVED_ENTITY.ENTITY_ID));
+                if(relatedEntitiesByPrimaryId.has(netEntity.RESOLVED_ENTITY.ENTITY_ID)) {
+                  netEntity.RELATED_ENTITIES = netEntity.RELATED_ENTITIES ? 
+                  netEntity.RELATED_ENTITIES : 
+                  [...relatedEntitiesByPrimaryId.get(netEntity.RESOLVED_ENTITY.ENTITY_ID)]
+                  .map(_relEntityByPrimary => { return _relEntityByPrimary[1] })
+                }
+              }
+              if(relatedEntitiesById.has(netEntity.RESOLVED_ENTITY.ENTITY_ID)) {
+                netEntity.RESOLVED_ENTITY = relatedEntitiesById.get(netEntity.RESOLVED_ENTITY.ENTITY_ID);
+              }
+
+              return netEntity;
+            });
+          }
+        });
+      }
+
+      console.log(`!!!!!!!!!!!!!! getGraphEntityNetwork: SWEET !!!!!!!!!!!!!!`, originalData, _data );
+      returnSubject.next(_data);
+    });
+    return returnObserveable;
   }
 
   /**

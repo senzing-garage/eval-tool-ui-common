@@ -1,5 +1,5 @@
 import { OnDestroy, Injectable, Inject } from '@angular/core';
-import { SzSdkPrefsModel, SzPrefsService } from '@senzing/sdk-components-ng';
+import { SzSdkPrefsModel, SzPrefsService } from '@senzing/sdk-components-grpc-web';
 import { StorageService, LOCAL_STORAGE, SESSION_STORAGE } from 'ngx-webstorage-service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';

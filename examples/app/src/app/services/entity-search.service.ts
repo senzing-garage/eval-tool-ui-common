@@ -11,13 +11,14 @@ import {
   SzEntitySearchParams,
   SzSdkSearchResult,
   SzSearchService,
-  SzSearchResultEntityData,
-  SzEntityData,
   SzEntityRecord,
   SzSearchByIdFormParams,
   SzSdkSearchResolvedEntity, 
   SzResumeEntity,
   SzGrpcConfig,
+  SzSdkEntityResponse,
+  SzNetorkGraphCompositeResponse,
+  SzSdkEntityRecord,
 } from '@senzing/sdk-components-grpc-web';
 import { 
   //EntityGraphService, 
@@ -53,8 +54,8 @@ export class EntitySearchService {
   /** the current search results */
   private _currentSearchResults: SzSdkSearchResult[];
   private _results = new Subject<SzSdkSearchResult[]>();
-  private _currentRecord: SzEntityRecord;
-  private _recordChange = new Subject<SzEntityRecord>();
+  private _currentRecord: SzSdkEntityRecord;
+  private _recordChange = new Subject<SzSdkEntityRecord>();
 
   public set currentSearchResults(value) {
     this._currentSearchResults = value;
@@ -64,17 +65,17 @@ export class EntitySearchService {
     // TODO: pull from last subject
     return this._currentSearchResults;
   }
-  public set currentRecord(value: SzEntityRecord) {
+  public set currentRecord(value: SzSdkEntityRecord) {
     this._currentRecord = value;
     this._recordChange.next(value);
   }
-  public get currentRecord(): SzEntityRecord {
+  public get currentRecord(): SzSdkEntityRecord {
     return this._currentRecord;
   }
   public get results(): Observable<SzSdkSearchResult[]> {
     return this._results.asObservable();
   }
-  public get record(): Observable<SzEntityRecord> {
+  public get record(): Observable<SzSdkEntityRecord> {
     return this._recordChange.asObservable();
   }
 
@@ -91,7 +92,17 @@ export class EntitySearchService {
     this._currentlySelectedEntityId = value;
     this._entityId.next(value);
   }
+  
   /** currently selected entitities data*/
+  private _currentlySelectedSearchResult: SzSdkSearchResult;
+  public get currentlySelectedSearchResult(): SzSdkSearchResult | undefined {
+    return this._currentlySelectedSearchResult
+  }
+  public set currentlySelectedSearchResult(value: SzSdkSearchResult | undefined) {
+    this._currentlySelectedSearchResult = value;
+    //this._entityId.next(value);
+  }
+
   private _currentlySelectedEntityData: SzSdkSearchResolvedEntity | SzResumeEntity;
   public get currentlySelectedEntityData(): SzSdkSearchResolvedEntity | SzResumeEntity | undefined {
     return this._currentlySelectedEntityData;
@@ -100,6 +111,7 @@ export class EntitySearchService {
     this._currentlySelectedEntityData = value;
     //this._entityId.next(value);
   }
+  
 
   /** the search parameters from the last search performed */
   public currentSearchParameters: SzEntitySearchParams;
@@ -146,7 +158,7 @@ export class EntitySearchService {
         retVal = '(1) Result for a entity with an id matching "' + retVal + '"';
       }
     } else if(this.currentRecord && this.currentRecord !== undefined) {
-      params.push(this.currentRecord.recordId);
+      params.push(this.currentRecord.RECORD_ID);
       retVal = params.join(', ');
       retVal = '(1) Result for "' + retVal + '"';
     } else if(this.currentlySelectedEntityId) {
@@ -235,14 +247,14 @@ export class SearchByIdParamsResolverService implements Resolve<SzSearchByIdForm
 @Injectable({
   providedIn: 'root'
 })
-export class EntityDetailResolverService implements Resolve<SzEntityData> {
+export class EntityDetailResolverService implements Resolve<SzSdkEntityResponse> {
   constructor(
     private sdkSearchService: SzSearchService,
     private router: Router,
     private search: EntitySearchService,
     private spinner: SpinnerService) {}
 
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<SzEntityData> | Observable<never> {
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<SzSdkEntityResponse> | Observable<never> {
     this.spinner.show();
     const entityId = parseInt( route.paramMap.get('entityId'), 10);
     if (entityId && entityId > 0) {
@@ -347,31 +359,24 @@ export class CurrentEntityUnResolverService implements Resolve<number | undefine
 @Injectable({
   providedIn: 'root'
 })
-export class GraphEntityNetworkResolverService implements Resolve<SzEntityNetworkData> {
+export class GraphEntityNetworkResolverService implements Resolve<SzNetorkGraphCompositeResponse> {
   constructor(
     private sdkSearchService: SzSearchService,
-    private graphService: EntityGraphService,
     private prefsService: PrefsManagerService,
     private router: Router,
     private search: EntitySearchService,
     private spinner: SpinnerService) {}
 
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<SzEntityNetworkData> | Observable<never> {
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<SzNetorkGraphCompositeResponse> | Observable<never> {
     this.spinner.show();
     const entityId = parseInt( route.paramMap.get('entityId'), 10);
     if (entityId && entityId > 0) {
-      return this.graphService.findEntityNetwork(
+      return this.sdkSearchService.getGraphNetworkData(
         [entityId],
-        undefined,
         this.prefsService.prefs.graph.maxDegreesOfSeparation,
         this.prefsService.prefs.graph.buildOut,
-        this.prefsService.prefs.graph.maxEntities,
-        SzFeatureMode.NONE,
-        true,
-        false,
-        false,
-        true).pipe(
-          map(res => (res.data as SzEntityNetworkData)),
+        this.prefsService.prefs.graph.maxEntities).pipe(
+          map(res => (res as SzNetorkGraphCompositeResponse)),
           mergeMap((networkData) => {
             this.spinner.hide();
             if (networkData) {
