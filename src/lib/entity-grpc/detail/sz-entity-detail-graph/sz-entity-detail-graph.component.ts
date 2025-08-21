@@ -1,10 +1,6 @@
 import { Component, HostBinding, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
-import {
-  SzRelatedEntity,
-  SzResolvedEntity
-} from '@senzing/rest-api-client-ng';
 import { SzGraphNodeFilterPair } from '../../../models/graph';
 import { SzPrefsService } from '../../../services/sz-prefs.service';
 import { SzGraphComponentGrpc } from '../../../graph-grpc/sz-graph.component';

@@ -37,8 +37,6 @@ export * from './lib/services/sz-how-ui.service';
   */
 
 //export * from '../deprecated/search/sz-search/sz-search.component';
-export { SzSearchByIdGrpcComponent, SzSearchByIdFormParams } from './lib/search-grpc/sz-search/sz-search-by-id.component';
-export { SzEntityRecordViewerComponent } from './lib/record/sz-entity-record-viewer.component';
 //export * from './lib/search/sz-search-results/sz-search-results.component';
 //export * from './lib/search/sz-search-result-card/sz-search-result-card.component';
 //export * from './lib/entity/detail/sz-entity-detail.component';
@@ -46,17 +44,17 @@ export { SzEntityRecordViewerComponent } from './lib/record/sz-entity-record-vie
 //export * from './lib/entity/detail/sz-entity-detail-how-report/sz-entity-detail-how-report.component';
 
 /** graph related */
-//export { SzRelationshipNetworkComponent } from './lib/graph/sz-relationship-network/sz-relationship-network.component';
 //export { SzRelationshipNetworkInputComponent } from './lib/graph/sz-relationship-network-input/sz-relationship-network-input.component';
 //export { SzRelationshipNetworkLookupComponent } from './lib/graph/sz-relationship-network-lookup/sz-relationship-network-lookup.component';
 //export { SzRelationshipPathComponent } from './lib/graph/sz-relationship-path/sz-relationship-path.component';
 //export { SzGraphComponent } from './lib/graph/sz-graph.component';
-//export * from './lib/graph/sz-graph-control.component';
-//export * from './lib/graph/sz-graph-filter.component';
-//export { SzEntityDetailGraphComponent } from './lib/entity/detail/sz-entity-detail-graph/sz-entity-detail-graph.component';
-//export { SzStandaloneGraphComponent } from './lib/entity/detail/sz-entity-detail-graph/sz-standalone-graph.component';
-//export * from './lib/entity/detail/sz-entity-detail-graph/sz-entity-detail-graph-control.component';
-//export * from './lib/entity/detail/sz-entity-detail-graph/sz-entity-detail-graph-filter.component';
+export { SzRelationshipNetworkComponent } from './lib/graph-grpc/sz-relationship-network/sz-relationship-network.component';
+export * from './lib/graph-grpc/sz-graph-control.component';
+export * from './lib/graph-grpc/sz-graph-filter.component';
+export { SzEntityDetailGraphComponent } from './lib/entity-grpc/detail/sz-entity-detail-graph/sz-entity-detail-graph.component';
+export { SzStandaloneGraphComponent } from './lib/entity-grpc/detail/sz-entity-detail-graph/sz-standalone-graph.component';
+export * from './lib/entity-grpc/detail/sz-entity-detail-graph/sz-entity-detail-graph-control.component';
+export * from './lib/entity-grpc/detail/sz-entity-detail-graph/sz-entity-detail-graph-filter.component';
 /* charts */
 export { SzRecordStatsDonutChart } from './lib/charts/records-by-datasources/sz-donut.component'
 /** shared */
@@ -124,9 +122,12 @@ export { SzHowVirtualEntityDialog } from './lib/how/sz-how-virtual-entity-dialog
 /** --------------------------   gRPC Web */
 export * from './lib/configuration/sz-product-info/sz-product-info.component';
 export * from './lib/import/sz-import-files.component';
+export { SzSearchByIdGrpcComponent, SzSearchByIdFormParams } from './lib/search-grpc/sz-search/sz-search-by-id.component';
 export { SzSearchGrpcComponent } from './lib/search-grpc/sz-search/sz-search.component';
 export { SzSearchResultsGrpcComponent } from './lib/search-grpc/sz-search-results/sz-search-results.component';
+export { SzSearchResultCardGrpcComponent } from './lib/search-grpc/sz-search-result-card/sz-search-result-card.component';
 export { SzEntityDetailGrpcComponent } from './lib/entity-grpc/detail/sz-entity-detail.component';
+export { SzEntityRecordViewerComponent } from './lib/record/sz-entity-record-viewer.component';
 
 // models
 export * from './lib/models/grpc/config';
@@ -138,7 +139,8 @@ export * from './lib/models/SzResumeEntity';
 // services
 export { SzGrpcConfig } from './lib/services/grpc/config.service';
 export { SzGrpcConfigManagerService } from './lib/services/grpc/configManager.service';
-
+export { SzGrpcEngineService }  from './lib/services/grpc/engine.service';
+export { SzGrpcProductService }  from './lib/services/grpc/product.service';
 
 /** export some members of rest client to ease type use */
 export {

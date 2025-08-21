@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, ViewChild } from '@angular/core';
 import { 
-  SzEntityDetailComponentGrpc,
+  SzEntityDetailGrpcComponent,
   SzEntityIdentifier, SzEntitySearchParams
 } from '@senzing/sdk-components-grpc-web';
 
@@ -26,7 +26,7 @@ import {
   selector: 'app-root',
   imports: [
     CommonModule,
-    SzSearchGrpcComponent, SzSearchResultsGrpcComponent, SzEntityDetailComponentGrpc
+    SzSearchGrpcComponent, SzSearchResultsGrpcComponent, SzEntityDetailGrpcComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'

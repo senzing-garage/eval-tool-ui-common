@@ -1,9 +1,18 @@
 import { Component, ChangeDetectorRef, ViewContainerRef } from '@angular/core';
-import { UntypedFormBuilder } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, UntypedFormBuilder } from '@angular/forms';
+import { Overlay } from '@angular/cdk/overlay';
+import { CommonModule } from '@angular/common';
+import { MatSliderModule } from '@angular/material/slider';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatIconModule } from '@angular/material/icon';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { SzPrefsService } from '../../../services/sz-prefs.service';
 import { SzDataSourcesService } from '../../../services/sz-datasources.service';
-import { SzGraphFilterComponent } from '../../../graph/sz-graph-filter.component';
-import { Overlay } from '@angular/cdk/overlay';
+import { SzGraphFilterComponent } from '../../../graph-grpc/sz-graph-filter.component';
 
 /**
  * Control Component allowing UI friendly changes
@@ -27,9 +36,14 @@ import { Overlay } from '@angular/cdk/overlay';
  */
 @Component({
     selector: 'sz-entity-detail-graph-filter',
-    templateUrl: '../../../graph/sz-graph-filter.component.html',
-    styleUrls: ['../../../graph/sz-graph-filter.component.scss'],
-    standalone: false
+    templateUrl: '../../../graph-grpc/sz-graph-filter.component.html',
+    styleUrls: ['../../../graph-grpc/sz-graph-filter.component.scss'],
+    imports: [
+      CommonModule, ReactiveFormsModule, FormsModule,
+      MatSliderModule, MatCheckboxModule, MatInputModule, MatButtonModule,
+      MatChipsModule, MatBadgeModule, MatIconModule,
+      DragDropModule,
+    ]
 })
 export class SzEntityDetailGraphFilterComponent extends SzGraphFilterComponent {
   constructor(

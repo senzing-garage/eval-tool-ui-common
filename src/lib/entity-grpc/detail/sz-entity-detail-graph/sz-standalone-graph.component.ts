@@ -9,6 +9,10 @@ import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { MatDialog } from '@angular/material/dialog';
 import { SzMatchKeyTokenFilterScope } from '../../../models/graph';
 import { SzCSSClassService } from '../../../services/sz-css-class.service';
+import { CommonModule } from '@angular/common';
+import { SzGraphFilterComponent } from  '../../../graph-grpc/sz-graph-filter.component';
+import { SzGraphControlComponent } from  '../../../graph-grpc/sz-graph-control.component';
+import { SzRelationshipNetworkComponent } from  '../../../graph-grpc/sz-relationship-network/sz-relationship-network.component';
 
 /**
  * Embeddable Graph Component
@@ -54,7 +58,12 @@ import { SzCSSClassService } from '../../../services/sz-css-class.service';
 @Component({
     selector: 'sz-standalone-graph',
     templateUrl: './sz-standalone-graph.component.html',
-    styleUrls: ['../../../graph/sz-graph.component.scss']
+    styleUrls: ['../../../graph-grpc/sz-graph.component.scss'],
+    imports: [
+      CommonModule,
+      SzGraphFilterComponent, SzGraphControlComponent,
+      SzRelationshipNetworkComponent
+    ]
 })
 export class SzStandaloneGraphComponent extends SzGraphComponentGrpc implements AfterViewInit {  
   /** @internal */

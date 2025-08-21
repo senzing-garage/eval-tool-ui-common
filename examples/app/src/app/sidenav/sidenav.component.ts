@@ -10,6 +10,8 @@ import { AboutInfoService } from '../services/about.service';
 import { Timer } from 'd3-timer';
 import { SzFoliosService, SzPrefsService, SzSearchHistoryFolio, SzSearchHistoryFolioItem } from '@senzing/sdk-components-grpc-web';
 import { takeUntil } from 'rxjs/operators';
+import { MatIconModule } from '@angular/material/icon';
+import { CommonModule } from '@angular/common';
 
 export interface NavItem {
   key: string;
@@ -22,7 +24,11 @@ export interface NavItem {
 @Component({
   selector: 'app-sidenav',
   templateUrl: './sidenav.component.html',
-  styleUrls: ['./sidenav.component.scss']
+  styleUrls: ['./sidenav.component.scss'],
+  imports: [
+    CommonModule,
+    MatIconModule
+  ]
 })
 export class SideNavComponent {
   /** subscription to notify subscribers to unbind */

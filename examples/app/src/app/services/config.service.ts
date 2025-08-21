@@ -1,7 +1,11 @@
 import { Injectable, Inject } from '@angular/core';
 import { BehaviorSubject, Observable, of, Subject, interval, from } from 'rxjs';
 import { catchError, filter, switchMap, take, tap } from 'rxjs/operators';
-import { SzAdminService, SzRestConfigurationParameters, SzConfigurationService, SzServerInfo, SzMeta } from '@senzing/sdk-components-ng';
+import { 
+  SzRestConfigurationParameters, 
+  SzConfigurationService, 
+  SzServerInfo, 
+  SzMeta } from '@senzing/sdk-components-grpc-web';
 import { HttpClient } from '@angular/common/http';
 
 export interface AuthConfig {
@@ -72,12 +76,12 @@ export class SzWebAppConfigService {
   public get isAdminEnabled(): boolean {
     return this._serverInfo && this._serverInfo.adminEnabled;
   }
-  public get infoQueueConfigured(): boolean {
+  /*public get infoQueueConfigured(): boolean {
     return this._serverInfo && this._serverInfo.infoQueueConfigured !== undefined ? this._serverInfo.infoQueueConfigured : false;
   }
   public get loadQueueConfigured(): boolean {
     return this._serverInfo && this._serverInfo.loadQueueConfigured !== undefined ? this._serverInfo.loadQueueConfigured : false;
-  }
+  }*/
   public get isPocServerInstance(): boolean {
     return this._serverInfoMetadata && this._serverInfoMetadata.pocApiVersion !== undefined ? true : false;
   }
@@ -93,7 +97,7 @@ export class SzWebAppConfigService {
   public onServerInfoUpdated                                          = this._onServerInfoUpdated.asObservable();
 
   constructor( 
-    private adminService: SzAdminService, 
+    //private adminService: SzAdminService, 
     private http: HttpClient,
     private sdkConfigService: SzConfigurationService
   ) {
@@ -122,7 +126,9 @@ export class SzWebAppConfigService {
         this._onPocStreamConfigChange.next( this._pocStreamConfig );
         //console.warn('POC STREAM CONFIG!', this._pocStreamConfig);
       });
+      
       // get updated server info if api config has changed
+      /*
       this.adminService.getServerInfo().pipe(take(1)).subscribe( (resp: SzServerInfo) => {
         this._serverInfo = resp;
         this._onServerInfoUpdated.next(this._serverInfo);
@@ -132,6 +138,7 @@ export class SzWebAppConfigService {
         this._serverInfoMetadata = resp;
         this._onServerInfoUpdated.next(this._serverInfo);
       });
+      */
     });
 
     // If the server info or server info metadata has been updated we need to 
@@ -173,6 +180,7 @@ export class SzWebAppConfigService {
       this._authConfig = authConf;
     });
     // get initial "ServerInfo"
+    /*
     this.adminService.getServerInfo().pipe(take(1)).subscribe( (resp: SzServerInfo) => {
       this._serverInfo = resp;
       this._onServerInfoUpdated.next(this._serverInfo);
@@ -181,13 +189,14 @@ export class SzWebAppConfigService {
     this.adminService.getServerInfoMetadata().pipe(take(1)).subscribe((resp: SzMeta) => {
       this._serverInfoMetadata = resp;
       this._onServerInfoUpdated.next(this._serverInfo);
-    });
+    });*/
 
     // -------------------------------------  set up polling requests -----------------------------------------
     /** now set up polling for updates of server-info properties */
-    this.pollForServerInfo().subscribe();
+    //this.pollForServerInfo().subscribe();
   }
   /** poll for server info */
+  /*
   private pollForServerInfo(): Observable<SzServerInfo> {
     return interval(this.pollingInterval).pipe(
         switchMap(() => from( this.adminService.getServerInfo() )),
@@ -195,7 +204,8 @@ export class SzWebAppConfigService {
           this._serverInfo = resp;
         } )
     );
-  }
+  }*/
+
   public getRuntimeAuthConfig(): Observable<AuthConfig> {
     // reach out to webserver to get auth
     // config. we cant do this with static files

@@ -7,6 +7,8 @@
       <mat-icon color="secondary" class="graph" aria-hidden="false" aria-label="Open Results in Graph">bubble_chart</mat-icon>
     </button>
   </button>
-  <sz-search-results [results]="currentSearchResults" (resultClick)="onSearchResultClick($event)"></sz-search-results>
+  <sz-search-results-grpc 
+  [results]="currentSearchResults" 
+  (resultClick)="onSearchResultClick($event)"></sz-search-results-grpc>
 </div>
 <!-- end search results -->

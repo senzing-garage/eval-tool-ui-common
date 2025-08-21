@@ -8,8 +8,21 @@ import { Component, OnInit, Input, AfterViewInit, OnDestroy } from '@angular/cor
   styleUrls: ['./error.component.scss']
 })
 export class ErrorPageComponent implements OnInit, AfterViewInit, OnDestroy {
-  @Input()
-  public code: number;
+  private _code: number;
+  @Input() set code(value: number | string) {
+    if (typeof value != "string"){
+      // assume number
+      this._code = value as number;
+    } else {
+      // assume string
+      try{
+        this._code = parseInt(value as string);
+      }catch(err){}
+    }
+  }
+  get code() {
+    return this._code;
+  }
 
   @Input()
   public title: string;

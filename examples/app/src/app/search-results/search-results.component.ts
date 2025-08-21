@@ -4,19 +4,30 @@ import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import {
   SzEntitySearchParams,
-  SzAttributeSearchResult
-} from '@senzing/sdk-components-ng';
+  SzSdkSearchResult,
+  SzSearchGrpcComponent,
+  SzSearchResultsGrpcComponent,
+
+  //SzAttributeSearchResult
+} from '@senzing/sdk-components-grpc-web';
 import { SpinnerService } from '../services/spinner.service';
 import { EntitySearchService } from '../services/entity-search.service';
+import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-search-results',
   templateUrl: './search-results.component.html',
-  styleUrls: ['./search-results.component.scss']
+  styleUrls: ['./search-results.component.scss'],
+  imports: [
+    CommonModule,
+    MatIconModule,
+    SzSearchResultsGrpcComponent
+  ]
 })
 export class SearchResultsComponent implements OnInit {
   /** the current search results */
-  public currentSearchResults: SzAttributeSearchResult[];
+  public currentSearchResults: SzSdkSearchResult[];
   public currentSearchParameters: SzEntitySearchParams;
 
   constructor(
@@ -28,7 +39,7 @@ export class SearchResultsComponent implements OnInit {
 
   ngOnInit() {
     this.route.data
-    .subscribe((data: { results: SzAttributeSearchResult[], parameters: SzEntitySearchParams }) => {
+    .subscribe((data: { results: SzSdkSearchResult[], parameters: SzEntitySearchParams }) => {
       this.currentSearchParameters = data.parameters;
       this.currentSearchResults = data.results;
       // clear out any globally stored value;
@@ -38,7 +49,7 @@ export class SearchResultsComponent implements OnInit {
     });
 
     // listen for global search data
-    this.search.results.subscribe((results: SzAttributeSearchResult[]) => {
+    this.search.results.subscribe((results: SzSdkSearchResult[]) => {
       this.currentSearchResults = results;
       // set page title
       this.titleService.setTitle( this.search.searchTitle );
@@ -58,7 +69,7 @@ export class SearchResultsComponent implements OnInit {
   /** when user clicks the "open results in graph" button */
   onOpenInGraph($event) {
     const entityIds = this.currentSearchResults.map( (ent) => {
-      return ent.entityId;
+      return ent.ENTITY.RESOLVED_ENTITY.ENTITY_ID;
     });
     if(entityIds && entityIds.length === 1) {
       // single result

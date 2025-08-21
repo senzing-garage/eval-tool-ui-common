@@ -17,10 +17,11 @@ import {
 
 // new grpc components
 import {
-  SzEntityDetailComponentGrpc,
+  SzEntityDetailGrpcComponent,
+  SzResumeEntity,
+  SzSdkResolvedEntity,
   SzSearchGrpcComponent, 
-  SzSearchResultsGrpcComponent,
-  SzGrpcConfigManagerService
+  SzSearchResultsGrpcComponent
 } from '@senzing/sdk-components-grpc-web';
 
 
@@ -28,13 +29,15 @@ import {
   selector: 'app-detail',
   templateUrl: './detail.component.html',
   imports: [
-    CommonModule, Title,
-    SzSearchGrpcComponent, SzSearchResultsGrpcComponent, SzEntityDetailComponentGrpc
+    CommonModule,
+    SzSearchGrpcComponent, 
+    SzSearchResultsGrpcComponent, 
+    SzEntityDetailGrpcComponent
   ],
   styleUrls: ['./detail.component.scss']
 })
 export class DetailComponent implements OnInit {
-  @ViewChild('entityDetailComponent') entityDetailComponent: SzEntityDetailComponentGrpc;
+  @ViewChild('entityDetailComponent') entityDetailComponent: SzEntityDetailGrpcComponent;
   @ViewChild('graphContextMenu') graphContextMenu: TemplateRef<any>;
   public _showGraphMatchKeys = true;
   @Input() public set showGraphMatchKeys( value: boolean ) {
@@ -179,7 +182,7 @@ export class DetailComponent implements OnInit {
     }
   }
   /** update the page title to the entity name */
-  onEntityDataChanged(data: SzEntityData) {
+  onEntityDataChanged(data: SzResumeEntity) {
     const titleCaseWord = (word: string) => {
       if (!word) { return word; }
       return word[0].toUpperCase() + word.substr(1).toLowerCase();
@@ -188,9 +191,9 @@ export class DetailComponent implements OnInit {
       if (!words) { return words; }
       return (words.split(' ').map( titleCaseWord ).join(' '));
     };
-    if(data && data.resolvedEntity) {
-      if(data.resolvedEntity.entityName) {
-        this.titleService.setTitle( titleCaseSentence(data.resolvedEntity.entityName) + ': Details');
+    if(data) {
+      if(data.ENTITY_NAME) {
+        this.titleService.setTitle( titleCaseSentence(data.ENTITY_NAME) + ': Details');
       }
     }
   }

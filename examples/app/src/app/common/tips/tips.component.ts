@@ -1,9 +1,15 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-tips',
   templateUrl: './tips.component.html',
-  styleUrls: ['./tips.component.scss']
+  styleUrls: ['./tips.component.scss'],
+  imports: [
+    CommonModule,
+    MatIconModule
+  ]
 })
 export class TipsComponent implements OnInit {
   private imageDir = 'assets/getting-started/';

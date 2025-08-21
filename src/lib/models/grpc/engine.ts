@@ -120,6 +120,7 @@ export interface SzSdkFindNetworkResponse {
     ENTITY_PATHS: SzSdkFindNetworkNetworkPath[]
 }
 
+/*
 export interface SzGraphNetworkResponse extends SzSdkFindNetworkResponse {
     ENTITIES: {
         RELATED_ENTITIES: SzSdkRelatedEntity[],
@@ -128,3 +129,4 @@ export interface SzGraphNetworkResponse extends SzSdkFindNetworkResponse {
     ENTITY_NETWORK_LINKS: SzSdkFindNetworkNetworkLink[],
     ENTITY_PATHS: SzSdkFindNetworkNetworkPath[]
 }
+*/

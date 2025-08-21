@@ -32,8 +32,7 @@ import {
   SzSdkSearchResult,
   SzGrpcConfig,
 } from '@senzing/sdk-components-grpc-web';
-
-
+import { TipsComponent } from '../common/tips/tips.component';
 import { EntitySearchService } from '../services/entity-search.service';
 import { SpinnerService } from '../services/spinner.service';
 import { UiService } from '../services/ui.service';
@@ -41,13 +40,17 @@ import { PrefsManagerService } from '../services/prefs-manager.service';
 import { SzWebAppConfigService } from '../services/config.service';
 import { NavItem } from '../sidenav/sidenav.component';
 import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-search',
   templateUrl: './search.component.html',
   imports: [
     CommonModule,
-    SzSearchGrpcComponent, SzSearchResultsGrpcComponent, SzEntityDetailGrpcComponent
+    TipsComponent,
+    MatIconModule,
+    SzSearchGrpcComponent,
+    SzSearchResultsGrpcComponent
   ],
   styleUrls: ['./search.component.scss']
 })
@@ -161,7 +164,7 @@ export class AppSearchComponent implements OnInit {
    * Event handler for when the fields in the SzSearchComponent
    * are cleared.
    */
-  public onSearchResultsCleared(searchParams: SzEntitySearchParams) {
+  public onSearchResultsCleared(searchParams: void) {
     // hide search results
     this.entitySearchService.currentSearchResults = undefined;
     this.entitySearchService.currentlySelectedEntityId = undefined;

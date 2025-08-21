@@ -1,4 +1,4 @@
-<sz-search-by-id
+<sz-search-by-id-grpc
     cancelButtonLabel="Clear"
     (parameterChange)="onSearchParameterChange($event)"
     (entityChange)="onEntityResult($event)"
@@ -6,14 +6,13 @@
     (resultChange)="onRecordChange($event)"
     (searchStart)="onSearchStart($event)"
     (searchEnd)="onSearchEnd($event)"
-    (exception)="onSearchException($event)"></sz-search-by-id>
-<sz-search-result-card *ngIf="entitySearchService.currentlySelectedEntityData"
+    (exception)="onSearchException($event)"></sz-search-by-id-grpc>
+<sz-search-result-card-grpc *ngIf="hasCurrentlySelectedSearchResult"
       class="matches"
-      (click)="onSearchResultClick(entitySearchService.currentlySelectedEntityData.entityId)"
-      [searchResult]="entitySearchService.currentlySelectedEntityData"
-      [cardTitle]="'Matches'"
-      [showDataSources]="true">
-</sz-search-result-card>
+      (click)="onSearchResultClick(this.entitySearchService.currentlySelectedSearchResult.ENTITY.RESOLVED_ENTITY.ENTITY_ID)"
+      [searchResult]="entitySearchService.currentlySelectedSearchResult"
+      [cardTitle]="'Matches'">
+</sz-search-result-card-grpc>
 <div *ngIf="entitySearchService.currentRecord">
     <!-- start record results -->
     <div class="search-results">

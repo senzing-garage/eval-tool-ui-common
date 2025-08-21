@@ -18,7 +18,7 @@
           [showMatchKeyControl]="false"
           [showFiltersControl]="false"
           (entityClick)="onGraphEntityClick($event)"
-          [showMatchKeys]="_showMatchKeys"
+          [showLinkLabels]="_showLinkLabels"
           (requestStarted)="onRequestStarted($event)"
           (renderComplete)="onRenderComplete($event)"
           (requestComplete)="onRequestComplete($event)"
@@ -43,20 +43,20 @@
             <button (click)="onTabClick('filters')" class="tab" [class.active]="showFilters">filters</button>
           </div>
           <!-- start entity detail -->
-          <sz-entity-detail
+          <sz-entity-detail-grpc
             *ngIf="showEntityDetail"
             class="embedded-detail-viewer"
             #entityDetailComponent
             [updatePrefsOnChange]="false"
             [showGraphSection]="false"
             [forceLayout]="'layout-rail'"
-            [entityId]="currentlySelectedEntityId"></sz-entity-detail>
+            [entityId]="currentlySelectedEntityId"></sz-entity-detail-grpc>
           <!-- end entity detail -->
           <!-- start filters control -->
           <sz-entity-detail-graph-filter #graphFilter
           *ngIf="showFilters"
           class="sz-entity-detail-graph-filter"
-          [showLinkLabels]="showMatchKeys"
+          [showLinkLabels]="showLinkLabels"
           [showDataSources]="showDataSourcesInFilters"
           [showMatchKeys]="showMatchKeysInFilters"
           (optionChanged)="onFilterOptionChange($event)"

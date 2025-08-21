@@ -4,11 +4,9 @@ import { SpinnerComponent } from './spinner.component';
 import { SpinnerService } from '../../services/spinner.service';
 
 @NgModule({
-  declarations: [
-    SpinnerComponent
-  ],
   imports: [
-    CommonModule
+    CommonModule,
+    SpinnerComponent
   ],
   providers: [
     SpinnerService
