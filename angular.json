@@ -2186,7 +2186,10 @@
               }
             ],
             "styles": [
-              "examples/app/src/styles.scss"
+              "src/lib/scss/styles.scss",
+              "src/lib/scss/themes/senzing.css",
+              "examples/app/src/app/scss/styles.scss",
+              "examples/app/src/app/scss/theme.scss"
             ],
             "scripts": []
           },
