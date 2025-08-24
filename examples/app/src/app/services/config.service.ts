@@ -162,6 +162,7 @@ export class SzWebAppConfigService {
 
     // -----------------------------------------  initial requests ---------------------------------------------
     // get initial runtime config for /api requests
+    /*
     this.getRuntimeApiConfig().pipe(
       take(1)
     ).subscribe((apiConf: SzRestConfigurationParameters) => {
@@ -179,6 +180,7 @@ export class SzWebAppConfigService {
     ).subscribe((authConf: AuthConfig) => {
       this._authConfig = authConf;
     });
+    */
     // get initial "ServerInfo"
     /*
     this.adminService.getServerInfo().pipe(take(1)).subscribe( (resp: SzServerInfo) => {
