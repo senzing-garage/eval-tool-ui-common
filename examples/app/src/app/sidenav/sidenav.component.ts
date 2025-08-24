@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, Output, EventEmitter, Input, ViewChild, H
 import { SpinnerService } from '../services/spinner.service';
 import { UiService } from '../services/ui.service';
 import { EntitySearchService } from '../services/entity-search.service';
-import { Router } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, RouterModule } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { Subject } from 'rxjs';
 import {Overlay } from '@angular/cdk/overlay';
@@ -18,7 +18,9 @@ export interface NavItem {
   name: string;
   order: number;
   submenuItems?: NavItem[],
-  default?: boolean
+  default?: boolean,
+  route?: string,
+  disabled?: boolean
 }
 
 @Component({
@@ -27,7 +29,10 @@ export interface NavItem {
   styleUrls: ['./sidenav.component.scss'],
   imports: [
     CommonModule,
-    MatIconModule
+    MatIconModule,
+    RouterModule,
+    RouterLink,
+    RouterLinkActive
   ]
 })
 export class SideNavComponent {
@@ -61,11 +66,12 @@ export class SideNavComponent {
   @Output() public  onItemHover = new EventEmitter<NavItem>();
   @Output() public  expand = new EventEmitter<NavItem>();
 
-  private menuItems = {
+  private menuItems: {[key: string]: NavItem} = {
     'overview': {
       name: 'overview',
       key: 'overview',
-      order: 0
+      order: 0,
+      route: 'overview'
     },
     'search': {
       name: 'search',
@@ -75,12 +81,14 @@ export class SideNavComponent {
         {
           name: 'By Attribute',
           key: 'search-by-attribute',
-          order: 0
+          order: 0,
+          route: 'search/by-attribute'
         },
         {
           name: 'By Record/Entity Id',
           key: 'search-by-id',
-          order: 1
+          order: 1,
+          route: 'search/by-id'
         }
       ]
     },
@@ -90,19 +98,22 @@ export class SideNavComponent {
       order: 2
     },
     'statistics': {
-      name: 'search',
-      key: 'search',
-      order: 3
+      name: 'statistics',
+      key: 'statistics',
+      order: 3,
+      disabled: true
     },
     'composition': {
-      name: 'search',
-      key: 'search',
-      order: 4
+      name: 'composition',
+      key: 'composition',
+      order: 4,
+      disabled: true
     },
     'review': {
-      name: 'search',
-      key: 'search',
-      order: 5
+      name: 'review',
+      key: 'review',
+      order: 5,
+      disabled: true
     },
     'datasources': {
       name: 'Data Sources',
@@ -124,7 +135,7 @@ export class SideNavComponent {
     'settings': {
       name: 'Settings',
       key: 'settings',
-      order: 7
+      order: 7,
       /*submenuItems: [
         {
           name: 'Search',
@@ -142,16 +153,20 @@ export class SideNavComponent {
           order: 2
         }
       ]*/
+      disabled: true
     },
     'admin': {
       name: 'Admin',
       key: 'admin',
-      order: 8
+      order: 8,
+      route: 'admin',
+      disabled: true
     },
     'license': {
       name: 'License Information',
       key: 'license',
-      order: 9
+      order: 9,
+      route: 'license'
     }
   }
 
@@ -225,9 +240,16 @@ export class SideNavComponent {
     }
     return retValue;
   }
-
+  public isDisabled(itemKey: string): boolean {
+    return (itemKey && this.menuItems[ itemKey ] && this.menuItems[ itemKey ].disabled) ? true : false;
+  }
   public selectMenuItem(itemKey: string) {
     this.selectedPrimaryNavItem = this.menuItems[ itemKey ];
+    console.log(`selectMenuItem: "${itemKey}"`,this.selectedPrimaryNavItem);
+    if(this.selectedPrimaryNavItem && this.selectedPrimaryNavItem.route && !this.selectedPrimaryNavItem.submenuItems) {
+      // go to primary menu item link
+      this.router.navigateByUrl(this.selectedPrimaryNavItem.route)
+    }
   }
   public onMouseEnterMenuItem(itemKey: string) {
     this.selectedPrimaryNavItem = this.menuItems[ itemKey ];

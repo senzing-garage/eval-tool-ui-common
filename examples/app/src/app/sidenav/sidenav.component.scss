@@ -62,6 +62,18 @@
         color: #757686;
 
         li {
+            &[disabled=true] {
+                border-left-color: transparent !important;
+                background-color: transparent !important;
+                &:hover, &:active {
+                    cursor: default;
+                    color: transparent !important;
+                    background-color: transparent !important;
+                    .mat-icon {
+                        color: #757686
+                    }
+                }
+            }
             background-color: #3c3a3c;
             box-sizing: border-box;
             vertical-align: middle;
