@@ -19,7 +19,7 @@ import {
   SzSdkEntityResponse,
   SzNetorkGraphCompositeResponse,
   SzSdkEntityRecord,
-} from '@senzing/sdk-components-grpc-web';
+} from '@senzing/sz-sdk-components-grpc-web';
 import { 
   //EntityGraphService, 
   //SzEntityNetworkData, 

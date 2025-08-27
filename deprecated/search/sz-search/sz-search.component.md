@@ -9,7 +9,7 @@ first two methods to your component(or app.component.ts) that will handle the ou
 
 ```typescript
   public onSearchResults(evt: SzSearchResults) {
-    console.log('@senzing/sdk-components-grpc-web/sz-search/searchResults: ', evt);
+    console.log('@senzing/sz-sdk-components-grpc-web/sz-search/searchResults: ', evt);
     // store on current scope
     this.currentSearchResults = evt;
   }
@@ -29,7 +29,11 @@ public currentSearchResults: SzAttributeSearchResult[];
 your app.component.ts up to this point should look something like this:
 
 ```typescript
-import { SzAttributeSearchResult, SzEntitySearchParams, SzSearchComponent } from "@senzing/sdk-components-grpc-web";
+import {
+  SzAttributeSearchResult,
+  SzEntitySearchParams,
+  SzSearchComponent
+} from '@senzing/sz-sdk-components-grpc-web';
 
 @Component({
   selector: "app-root",

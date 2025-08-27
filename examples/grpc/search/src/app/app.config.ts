@@ -3,7 +3,7 @@ import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
 import { SzGrpcWebEnvironment } from '@senzing/sz-sdk-typescript-grpc-web';
-import { SenzingSdkModule, SzRestConfiguration } from '@senzing/sdk-components-grpc-web';
+import { SenzingSdkModule, SzRestConfiguration } from '@senzing/sz-sdk-components-grpc-web';
 import { UiService } from 'examples/app/src/app/services/ui.service';
 import { PrefsManagerService } from 'examples/app/src/app/services/prefs-manager.service';
 import { AuthGuardService } from 'examples/app/src/app/services/ag.service';

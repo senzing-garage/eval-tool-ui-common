@@ -5,7 +5,7 @@ import {
   SzRestConfigurationParameters, 
   SzConfigurationService, 
   SzServerInfo, 
-  SzMeta } from '@senzing/sdk-components-grpc-web';
+  SzMeta } from '@senzing/sz-sdk-components-grpc-web';
 import { HttpClient } from '@angular/common/http';
 
 export interface AuthConfig {

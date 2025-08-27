@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { SzImportFileComponent } from '@senzing/sdk-components-grpc-web';
+import { SzImportFileComponent } from '@senzing/sz-sdk-components-grpc-web';
 import { SzGrpcWebEnvironment } from '@senzing/sz-sdk-typescript-grpc-web';
 import { MatIconModule } from '@angular/material/icon';
 

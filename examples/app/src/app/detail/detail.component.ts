@@ -22,7 +22,7 @@ import {
   SzSdkResolvedEntity,
   SzSearchGrpcComponent, 
   SzSearchResultsGrpcComponent
-} from '@senzing/sdk-components-grpc-web';
+} from '@senzing/sz-sdk-components-grpc-web';
 
 
 @Component({

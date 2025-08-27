@@ -3,7 +3,7 @@ import {
   SzEntitySearchParams,
   SzAttributeSearchResult,
   SzSearchComponent
-} from '@senzing/sdk-components-grpc-web';
+} from '@senzing/sz-sdk-components-grpc-web';
 
 @Component({
     selector: 'app-root',

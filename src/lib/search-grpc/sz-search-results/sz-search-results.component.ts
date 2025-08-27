@@ -61,9 +61,6 @@ export class SzSearchResultsGrpcComponent implements OnInit, OnDestroy {
     get searchResultsTotal(): number {
         return (this.searchResults && this.searchResults.length) ? this.searchResults.length : 0;
     }
-
-  
-
     /**
      * Shows or hides the match keys in the result items header.
      * @memberof SzSearchResultsComponent
@@ -271,7 +268,7 @@ export class SzSearchResultsGrpcComponent implements OnInit, OnDestroy {
             this.toggleSelected( resData );
             return;
         }*/
-
+        console.log(`SzSearchResultsGrpcComponent.onResultClick: `, evt, resData);
         // preflight check to see if user is trying to select text
         if(window && window.getSelection){
         var selection = window.getSelection();

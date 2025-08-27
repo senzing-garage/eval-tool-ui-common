@@ -961,7 +961,7 @@ export class SzSearchComponent implements OnInit, OnDestroy {
        })
     ).subscribe(
       (cfg: SzRestConfiguration) => {
-        //console.info('@senzing/sdk-components-grpc-web/sz-search[ngOnInit]->apiConfigService.parametersChanged: ', cfg);
+        //console.info('@senzing/sz-sdk-components-grpc-web/sz-search[ngOnInit]->apiConfigService.parametersChanged: ', cfg);
         this.updateAttributeTypes();
       }
     );

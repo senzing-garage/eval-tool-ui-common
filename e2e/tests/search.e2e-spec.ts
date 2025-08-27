@@ -1,7 +1,7 @@
 import { SearchBox } from './search.po';
 import { browser, until, by, $$, $ } from 'protractor';
 
-describe('@senzing/sdk-components-grpc-web/sz-search tests', () => {
+describe('@senzing/sz-sdk-components-grpc-web/sz-search tests', () => {
   let page: SearchBox;
 
   beforeEach(() => {

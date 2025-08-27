@@ -3,7 +3,7 @@ import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
 import { SzGrpcWebEnvironment } from '@senzing/sz-sdk-typescript-grpc-web';
-import { SenzingSdkModule, SzRestConfiguration } from '@senzing/sdk-components-grpc-web';
+import { SenzingSdkModule, SzRestConfiguration } from '@senzing/sz-sdk-components-grpc-web';
 
 const grpcSdkEnv = new SzGrpcWebEnvironment({
     connectionString: `http://localhost:8260/grpc`
