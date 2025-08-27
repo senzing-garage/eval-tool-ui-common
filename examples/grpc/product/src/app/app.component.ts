@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { SzProductInfoComponent } from '@senzing/sdk-components-grpc-web';
+import { SzProductInfoComponent } from '@senzing/sz-sdk-components-grpc-web';
 import { SzGrpcWebEnvironment } from '@senzing/sz-sdk-typescript-grpc-web';
 
 const grpcSdkEnv = new SzGrpcWebEnvironment({

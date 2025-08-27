@@ -17,21 +17,21 @@ import { takeUntil, filter, map } from 'rxjs/operators';
 import { 
   SzEntityDetailGrpcComponent,
   SzEntityIdentifier, SzEntitySearchParams
-} from '@senzing/sdk-components-grpc-web';
+} from '@senzing/sz-sdk-components-grpc-web';
 
 // new grpc components
 import {
   SzSearchGrpcComponent, 
   SzSearchResultsGrpcComponent,
   SzGrpcConfigManagerService
-} from '@senzing/sdk-components-grpc-web';
+} from '@senzing/sz-sdk-components-grpc-web';
 // new grpc models
 import { 
   SzSdkSearchResolvedEntity, 
   //SzSearchByIdFormParams,
   SzSdkSearchResult,
   SzGrpcConfig,
-} from '@senzing/sdk-components-grpc-web';
+} from '@senzing/sz-sdk-components-grpc-web';
 import { TipsComponent } from '../common/tips/tips.component';
 import { EntitySearchService } from '../services/entity-search.service';
 import { SpinnerService } from '../services/spinner.service';
@@ -205,11 +205,11 @@ export class AppSearchComponent implements OnInit {
     this.spinner.hide();
   }
   /** when user clicks on a search result item */
-  onSearchResultClick(param) {
+  onSearchResultClick(entity: SzSdkSearchResolvedEntity) {
     if(!this._openResultLinksInGraph){
-      this.router.navigate(['search/by-attribute/entity/' + param.entityId]);
+      this.router.navigate(['search/by-attribute/entity/' + entity.ENTITY_ID]);
     } else {
-      this.router.navigate(['graph/' + param.entityId]);
+      this.router.navigate(['graph/' + entity.ENTITY_ID]);
     }
   }
   /** when user clicks the "open results in graph" button */

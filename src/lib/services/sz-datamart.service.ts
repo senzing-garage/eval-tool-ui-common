@@ -16,7 +16,7 @@ import {
     SzEntity,
     SzEntityData,
     SzEntityIdentifiers,
-    EntityDataService,
+    //EntityDataService,
     SzEntityResponse,
     SzDetailLevel,
     SzPagedRelationsResponse,
@@ -33,6 +33,9 @@ import { SzPrefsService } from '../services/sz-prefs.service';
 import { SzDataSourcesService } from './sz-datasources.service';
 import { SzCrossSourceSummaryCategoryType } from '../models/stats';
 import { SzSdkDataSource } from '../models/grpc/config';
+import { SzGrpcEngineService } from './grpc/engine.service';
+import { SzEngineFlags } from '@senzing/sz-sdk-typescript-grpc-web';
+import { SzSdkEntityResponse, SzSdkResolvedEntity } from '../models/grpc/engine';
 
 /**
  * Represents an object of a sampling dataset. When a user clicks on a venn diagram a number of 
@@ -57,7 +60,7 @@ export class SzStatSampleSet {
     /** @internal */
     private _isRelationsResponse    = false;
     /** @internal */
-    private _entities               = new Map<SzEntityIdentifier, SzEntityData>();
+    private _entities               = new Map<SzEntityIdentifier, SzSdkResolvedEntity>();
     /** @internal */
     private _entityPages: Map<number, SzEntitiesPage>       = new Map<number, SzEntitiesPage>();
     /** @internal */
@@ -381,7 +384,10 @@ export class SzStatSampleSet {
     constructor( 
         private parameters: SzStatSampleSetParameters,
         private prefs: SzPrefsService,
-        private statsService: SzStatisticsService, private entityDataService: EntityDataService, deferInitialRequest?: boolean) {
+        private statsService: SzStatisticsService, 
+        private engineService: SzGrpcEngineService,
+        //private entityDataService: EntityDataService, 
+        deferInitialRequest?: boolean) {
 
         if(this.parameters) {
             this._requestParameters = parameters;
@@ -464,14 +470,31 @@ export class SzStatSampleSet {
      * We need to get full entity data for entity objects since the datamart endpoints 
      * return minimal information. Gets the SzEntityData[] responses for multiple entities 
      */
-    private getEntitiesByIds(entityIds: SzEntityIdentifiers, withRelated = false, detailLevel = SzDetailLevel.BRIEF): Observable<SzEntityData[]> {
-        console.log('@senzing/sdk/services/sz-datamart[getEntitiesByIds('+ entityIds +', '+ withRelated +')] ');
-        const withRelatedStr = withRelated ? 'FULL' : 'NONE';
-        let _retSubject = new Subject<SzEntityData[]>();
+    
+    private getEntitiesByIds(entityIds: Array<string | number>): Observable<SzSdkResolvedEntity[]> {
+        console.log('@senzing/sdk/services/sz-datamart[getEntitiesByIds('+ entityIds +')] ');
+        let _retSubject = new Subject<SzSdkResolvedEntity[]>();
         let _retVal     = _retSubject.asObservable();
+        const flags     = SzEngineFlags.SZ_ENTITY_DEFAULT_FLAGS |
+        SzEngineFlags.SZ_ENTITY_INCLUDE_ALL_RELATIONS | 
+        SzEngineFlags.SZ_ENTITY_INCLUDE_ENTITY_NAME |
+        SzEngineFlags.SZ_ENTITY_INCLUDE_RELATED_ENTITY_NAME |
+        SzEngineFlags.SZ_ENTITY_INCLUDE_ALL_RELATIONS |
+        SzEngineFlags.SZ_ENTITY_INCLUDE_DISCLOSED_RELATIONS;
 
-        let _listOfObserveables = entityIds.map((eId) => {
-            return this.entityDataService.getEntityByEntityId(eId, detailLevel, undefined, undefined, undefined, false, withRelatedStr)
+        this.engineService.getEntitiesByEntityId(entityIds, flags).pipe(
+            map((responses: SzSdkEntityResponse[])=> {
+                return responses.map((entity: SzSdkEntityResponse)=>{
+                    return entity.RESOLVED_ENTITY
+                })
+            })
+        ).subscribe((results: SzSdkResolvedEntity[])=>{
+            _retSubject.next(results);
+        });
+        
+        /*let _listOfObserveables = entityIds.map((eId) => {
+            return this.engineService.    getEntityByEntityId(eId, flags);
+            //return this.entityDataService.getEntityByEntityId(eId, detailLevel, undefined, undefined, undefined, false, withRelatedStr)
         })
 
         forkJoin(_listOfObserveables).pipe(
@@ -482,7 +505,7 @@ export class SzStatSampleSet {
         .subscribe((results: SzEntityData[]) => {
             console.warn('@senzing/sdk/services/sz-datamart[getEntitiesByIds RESULT: ', results);
             _retSubject.next(results);
-        })
+        })*/
 
         return _retVal;
     }
@@ -625,13 +648,13 @@ export class SzStatSampleSet {
                     return ent.entityId;
                 });
 
-                const _extendEntityData = (edata: SzEntityData[] | undefined) => {
+                const _extendEntityData = (edata: SzSdkResolvedEntity[] | undefined) => {
                     //console.timeLog('SzStatSampleSet.getSampleDataFromParameters()', ': got entities: ', edata);
                     // expanded data
                     if(edata && edata.forEach) {
-                        edata.forEach((ent: SzEntityData) => {
+                        edata.forEach((ent: SzSdkResolvedEntity) => {
                             // add to internal array
-                            this._entities.set(ent.resolvedEntity.entityId, ent);
+                            this._entities.set(ent.ENTITY_ID, ent);
                         })
                     }
                     let dataset = this.currentPageResults;
@@ -649,7 +672,7 @@ export class SzStatSampleSet {
                         _extendEntityData(undefined);
                     } else {
                         // fetch data
-                        this.getEntitiesByIds(entitiesToRequest, false, SzDetailLevel.VERBOSE).pipe(
+                        this.getEntitiesByIds(entitiesToRequest).pipe(
                             takeUntil(this.unsubscribe$),
                             take(1)
                         ).subscribe({next: _extendEntityData,
@@ -701,23 +724,23 @@ export class SzStatSampleSet {
                     if(_relId && !this._entities.has(_relId) && entitiesToRequest.indexOf(_relId) < 0) { entitiesToRequest.push(_relId); }
                 });
 
-                const _extendRelatedData = (edata: SzEntityData[] | undefined) => {
+                const _extendRelatedData = (edata: SzSdkResolvedEntity[] | undefined) => {
                     //console.timeLog('SzStatSampleSet.getSampleDataFromParameters()', ': got entities: ', edata);
                     // set entity data
                     if(edata && edata.forEach) {
-                        edata.forEach((ent: SzEntityData) => {
+                        edata.forEach((ent: SzSdkResolvedEntity) => {
                             // add to internal array
-                            this._entities.set(ent.resolvedEntity.entityId, ent);
+                            this._entities.set(ent.ENTITY_ID, ent);
                         })
                     }
                     // now extend records with real data
                     _currentPageRelations.forEach((rel: SzRelation) => {
                         if(this._entities.has(rel.entity.entityId)) {
-                            let _fullEnt        = this._entities.get(rel.entity.entityId).resolvedEntity;
+                            let _fullEnt        = this._entities.get(rel.entity.entityId);
                             // extend records first
                             let _fullEntRecsMap = new Map();
-                            _fullEnt.records.map((rec) => {
-                                _fullEntRecsMap.set(rec.dataSource+'|'+rec.recordId, rec);
+                            _fullEnt.RECORDS.map((rec) => {
+                                _fullEntRecsMap.set(rec.DATA_SOURCE+'|'+rec.RECORD_ID, rec);
                             })
                             
                             rel.entity.records  = rel.entity.records.map((eRec) => {
@@ -727,10 +750,10 @@ export class SzStatSampleSet {
                             rel.entity = Object.assign(Object.assign({}, _fullEnt), rel.entity);
                         }
                         if(this._entities.has(rel.relatedEntity.entityId)) {
-                            let _fullEnt        = this._entities.get(rel.relatedEntity.entityId).resolvedEntity;
+                            let _fullEnt        = this._entities.get(rel.relatedEntity.entityId);
                             let _fullEntRecsMap = new Map();
-                            _fullEnt.records.map((rec) => {
-                                _fullEntRecsMap.set(rec.dataSource+'|'+rec.recordId, rec);
+                            _fullEnt.RECORDS.map((rec) => {
+                                _fullEntRecsMap.set(rec.DATA_SOURCE+'|'+rec.RECORD_ID, rec);
                             })
                             rel.relatedEntity.records  = rel.relatedEntity.records.map((eRec) => {
                                 //let _moddedRec          = Object.assign({}, _fullEntRecsMap.get(eRec.dataSource+'|'+eRec.recordId), {matchKey: rel.matchKey ? rel.matchKey : undefined, matchLevel: undefined});
@@ -761,7 +784,7 @@ export class SzStatSampleSet {
                         _extendRelatedData(undefined);
                     } else {
                         //console.timeLog('SzStatSampleSet.getSampleDataFromParameters()', ': get entity data: ', entitiesToRequest);
-                        this.getEntitiesByIds(entitiesToRequest, false, SzDetailLevel.VERBOSE).pipe(
+                        this.getEntitiesByIds(entitiesToRequest).pipe(
                             takeUntil(this.unsubscribe$),
                             take(1)
                         ).subscribe({
@@ -1133,7 +1156,8 @@ export class SzDataMartService {
         private http: HttpClient, 
         public prefs: SzPrefsService,
         private dataSourcesService: SzDataSourcesService,
-        private entityDataService: EntityDataService,
+        //private entityDataService: EntityDataService,
+        private engineService: SzGrpcEngineService,
         private statsService: SzStatisticsService) {
         if(!this._dataSources){
             this.getDataSources()
@@ -1194,7 +1218,7 @@ export class SzDataMartService {
             matchKey: matchKey,
             principle: principle,
             pageSize: pageSize
-        }, this.prefs, this.statsService, this.entityDataService);
+        }, this.prefs, this.statsService, this.engineService);
         
         if(unfilteredCount) {
             this._sampleSet.unfilteredCount = unfilteredCount;

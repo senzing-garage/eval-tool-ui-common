@@ -67,7 +67,7 @@
                 background-color: transparent !important;
                 &:hover, &:active {
                     cursor: default;
-                    color: transparent !important;
+                    color: #757686;
                     background-color: transparent !important;
                     .mat-icon {
                         color: #757686
@@ -269,15 +269,17 @@
                     &:active, &.active {
                         color: #E1E2ED;
                         padding-left: 16px;
-                        border-top: 1px solid #3FD0F5;
+                        /*border-top: 1px solid #3FD0F5;
                         border-right: 1px solid #3FD0F5;
                         border-bottom: 1px solid #3FD0F5;
-                        border-left: 1px solid #3FD0F5;
+                        border-left: 1px solid #3FD0F5;*/
+                        background: #5d5b61;
+                        color: #3FD0F5;
                         line-height: calc(56px - 2px);
 
                         &:hover {
                             cursor: default;
-                            color: #E1E2ED;
+                            color: #3FD0F5;
                         }
                     }
                     &:hover {

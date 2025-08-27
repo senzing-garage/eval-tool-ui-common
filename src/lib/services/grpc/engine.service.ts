@@ -74,7 +74,7 @@ export class SzGrpcEngineService {
         return retVal.asObservable();
     }
 
-    public getEntitiesByEntityId(entityIds: Array<string | number>, flags: BigInt | number = SzEngineFlags.SZ_ENTITY_DEFAULT_FLAGS): Observable<any | SzError> {
+    public getEntitiesByEntityId(entityIds: Array<string | number>, flags: BigInt | number = SzEngineFlags.SZ_ENTITY_DEFAULT_FLAGS): Observable<SzSdkEntityResponse[] | SzError> {
       let retVal    = new Subject<SzSdkEntityResponse[] | SzError>();
       let requests  = [];
       console.log(`getting entities by id from grpc...`);

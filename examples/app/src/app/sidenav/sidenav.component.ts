@@ -8,7 +8,7 @@ import { Subject } from 'rxjs';
 import {Overlay } from '@angular/cdk/overlay';
 import { AboutInfoService } from '../services/about.service';
 import { Timer } from 'd3-timer';
-import { SzFoliosService, SzPrefsService, SzSearchHistoryFolio, SzSearchHistoryFolioItem } from '@senzing/sdk-components-grpc-web';
+import { SzFoliosService, SzPrefsService, SzSearchHistoryFolio, SzSearchHistoryFolioItem } from '@senzing/sz-sdk-components-grpc-web';
 import { takeUntil } from 'rxjs/operators';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
@@ -80,7 +80,7 @@ export class SideNavComponent {
       submenuItems: [
         {
           name: 'By Attribute',
-          key: 'search-by-attribute',
+          key: '/search-by-attribute',
           order: 0,
           route: 'search/by-attribute'
         },
@@ -88,7 +88,7 @@ export class SideNavComponent {
           name: 'By Record/Entity Id',
           key: 'search-by-id',
           order: 1,
-          route: 'search/by-id'
+          route: '/search/by-id'
         }
       ]
     },
@@ -159,14 +159,14 @@ export class SideNavComponent {
       name: 'Admin',
       key: 'admin',
       order: 8,
-      route: 'admin',
+      route: '/admin',
       disabled: true
     },
     'license': {
       name: 'License Information',
       key: 'license',
       order: 9,
-      route: 'license'
+      route: '/license'
     }
   }
 

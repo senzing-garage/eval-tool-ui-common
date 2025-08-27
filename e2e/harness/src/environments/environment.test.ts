@@ -1,4 +1,4 @@
-import { SzRestConfigurationParameters } from '@senzing/sdk-components-grpc-web';
+import { SzRestConfigurationParameters } from '@senzing/sz-sdk-components-grpc-web';
 
 // This file can be replaced during build by using the `fileReplacements` array.
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.

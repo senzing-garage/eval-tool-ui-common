@@ -8,7 +8,7 @@ import {
   SzSearchByIdFormParams,
   SzEntityRecordViewerComponent,
   SzSdkEntityRecord
-} from '@senzing/sdk-components-grpc-web';
+} from '@senzing/sz-sdk-components-grpc-web';
 import { SpinnerService } from '../services/spinner.service';
 import { EntitySearchService } from '../services/entity-search.service';
 import { takeUntil } from 'rxjs/operators';

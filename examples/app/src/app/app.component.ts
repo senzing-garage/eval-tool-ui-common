@@ -11,7 +11,7 @@ import { SpinnerService } from './services/spinner.service';
 import { UiService } from './services/ui.service';
 import { PrefsManagerService } from './services/prefs-manager.service';
 import { Subject, takeUntil } from 'rxjs';
-import { SzEntitySearchParams, SzResumeEntity, SzSdkEntityRecord, SzSdkSearchResult } from '@senzing/sdk-components-grpc-web';
+import { SzEntitySearchParams, SzResumeEntity, SzSdkEntityRecord, SzSdkSearchResult } from '@senzing/sz-sdk-components-grpc-web';
 
 @Component({
   selector: 'app-root',

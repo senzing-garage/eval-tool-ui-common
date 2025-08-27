@@ -1,6 +1,6 @@
 {
   "$schema": "../../node_modules/ng-packagr/ng-package.schema.json",
-  "dest": "../../dist/@senzing/sdk-components-grpc-web",
+  "dest": "../../dist/@senzing/sz-sdk-components-grpc-web",
   "lib": {
     "entryFile": "public-api.ts"
   },

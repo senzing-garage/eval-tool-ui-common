@@ -10,7 +10,7 @@ import {
 
 import { AppSearchComponent } from './search/search.component';
 import { AppSearchByIdComponent } from './search/search-by-id.component';
-import { SearchResultsComponent } from './search-results/search-results.component';
+//import { SearchResultsComponent } from './search-results/search-results.component';
 import { SearchRecordComponent } from './record/record.component';
 import { DetailComponent } from './detail/detail.component';
 import { GraphComponent } from './graph/graph.component';
@@ -39,7 +39,7 @@ export const routes: Routes = [
   { path: 'search/by-attribute/entity/:entityId', component: DetailComponent, data: { animation: 'search-detail' } },
   { path: 'search/by-id/entitities/:entityId', component: DetailComponent, data: { animation: 'search-detail' } },
   { path: 'search/by-id/datasources/:datasource/records/:recordId', component: SearchRecordComponent, data: { animation: 'search-detail' } },
-  { path: 'search/results', component: SearchResultsComponent, data: { animation: 'search-results' } },
+  //{ path: 'search/results', component: SearchResultsComponent, data: { animation: 'search-results' } },
   //{ path: 'settings', component: AppSettingsComponent},
   { path: 'statistics', component: BlankComponent},
   { path: 'errors/no-results', component: NoResultsComponent, data: { animation: 'search-detail' } },

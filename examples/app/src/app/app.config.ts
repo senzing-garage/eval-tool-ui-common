@@ -2,7 +2,7 @@ import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { SzGrpcWebEnvironment } from '@senzing/sz-sdk-typescript-grpc-web';
-import { SenzingSdkModule, SzRestConfiguration } from '@senzing/sdk-components-grpc-web';
+import { SenzingSdkModule, SzRestConfiguration } from '@senzing/sz-sdk-components-grpc-web';
 import { provideHttpClient } from '@angular/common/http';
 
 // config factory for sdk(s)

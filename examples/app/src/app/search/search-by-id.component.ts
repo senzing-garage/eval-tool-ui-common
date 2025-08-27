@@ -24,7 +24,7 @@ import {
   SzSdkResolvedEntity,
   SzEntityRecordViewerComponent,
   SzSdkEntityRecord
-} from '@senzing/sdk-components-grpc-web';
+} from '@senzing/sz-sdk-components-grpc-web';
 
 import { EntitySearchService } from '../services/entity-search.service';
 import { SpinnerService } from '../services/spinner.service';
@@ -90,7 +90,10 @@ export class AppSearchByIdComponent implements OnInit {
   ) {
       // get "/config/api" for immutable api path configuration
       this.configService.getRuntimeApiConfig();
-      this.entitySearchService.currentlySelectedSearchResult.ENTITY.RESOLVED_ENTITY.ENTITY_ID
+      if(this.entitySearchService.currentlySelectedSearchResult) {
+        // do .... hmmm.. dunno.
+        //this.entitySearchService.currentlySelectedSearchResult.ENTITY.RESOLVED_ENTITY.ENTITY_ID
+      }
   }
 
   ngOnInit() {}
