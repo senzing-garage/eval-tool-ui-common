@@ -11,7 +11,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { SzResumeEntity } from '../../../models/SzResumeEntity';
 import { getStringEntityFeatures } from '../../../common/entity-utils';
 import { SzGrpcConfigManagerService } from '../../../services/grpc/configManager.service';
-import { SzSdkEntityRecord } from 'src/lib/models/grpc/engine';
+import { SzSdkEntityRecord } from '../../../models/grpc/engine';
 
 /**
  * @internal

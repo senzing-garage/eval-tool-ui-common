@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, ViewChild, C
 import { CommonModule } from '@angular/common';
 
 import { SzSectionDataByDataSource, SzEntityDetailSectionData } from '../../../models/entity-detail-section-data';
-import { SzEntityIdentifier, SzEntityRecord, SzRecordId } from '@senzing/rest-api-client-ng';
+import { SzEntityIdentifier, SzRecordId } from '@senzing/rest-api-client-ng';
 import { SzPrefsService } from '../../../services/sz-prefs.service';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
@@ -12,7 +12,7 @@ import { SzMultiSelectButtonComponent } from '../../../shared/multi-select-butto
 import { SzEntityRecordCardHeaderComponentGrpc } from '../../sz-entity-record-card/sz-entity-record-card-header/sz-entity-record-card-header.component';
 import { SzEntityRecordCardContentComponentGrpc } from '../../sz-entity-record-card/sz-entity-record-card-content/sz-entity-record-card-content.component';
 import { SzResumeRecordsByDataSource, SzResumeRelatedEntitiesByMatchKey, SzResumeRelatedEntity } from '../../../models/SzResumeEntity';
-import { SzSdkEntityRecord } from 'src/lib/models/grpc/engine';
+import { SzSdkEntityRecord } from '../../../models/grpc/engine';
 import { SzEntityMatchPillComponent } from '../../sz-entity-match-pill/sz-entity-match-pill.component';
 
 /**

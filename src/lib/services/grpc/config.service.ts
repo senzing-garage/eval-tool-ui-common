@@ -4,8 +4,7 @@ import { Subject } from 'rxjs';
 import { SzSdkConfigAttr, SzSdkConfigFeatureType, SzSdkConfigJson, SzSdkDataSource } from '../../models/grpc/config';
 import { SzSdkEntityFeature } from "../../models/grpc/engine";
 import { SzAttrClass, SzFeatureType } from "../../models/SzFeatureTypes";
-
-//import { SzProductLicenseResponse, SzProductVersionResponse } from 'src/lib/models/grpc/product';
+//import { SzProductLicenseResponse, SzProductVersionResponse } from '../../models/grpc/product';
 
 @Injectable({
   providedIn: 'root'
