@@ -1,7 +1,7 @@
 import { Inject, Injectable, signal } from '@angular/core';
 import { SzGrpcWebEnvironment } from '@senzing/sz-sdk-typescript-grpc-web';
 import { Subject } from 'rxjs';
-import { SzProductLicenseResponse, SzProductVersionResponse } from 'src/lib/models/grpc/product';
+import { SzProductLicenseResponse, SzProductVersionResponse } from '../../models/grpc/product';
 
 @Injectable({
   providedIn: 'root'
