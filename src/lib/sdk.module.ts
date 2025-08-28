@@ -274,7 +274,8 @@ const SzGrpcEnvInjector = new InjectionToken<SzGrpcWebEnvironment>("SzGrpcWebEnv
         SzWhyEntitiesDialog,
         SzWhyEntityDialog,
         SzPreferencesComponent
-    ], imports: [CommonModule,
+    ], imports: [
+        CommonModule,
         DragDropModule,
         FormsModule,
         ReactiveFormsModule,
