@@ -5,13 +5,6 @@ import { Observable, Subject  } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 
-import {
-  //Configuration as SzRestConfiguration,
-  //ConfigurationParameters as SzRestConfigurationParameters,
-  //SzEntityRecord,
-  //EntityDataService as SzEntityDataService,
-  //SzEntityData
-} from '@senzing/rest-api-client-ng';
 import { SzEntitySearchParams } from '../../models/entity-search';
 import { SzSearchService } from '../../services/sz-search.service';
 import { JSONScrubber } from '../../common/utils';
@@ -19,7 +12,7 @@ import { SzConfigurationService } from '../../services/sz-configuration.service'
 import { SzPrefsService } from '../../services/sz-prefs.service';
 import { SzDataSourcesService } from '../../services/sz-datasources.service';
 import { SzSdkEntityRecord, SzSdkEntityResponse, SzSdkResolvedEntity } from '../../models/grpc/engine';
-import { SzSdkDataSource } from 'src/lib/models/grpc/config';
+import { SzSdkDataSource } from '../../models/grpc/config';
 
 /** @internal */
 export interface SzSearchByIdFormParams {

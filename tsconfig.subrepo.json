@@ -5,6 +5,7 @@
     "baseUrl": "../",
     "outDir": "../dist/out-tsc",
     "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
     "strict": false,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
@@ -15,6 +16,7 @@
     "downlevelIteration": true,
     "experimentalDecorators": true,
     "moduleResolution": "node",
+    "resolveJsonModule": true,
     "importHelpers": true,
     "paths": {
       "@senzing/rest-client-ng": [
@@ -24,18 +26,14 @@
       "@senzing/sz-sdk-components-grpc-web": [
         "dist/@senzing/sz-sdk-components-grpc-web/senzing-sdk-components-grpc-web",
         "dist/@senzing/sz-sdk-components-grpc-web"
-      ],
-      "@senzing/sdk-components-web": [
-        "dist/@senzing/sdk-components-web/senzing-sdk-components-web",
-        "dist/@senzing/sdk-components-web"
       ]
     },
-    "target": "es2017",
-    "module": "es2020",
+    "target": "ES2022",
+    "module": "ES2022",
     "lib": [
-      "es2018",
+      "ES2022",
       "dom"
-    ]
+    ],
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
