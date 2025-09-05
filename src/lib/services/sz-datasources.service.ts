@@ -81,10 +81,30 @@ export class SzDataSourcesService {
   /**
    * add datasources and return a array of datasources after the operation.
    */
-  /*public addDataSources(dataSources: string[]): Observable<string[]> {
-    return this.configService.addDataSources(dataSources)
-    .pipe(
-      map( (resp: SzDataSourcesResponse) => resp.data.dataSources )
-    )
-  }*/
+  public registerDataSources(dataSources: string[]): Observable<string[]> {
+    let retVal = new Subject<string[]>();
+    // first get current configs datasources to make sure were not 
+    // trying to re-register
+    if(dataSources.length > 0) {
+      this.configManagerService.config.then((conf)=>{
+        conf.dataSources.subscribe((registeredDataSources: SzSdkDataSource[])=> {
+          let _registeredCodes  = registeredDataSources.map((rDs)=>{ return rDs.DSRC_CODE; });
+          let _dataSourcesToAdd = dataSources.filter((dsToAdd)=> {
+            return !_registeredCodes.includes(dsToAdd);
+          });
+
+          conf.registerDataSources(_dataSourcesToAdd).pipe(
+            takeUntil(this.unsubscribe$)
+          ).subscribe((resp) => {
+            console.log(`added datasources: `, resp);
+            console.log(`conf: `, conf.definition);
+            this.configManagerService.setDefaultConfig(conf.definition).pipe(
+              takeUntil(this.unsubscribe$)
+            ).subscribe((newConfigId)=>{});
+          });
+        });
+      });
+    }
+    return retVal.asObservable();
+  }
 }
