@@ -1,11 +1,11 @@
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SzEntityDetailSectionSummaryComponent } from './summary.component';
+import { SzEntityDetailSectionSummaryComponentGrpc } from './summary.component';
 import { SenzingSdkModule } from 'src/lib/sdk.module';
 
 describe('SzEntityDetailSectionSummaryComponent', () => {
-  let component: SzEntityDetailSectionSummaryComponent;
-  let fixture: ComponentFixture<SzEntityDetailSectionSummaryComponent>;
+  let component: SzEntityDetailSectionSummaryComponentGrpc;
+  let fixture: ComponentFixture<SzEntityDetailSectionSummaryComponentGrpc>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -15,7 +15,7 @@ describe('SzEntityDetailSectionSummaryComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SzEntityDetailSectionSummaryComponent);
+    fixture = TestBed.createComponent(SzEntityDetailSectionSummaryComponentGrpc);
     component = fixture.componentInstance;
     component.section = {total: 0, title: ''};
   });

@@ -14,7 +14,6 @@ import { EntitySearchService } from '../services/entity-search.service';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import { SzEntityRecordCardComponent } from 'deprecated/entity/sz-entity-record-card/sz-entity-record-card.component';
 
 @Component({
   selector: 'app-search-record',
