@@ -3,6 +3,7 @@ import { SzPrefsService } from '../../../services/sz-prefs.service';
 import { Subject } from 'rxjs';
 import { SzGraphControlComponent } from '../../../graph-grpc/sz-graph-control.component';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 /**
  * @internal
@@ -12,9 +13,7 @@ import { CommonModule } from '@angular/common';
     selector: 'sz-entity-detail-graph-control',
     templateUrl: '../../../graph-grpc/sz-graph-control.component.html',
     styleUrls: ['../../../graph-grpc/sz-graph-control.component.scss'],
-    imports: [
-      CommonModule
-    ]
+    imports: [CommonModule, FormsModule]
 })
 export class SzEntityDetailGraphControlComponent extends SzGraphControlComponent {
   constructor(

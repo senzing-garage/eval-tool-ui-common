@@ -1,11 +1,11 @@
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SzEntityDetailComponentGrpc } from './sz-entity-detail.component';
+import { SzEntityDetailGrpcComponent } from './sz-entity-detail.component';
 import { SenzingSdkModule } from 'src/lib/sdk.module';
 
 describe('SzEntityDetailComponent', () => {
-  let component: SzEntityDetailComponentGrpc;
-  let fixture: ComponentFixture<SzEntityDetailComponentGrpc>;
+  let component: SzEntityDetailGrpcComponent;
+  let fixture: ComponentFixture<SzEntityDetailGrpcComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -15,7 +15,7 @@ describe('SzEntityDetailComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SzEntityDetailComponentGrpc);
+    fixture = TestBed.createComponent(SzEntityDetailGrpcComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
