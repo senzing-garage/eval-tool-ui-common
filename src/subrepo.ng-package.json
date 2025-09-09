@@ -1,6 +1,6 @@
 {
-  "$schema": "../../node_modules/ng-packagr/ng-package.schema.json",
-  "dest": "../../dist/@senzing/sz-sdk-components-grpc-web",
+  "$schema": "../../../node_modules/ng-packagr/ng-package.schema.json",
+  "dest": "../../../dist/@senzing/eval-tool-ui-common",
   "lib": {
     "entryFile": "public-api.ts"
   },
