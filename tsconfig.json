@@ -17,9 +17,9 @@
     "resolveJsonModule": true,
     "importHelpers": true,
     "paths": {
-      "@senzing/sz-sdk-components-grpc-web": [
-        "dist/@senzing/sz-sdk-components-grpc-web/senzing-sdk-components-grpc-web",
-        "dist/@senzing/sz-sdk-components-grpc-web"
+      "@senzing/eval-tool-ui-common": [
+        "dist/@senzing/eval-tool-ui-common/senzing-eval-tool-ui-common",
+        "dist/@senzing/eval-tool-ui-common"
       ]
     },
     "target": "ES2022",

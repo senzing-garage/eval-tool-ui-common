@@ -2,7 +2,7 @@
   "compileOnSave": false,
   "compilerOptions": {
     "baseUrl": ".",
-    "outDir": "../dist/@senzing/sz-sdk-components-grpc-web/schematics",
+    "outDir": "../dist/@senzing/eval-tool-ui-common/schematics",
     "forceConsistentCasingInFileNames": true,
     "strict": false,
     "noImplicitOverride": true,

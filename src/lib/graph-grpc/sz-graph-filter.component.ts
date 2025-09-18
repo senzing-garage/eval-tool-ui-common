@@ -223,7 +223,7 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
         // assume it's already cast correctly
         this._matchKeyTokenSelectionScope = (value as SzMatchKeyTokenFilterScope);
     }
-    //console.log(`@senzing/sz-sdk-components-grpc-web/sz-graph-filter.matchKeyTokenSelectionScope(${value} | ${(this._matchKeyTokenSelectionScope as unknown as string)})`, this._matchKeyTokenSelectionScope);
+    //console.log(`@senzing/eval-tool-ui-common/sz-graph-filter.matchKeyTokenSelectionScope(${value} | ${(this._matchKeyTokenSelectionScope as unknown as string)})`, this._matchKeyTokenSelectionScope);
   }
   /**
    * get the value of match key token filterings scope. possible values are 
@@ -242,7 +242,7 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
   private _showCoreMatchKeyTokenChips: boolean       = false;
   @Input() public set showCoreMatchKeyTokenChips(value: boolean) {
     this._showCoreMatchKeyTokenChips = value;
-    //console.log(`@senzing/sz-sdk-components-grpc-web/sz-graph-filter.showCoreMatchKeyTokenChips(${value})`, this._showCoreMatchKeyTokenChips);
+    //console.log(`@senzing/eval-tool-ui-common/sz-graph-filter.showCoreMatchKeyTokenChips(${value})`, this._showCoreMatchKeyTokenChips);
   }
   public get showCoreMatchKeyTokenChips(): boolean {
     return this._showCoreMatchKeyTokenChips;
@@ -449,7 +449,7 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
       .filter(v => v !== null);
     // update filters pref    
     this.prefs.graph.matchKeysIncluded = includedMatchKeyNames;
-    //console.log('@senzing/sz-sdk-components-grpc-web/sz-entity-detail-graph-filter.onMkFilterChange',this.prefs.graph.matchKeysIncluded);
+    //console.log('@senzing/eval-tool-ui-common/sz-entity-detail-graph-filter.onMkFilterChange',this.prefs.graph.matchKeysIncluded);
   }
   onMkTagFilterToggle( mkName: string ) {
     let _matchKeyTokensIncludedMemCopy: string[] = [];
@@ -461,18 +461,18 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
         // remove from position
         _matchKeyTokensIncludedMemCopy.splice(_existingKeyPos,1);
         this.prefs.graph.matchKeyTokensIncluded = _matchKeyTokensIncludedMemCopy;
-        console.log(`@senzing/sz-sdk-components-grpc-web/sz-entity-detail-graph-filter.onMkTagFilterToggle: removed ${mkName} from cloud value`,_matchKeyTokensIncludedMemCopy);
+        console.log(`@senzing/eval-tool-ui-common/sz-entity-detail-graph-filter.onMkTagFilterToggle: removed ${mkName} from cloud value`,_matchKeyTokensIncludedMemCopy);
       } else {
         // add to included token list
         _matchKeyTokensIncludedMemCopy.push( mkName );
         this.prefs.graph.matchKeyTokensIncluded = _matchKeyTokensIncludedMemCopy;
-        console.log(`@senzing/sz-sdk-components-grpc-web/sz-entity-detail-graph-filter.onMkTagFilterToggle: added ${mkName} to cloud value`,_matchKeyTokensIncludedMemCopy);
+        console.log(`@senzing/eval-tool-ui-common/sz-entity-detail-graph-filter.onMkTagFilterToggle: added ${mkName} to cloud value`,_matchKeyTokensIncludedMemCopy);
       }
     } else {
       // add to included token list
       _matchKeyTokensIncludedMemCopy.push( mkName );
       this.prefs.graph.matchKeyTokensIncluded = _matchKeyTokensIncludedMemCopy;
-      console.log(`@senzing/sz-sdk-components-grpc-web/sz-entity-detail-graph-filter.onMkTagFilterToggle: added ${mkName} to cloud value`,_matchKeyTokensIncludedMemCopy);
+      console.log(`@senzing/eval-tool-ui-common/sz-entity-detail-graph-filter.onMkTagFilterToggle: added ${mkName} to cloud value`,_matchKeyTokensIncludedMemCopy);
     }
   }
   onCoreMkTagFilterToggle( mkName: string ) { 
@@ -488,24 +488,24 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
       // now that we have a clean array see if the current value has 
       // an existing position
       let _existingKeyPos = _matchKeyTokensIncludedMemCopy.indexOf(mkName);
-      console.log(`@senzing/sz-sdk-components-grpc-web/sz-entity-detail-graph-filter.onCoreMkTagFilterToggle: checking if "${mkName}" is in existing items: ${_matchKeyTokensIncludedMemCopy}`, _existingKeyPos);
+      console.log(`@senzing/eval-tool-ui-common/sz-entity-detail-graph-filter.onCoreMkTagFilterToggle: checking if "${mkName}" is in existing items: ${_matchKeyTokensIncludedMemCopy}`, _existingKeyPos);
       if(_existingKeyPos > -1 && _matchKeyTokensIncludedMemCopy[_existingKeyPos]) {
         // remove from position
         _matchKeyTokensIncludedMemCopy.splice(_existingKeyPos,1);
         this.prefs.graph.matchKeyCoreTokensIncluded = _matchKeyTokensIncludedMemCopy;
-        console.log(`@senzing/sz-sdk-components-grpc-web/sz-entity-detail-graph-filter.onCoreMkTagFilterToggle: removed ${mkName} from cloud value`,_matchKeyTokensIncludedMemCopy);
+        console.log(`@senzing/eval-tool-ui-common/sz-entity-detail-graph-filter.onCoreMkTagFilterToggle: removed ${mkName} from cloud value`,_matchKeyTokensIncludedMemCopy);
       } else {
         // add to included token list
         _matchKeyTokensIncludedMemCopy.push( mkName );
         this.prefs.graph.matchKeyCoreTokensIncluded = _matchKeyTokensIncludedMemCopy;
-        console.log(`@senzing/sz-sdk-components-grpc-web/sz-entity-detail-graph-filter.onCoreMkTagFilterToggle: addeded ${mkName}(${_existingKeyPos}) to cloud value`,_matchKeyTokensIncludedMemCopy);
+        console.log(`@senzing/eval-tool-ui-common/sz-entity-detail-graph-filter.onCoreMkTagFilterToggle: addeded ${mkName}(${_existingKeyPos}) to cloud value`,_matchKeyTokensIncludedMemCopy);
       }
     } else {
       console.log(`matchKeyCoreTokensIncluded: ${this.matchKeyCoreTokensIncluded}`);
       // add to included token list
       _matchKeyTokensIncludedMemCopy.push( mkName );
       this.prefs.graph.matchKeyCoreTokensIncluded = _matchKeyTokensIncludedMemCopy;
-      console.log(`@senzing/sz-sdk-components-grpc-web/sz-entity-detail-graph-filter.onCoreMkTagFilterToggle: added ${mkName} to cloud value`,_matchKeyTokensIncludedMemCopy, this.matchKeyCoreTokensIncluded);
+      console.log(`@senzing/eval-tool-ui-common/sz-entity-detail-graph-filter.onCoreMkTagFilterToggle: added ${mkName} to cloud value`,_matchKeyTokensIncludedMemCopy, this.matchKeyCoreTokensIncluded);
     }
   }
 
@@ -668,7 +668,7 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
     } else if (isBoolean(event)) {
       _checked = (event as boolean);
     }
-    console.log('@senzing/sz-sdk-components-grpc-web/SzEntityDetailGraphFilterComponent.onCheckboxPrefToggle: ', optName, _checked, event);
+    console.log('@senzing/eval-tool-ui-common/SzEntityDetailGraphFilterComponent.onCheckboxPrefToggle: ', optName, _checked, event);
     this.prefs.graph[optName] = parseBool(_checked);
     this.optionChanged.emit({'name': optName, value: _checked});
   }
@@ -700,7 +700,7 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
     this.matchKeyTokenSelectionScope  = prefs.matchKeyTokenSelectionScope;
     //this._matchKeyTokenSelectionScope = prefs.matchKeyTokenSelectionScope;
 
-    console.log('@senzing/sz-sdk-components-grpc-web/sz-entity-detail-graph-filter.onPrefsChange(): ', prefs, this.dataSourceColors);
+    console.log('@senzing/eval-tool-ui-common/sz-entity-detail-graph-filter.onPrefsChange(): ', prefs, this.dataSourceColors);
     // update view manually (for web components redraw reliability)
     this.cd.detectChanges();
   }
@@ -769,7 +769,7 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
      * @TODO something about changing this is causing a new 
      * graph data request. Need to fix this.
      */
-    console.log('@senzing/sz-sdk-components-grpc-web/sz-entity-detail-graph-filter.onSelectAllMatchKeyTokens: ', selectAll);
+    console.log('@senzing/eval-tool-ui-common/sz-entity-detail-graph-filter.onSelectAllMatchKeyTokens: ', selectAll);
     if(this.showCoreMatchKeyTokenChips) {
       this.prefs.graph.matchKeyCoreTokensIncluded = selectAll ? this.matchKeyCoreTokens.map((token: SzMatchKeyTokenComposite) => { return token.name; }) : [];
     } else if(this.prefs.graph.matchKeyCoreTokensIncluded && this.prefs.graph.matchKeyCoreTokensIncluded.length > 0) {
@@ -897,11 +897,11 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
     while(this.filterByMatchKeysData.length > 0){
       this.filterByMatchKeysData.removeAt(this.filterByMatchKeysData.length - 1);
     }
-    //console.log('@senzing/sz-sdk-components-grpc-web/sz-entity-detail-graph-filter.removeAllMatchKeyControls: ', this.filterByMatchKeysData, this.matchKeysIncluded);
+    //console.log('@senzing/eval-tool-ui-common/sz-entity-detail-graph-filter.removeAllMatchKeyControls: ', this.filterByMatchKeysData, this.matchKeysIncluded);
   }
 
   private initializeMatchKeysFormControls() {
-    //console.log('@senzing/sz-sdk-components-grpc-web/sz-entity-detail-graph-filter.initializeMatchKeysFormControls: ', this.matchKeys, this.showMatchKeys, this.matchKeysIncluded);
+    //console.log('@senzing/eval-tool-ui-common/sz-entity-detail-graph-filter.initializeMatchKeysFormControls: ', this.matchKeys, this.showMatchKeys, this.matchKeysIncluded);
     if(this.matchKeys) {
       // remove old controls
       this.removeAllMatchKeyControls();
