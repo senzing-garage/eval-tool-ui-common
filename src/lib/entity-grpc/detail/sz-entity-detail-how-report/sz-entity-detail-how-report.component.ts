@@ -88,7 +88,7 @@ export class SzEntityDetailHowReportComponent implements OnDestroy, OnInit {
         /*SzHowUIService.getHowDataForEntity(this.entityId).pipe(
             takeUntil(this.unsubscribe$)
         ).subscribe((result) => {
-            console.log(`@senzing/sz-sdk-components-grpc-web/sz-entity-detail-section-how-report`, result);
+            console.log(`@senzing/eval-tool-ui-common/sz-entity-detail-section-how-report`, result);
         });*/
     }
   }
@@ -120,7 +120,7 @@ export class SzEntityDetailHowReportComponent implements OnDestroy, OnInit {
   }
 
   onDataChange(howData: SzHowEntityResult) {
-    console.log(`@senzing/sz-sdk-components-grpc-web/sz-entity-detail-section-how-report/onDataChange: `, howData);
+    console.log(`@senzing/eval-tool-ui-common/sz-entity-detail-section-how-report/onDataChange: `, howData);
     if(howData && howData.resolutionSteps && Object.keys(howData.resolutionSteps).length) {
         this._stepCount = Object.keys(howData.resolutionSteps).length;
     }

@@ -2,7 +2,7 @@
   "$schema": "../../node_modules/@angular-devkit/schematics/collection-schema.json",
   "schematics": {
     "ng-add": {
-      "description": "Add @senzing/sz-sdk-components-grpc-web to the project.",
+      "description": "Add @senzing/eval-tool-ui-common to the project.",
       "factory": "./ng-add/index"
     }
   }

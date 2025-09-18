@@ -2,7 +2,7 @@
 
 ## Installation
 
-Open up a terminal to your application root and type `npm install @senzing/sz-sdk-components-grpc-web --save`.
+Open up a terminal to your application root and type `npm install @senzing/eval-tool-ui-common --save`.
 
 ## Add to app.module.ts
 
@@ -11,7 +11,7 @@ Now open up your applications main module file, in most cases this will be app.m
 ```typescript
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { SenzingSdkModule } from '@senzing/sz-sdk-components-grpc-web';
+import { SenzingSdkModule } from '@senzing/eval-tool-ui-common';
 
 import { AppComponent } from './app.component';
 

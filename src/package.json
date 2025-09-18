@@ -1,14 +1,14 @@
 {
-  "name": "@senzing/sz-sdk-components-grpc-web",
+  "name": "@senzing/eval-tool-ui-common",
   "version": "0.0.4",
   "private": false,
   "keywords" :["Angular","Library","Senzing"],
   "license" : "SEE LICENSE IN LICENSE",
   "repository": {
     "type" : "git",
-    "url" : "https://github.com/senzing-garage/sz-sdk-components-grpc-web"
+    "url" : "https://github.com/senzing-garage/eval-tool-ui-common"
   },
-  "homepage" :"https://senzing.github.io/sz-sdk-components-grpc-web/",
+  "homepage" :"https://senzing.github.io/eval-tool-ui-common/",
   "dependencies": {
     "@types/d3": "^7.4.0",
     "d3": "^7.8.0",
