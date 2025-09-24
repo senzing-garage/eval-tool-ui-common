@@ -73,11 +73,17 @@
     opacity: var(--sz-entity-detail-header-section-totals-opacity);
     .section-summary__count {
       font-size: var(--sz-entity-detail-header-section-totals-font-size);
+      text-shadow: var(--sz-entity-detail-header-section-totals-count-shadow);
       font-weight: 600;
+    }
+    svg {
+      filter: var(--sz-entity-detail-header-section-totals-icon-filter);
     }
   }
   .section-summary__bottom {
+    color: var(--sz-entity-detail-header-section-totals-text-color);
     opacity: var(--sz-entity-detail-header-section-totals-opacity);
+    text-shadow: var(--sz-entity-detail-header-section-totals-text-shadow);
   }
 
   svg {

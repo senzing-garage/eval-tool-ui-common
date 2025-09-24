@@ -52,6 +52,7 @@ body {
     padding: var(--sz-graph-tooltip-padding);
     border-radius: var(--sz-graph-tooltip-border-radius);
     border: var(--sz-graph-tooltip-border);
+    z-index: var(--sz-graph-tooltip-z-index);
     box-shadow: 3px 3px 10px rgba(0, 0, 0, .5);
     pointer-events: none;
   }

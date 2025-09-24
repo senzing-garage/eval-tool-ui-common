@@ -64,6 +64,11 @@
   h3:first-child {
     margin-top: 0;
   }
+  h3 {
+    font-weight: var(--sz-graph-filter-control-header-font-weight);
+    font-size: var(--sz-graph-filter-control-header-font-size);
+    color: var(--sz-graph-filter-control-header-color);
+  }
 
   .filter-header {
     display: flex;
