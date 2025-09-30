@@ -1,0 +1,136 @@
+@use "_mixins.scss" as *;
+
+@font-face {
+    font-family: 'senzing';
+    src:  url('/fonts/Senzing.eot?4nlinf');
+    src:  url('/fonts/Senzing.eot?4nlinf#iefix') format('embedded-opentype'),
+      url('/fonts/Senzing.ttf?4nlinf') format('truetype'),
+      url('/fonts/Senzing.woff?4nlinf') format('woff'),
+      url('/fonts/Senzing.svg?4nlinf#senzing') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+  
+senzing-icons, [class^="senzing-"], [class*=" senzing-"] {
+    /* use !important to prevent issues with browser extensions that change fonts */
+    font-family: 'senzing' !important;
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+  
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  .senzing-insights_card:before {
+    content: "\e900";
+  }
+  .senzing-loading:before {
+    content: "\e901";
+  }
+  .senzing-matches_card:before {
+    content: "\e902";
+  }
+  .senzing-search_card:before {
+    content: "\e903";
+  }
+  .senzing-datasource_card:before {
+    content: "\e904";
+  }
+  .senzing-generic_datasource:before {
+    content: "\e905";
+  }
+  .senzing-quickbooks_logo:before {
+    content: "\e906";
+  }
+  .senzing-woo_logo:before {
+    content: "\e907";
+  }
+  .senzing-mailchimp_logo:before {
+    content: "\e908";
+  }
+  .senzing-salesforce_logo:before {
+    content: "\e909";
+  }
+  .senzing-wave_logo:before {
+    content: "\e90a";
+  }
+  .senzing-xero_logo:before {
+    content: "\e90b";
+  }
+  .senzing-rightarrow:before {
+    content: "\e90c";
+  }
+  .senzing-leftarrow:before {
+    content: "\e90d";
+  }
+  .senzing-downarrow:before {
+    content: "\e90e";
+  }
+  .senzing-hamburger:before {
+    content: "\e90f";
+  }
+  .senzing-dropdownarrow:before {
+    content: "\e910";
+  }
+  .senzing-help:before {
+    content: "\e911";
+  }
+  .senzing-heart:before {
+    content: "\e912";
+  }
+  .senzing-home:before {
+    content: "\e911";
+  }
+  .senzing-suggestions:before {
+    content: "\e913";
+  }
+  .senzing-lightbulb:before {
+    content: "\e914";
+  }
+  .senzing-disclosedrelationships:before {
+    content: "\e915";
+  }
+  .senzing-matches:before {
+    content: "\e916";
+  }
+  .senzing-relationships:before {
+    content: "\e917";
+  }
+  .senzing-user:before {
+    content: "\e918";
+  }
+  .senzing-link:before {
+    content: "\e919";
+  }
+  .senzing-key:before {
+    content: "\e91a";
+  }
+  .senzing-alert:before {
+    content: "\e91b";
+  }
+  .senzing-userfemale:before {
+    content: "\e91c";
+  }
+  .senzing-alarm:before {
+    content: "\e91d";
+  }
+  .senzing-audit:before {
+    content: "\e91e";
+  }
+  .senzing-search_navigation:before {
+    content: "\e91f";
+  }
+  .senzing-datasource:before {
+    content: "\e920";
+  }
+  .senzing-dashboard:before {
+    content: "\e921";
+  }
+  .senzing-workbench:before {
+    content: "\e922";
+  }
