@@ -1,9 +1,9 @@
 
 import { Component, HostBinding, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule} from '@angular/material/dialog';
 import { MatBottomSheetRef, MAT_BOTTOM_SHEET_DATA} from '@angular/material/bottom-sheet';
 
-import { SzAttributeType } from '@senzing/rest-api-client-ng';
+//import { SzAttributeType } from '@senzing/rest-api-client-ng';
 import { CommonModule, UpperCasePipe } from '@angular/common';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -11,14 +11,15 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { SzSdkConfigAttr } from "../../models/grpc/config";
 
 /** @internal */
-interface AttrRow extends SzAttributeType {
+interface AttrRow extends SzSdkConfigAttr {
     checked: boolean;
 }
 /** @internal */
 interface AttrData {
-    attributeTypes: SzAttributeType[]
+    attributeTypes: SzSdkConfigAttr[]
     selected: string[]
 }
 
@@ -45,7 +46,8 @@ interface AttrData {
     styleUrls: ['./sz-search-identifiers-picker.component.scss'],
     imports: [
         CommonModule, FormsModule, ReactiveFormsModule, 
-        MatBadgeModule, MatButtonModule, MatIconModule, MatInputModule, MatCheckboxModule
+        MatBadgeModule, MatButtonModule, 
+        MatDialogModule, MatIconModule, MatInputModule, MatCheckboxModule
     ]
 })
 export class SzSearchIdentifiersPickerDialogComponent {
@@ -92,9 +94,9 @@ export class SzSearchIdentifiersPickerDialogComponent {
         
         if(this.data) {
             this._dataModel = this.extendInputData(this.data.attributeTypes, this.data.selected).sort((a: AttrRow, b: AttrRow) => {
-                if (a.attributeCode < b.attributeCode) 
+                if (a.ATTR_CODE < b.ATTR_CODE) 
                     return -1; 
-                if (a.attributeCode > b.attributeCode) 
+                if (a.ATTR_CODE > b.ATTR_CODE) 
                     return 1; 
                 return 0; 
             });
@@ -107,12 +109,12 @@ export class SzSearchIdentifiersPickerDialogComponent {
      * @param value SzAttributeType[]
      * @param selected array of attributeCode strings that are selected
      */
-    protected extendInputData(value: SzAttributeType[], selected: string[]) {
+    protected extendInputData(value: SzSdkConfigAttr[], selected: string[]) {
         //console.log('extendInputData: ', value, selected);
         let retVal: Array<AttrRow> = [];
         if(value && value.map) {
-            retVal = value.map( (attrObj: SzAttributeType) => {
-                return Object.assign({checked: (attrObj.attributeCode && selected.indexOf(attrObj.attributeCode) > -1) }, attrObj);
+            retVal = value.map( (attrObj: SzSdkConfigAttr) => {
+                return Object.assign({checked: (attrObj.ATTR_CODE && selected.indexOf(attrObj.ATTR_CODE) > -1) }, attrObj);
             });
         }
         return retVal;
@@ -185,7 +187,7 @@ export class SzSearchIdentifiersPickerDialogComponent {
     styleUrls: ['./sz-search-identifiers-picker.component.scss'],
     imports: [
         CommonModule, FormsModule, ReactiveFormsModule, 
-        MatBadgeModule, MatButtonModule, MatIconModule, MatInputModule, MatCheckboxModule
+        MatBadgeModule, MatButtonModule, MatDialogModule, MatIconModule, MatInputModule, MatCheckboxModule
     ]
 })
 export class SzSearchIdentifiersPickerSheetComponent extends SzSearchIdentifiersPickerDialogComponent {
@@ -199,9 +201,9 @@ export class SzSearchIdentifiersPickerSheetComponent extends SzSearchIdentifiers
 
         if(this.data) {
             this._dataModel = this.extendInputData(this.data.attributeTypes, this.data.selected).sort((a: AttrRow, b: AttrRow) => {
-                if (a.attributeCode < b.attributeCode) 
+                if (a.ATTR_CODE < b.ATTR_CODE) 
                     return -1; 
-                if (a.attributeCode > b.attributeCode) 
+                if (a.ATTR_CODE > b.ATTR_CODE) 
                     return 1; 
                 return 0; 
             });

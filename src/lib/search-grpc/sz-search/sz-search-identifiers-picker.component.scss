@@ -12,14 +12,11 @@
         display: none;
     }
 
-    .mat-mdc-dialog-actions {
-        /*position: absolute;
-        bottom: 0px;
-        display: flex;*/
+    /*.mat-mdc-dialog-actions {
         flex-direction: row;
         justify-content: flex-end;
         position: relative;
-    }
+    }*/
 
     button.mat-primary {
         background-color: colors.$blue;
@@ -28,7 +25,6 @@
     button.toggle-all {
         left: 0px;
         position: absolute;
-        top: 15px;
     }
 }
 
@@ -66,9 +62,10 @@
     }
 }
 
+/*
 :host ::ng-deep .mat-mdc-dialog-content {
     height: calc(100% - 96px);
-}
+}*/
 
 :host.isMatSheet ::ng-deep .mat-mdc-dialog-content {
     height: calc(100vh - 32px - 0.67em - 0.67em - 16px);

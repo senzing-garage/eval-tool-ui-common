@@ -1,5 +1,5 @@
-<h1 mat-dialog-title class="mat-dialog-title">Identifier Types</h1>
-<div mat-dialog-content class="mat-dialog-content">
+<h2 mat-dialog-title class="mat-dialog-title" cdkDrag cdkDragRootElement=".cdk-overlay-pane">Identifier Types</h2>
+<div mat-dialog-content #dialogContent>
   <p>Select which identifiers appear in the dropdown</p>
   <!--<mat-form-field>
     <mat-label>Favorite Animal</mat-label>
@@ -16,12 +16,12 @@
   <div class="value-pair" *ngFor="let attrRow of orderedData">
     <div class="value-pair-row">
       <mat-checkbox [(ngModel)]="attrRow.checked">
-        {{attributeCodeAsText(attrRow.attributeCode) | uppercase}}
+        {{attributeCodeAsText(attrRow.ATTR_CODE) | uppercase}}
       </mat-checkbox>
     </div>
   </div>
 </div>
-<div *ngIf="showButtons" mat-dialog-actions class="mat-dialog-actions">
+<mat-dialog-actions *ngIf="showButtons" >
   <button mat-button color="basic" class="toggle-all hide-on-sheet">
     <mat-checkbox [(ngModel)]="allOptionsSelected" class="toggle-all">
       <span *ngIf="allOptionsSelected">Deselect All</span>
@@ -30,4 +30,4 @@
   </button>
   <button mat-button class="cancel" color="basic" (click)="onNoClick()">Cancel</button>
   <button mat-button class="accept" color="primary" (click)="onApplyClick()" cdkFocusInitial>Apply</button>
-</div>
+</mat-dialog-actions>
