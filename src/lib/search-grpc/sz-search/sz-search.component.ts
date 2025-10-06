@@ -648,7 +648,7 @@ export class SzSearchGrpcComponent implements OnInit, OnDestroy {
 
     // filter out by specific codes
     this.matchingAttributes = value;
-    //console.log(`SzSearchComponent.inputAttributeTypes(${JSON.stringify(value, undefined, 2)})`);
+    console.log(`SzSearchComponent.inputAttributeTypes(${JSON.stringify(value, undefined, 2)})`);
     this.matchingAttributes = this.filterAttributeTypesByAllowedTypes(value, this.allowedTypeAttributes);
   }
 
@@ -794,7 +794,7 @@ export class SzSearchGrpcComponent implements OnInit, OnDestroy {
 
   public chooseIdentifiers(event: Event) {
     const isNarrowLayout = this.layoutClasses.indexOf('layout-narrow') > -1;
-    //console.log(`SzSearchComponent.chooseIdentifiers ${JSON.stringify(this._attributeTypesFromServer, undefined, 2)}`);
+    console.log(`SzSearchComponent.chooseIdentifiers ${JSON.stringify(this._attributeTypesFromServer, undefined, 2)}`);
 
     if(!isNarrowLayout){
       const dialogRef = this.dialog.open(SzSearchIdentifiersPickerDialogComponent, {
