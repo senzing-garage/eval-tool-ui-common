@@ -1,13 +1,13 @@
 import { Injectable, Output, EventEmitter } from '@angular/core';
 
-import {
+/*import {
   EntityDataService,
   ConfigService,
   SzResolvedEntity,
   SzRelatedEntity,
   SzDataSourcesResponse,
   SzDataSourcesResponseData
-} from '@senzing/rest-api-client-ng';
+} from '@senzing/rest-api-client-ng';*/
 import { Observable, Subject } from 'rxjs';
 import { takeUntil, take, tap } from 'rxjs/operators';
 import { SzGrpcConfigManagerService } from './grpc/configManager.service';
@@ -25,7 +25,7 @@ import { SzSdkDataSource } from '../models/grpc/config';
 export class SzDataSourcesService {
   /** subscription to notify subscribers to unbind */
   public unsubscribe$ = new Subject<void>();
-  private _dataSourceDetails: SzDataSourcesResponseData | undefined;
+  //private _dataSourceDetails: SzDataSourcesResponseData | undefined;
 
   constructor(
       private configManagerService: SzGrpcConfigManagerService
@@ -97,6 +97,31 @@ export class SzDataSourcesService {
             takeUntil(this.unsubscribe$)
           ).subscribe((resp) => {
             console.log(`added datasources: `, resp);
+            console.log(`conf: `, conf.definition);
+            this.configManagerService.setDefaultConfig(conf.definition).pipe(
+              takeUntil(this.unsubscribe$)
+            ).subscribe((newConfigId)=>{});
+          });
+        });
+      });
+    }
+    return retVal.asObservable();
+  }
+  public unregisterDataSources(dataSources: string[]): Observable<string[]> {
+    let retVal = new Subject<string[]>();
+    // first get current configs datasources to make sure were not 
+    // trying to re-register
+    if(dataSources.length > 0) {
+      this.configManagerService.config.then((conf)=>{
+        conf.dataSources.subscribe((registeredDataSources: SzSdkDataSource[])=> {
+          let _registeredCodes  = registeredDataSources.map((rDs)=>{ return rDs.DSRC_CODE; });
+          let _dataSourcesToRemove = dataSources.filter((dsToRemove)=> {
+            return _registeredCodes.includes(dsToRemove);
+          });
+          conf.unregisterDataSources(_dataSourcesToRemove).pipe(
+            takeUntil(this.unsubscribe$)
+          ).subscribe((resp) => {
+            console.log(`removed datasources: `, resp);
             console.log(`conf: `, conf.definition);
             this.configManagerService.setDefaultConfig(conf.definition).pipe(
               takeUntil(this.unsubscribe$)
