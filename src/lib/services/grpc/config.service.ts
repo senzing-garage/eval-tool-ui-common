@@ -51,6 +51,15 @@ export class SzGrpcConfig {
         }).catch((err)=>{ retVal.error(err); })
         return retVal;
     }
+    unregisterDataSources(dataSourceCodes: string[]) {
+        let retVal  = new Subject<any>();
+        console.log(`delete datasource through grpc...`);
+
+        this.config.unregisterDataSources(dataSourceCodes).then((configResp) => {
+            retVal.next(configResp);
+        }).catch((err)=>{ retVal.error(err); })
+        return retVal;
+    }
     get featureTypes(): SzSdkConfigFeatureType[] {
         let retVal = [];
         if(this._config && this._config.definition) {
