@@ -4,6 +4,7 @@ import { Subject } from 'rxjs';
 import { SzSdkConfigAttr, SzSdkConfigFeatureType, SzSdkConfigJson, SzSdkDataSource } from '../../models/grpc/config';
 import { SzSdkEntityFeature } from "../../models/grpc/engine";
 import { SzAttrClass, SzFeatureType } from "../../models/SzFeatureTypes";
+import { SzSdkUnregisterDataSourceResponse } from '../../models/data-sources';
 //import { SzProductLicenseResponse, SzProductVersionResponse } from '../../models/grpc/product';
 
 @Injectable({
@@ -52,7 +53,7 @@ export class SzGrpcConfig {
         return retVal;
     }
     unregisterDataSources(dataSourceCodes: string[]) {
-        let retVal  = new Subject<any>();
+        let retVal  = new Subject<SzSdkUnregisterDataSourceResponse[]>();
         console.log(`delete datasource through grpc...`);
 
         this.config.unregisterDataSources(dataSourceCodes).then((configResp) => {
