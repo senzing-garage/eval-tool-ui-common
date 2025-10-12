@@ -1,3 +1,4 @@
+import { SzSdkDataSource } from "./grpc/config";
 
 export class SzDataSourceRecordAnalysis {
   dataSource: string;
@@ -10,4 +11,9 @@ export interface SzDataSourceComposite {
   color?: string,
   index?: number,
   hidden?: boolean
+}
+
+export interface SzSdkUnregisterDataSourceResponse {
+    DSRC_CODE?: string,
+    DELETED?: boolean
 }

@@ -12,6 +12,7 @@ import { Observable, Subject } from 'rxjs';
 import { takeUntil, take, tap } from 'rxjs/operators';
 import { SzGrpcConfigManagerService } from './grpc/configManager.service';
 import { SzSdkDataSource } from '../models/grpc/config';
+import { SzSdkUnregisterDataSourceResponse } from '../models/data-sources';
 
 /**
  * Provides access to the /datasources api path.
@@ -100,15 +101,17 @@ export class SzDataSourcesService {
             console.log(`conf: `, conf.definition);
             this.configManagerService.setDefaultConfig(conf.definition).pipe(
               takeUntil(this.unsubscribe$)
-            ).subscribe((newConfigId)=>{});
+            ).subscribe((newConfigId)=>{
+              retVal.next(resp);
+            });
           });
         });
       });
     }
     return retVal.asObservable();
   }
-  public unregisterDataSources(dataSources: string[]): Observable<string[]> {
-    let retVal = new Subject<string[]>();
+  public unregisterDataSources(dataSources: string[]): Observable<SzSdkUnregisterDataSourceResponse[]> {
+    let retVal = new Subject<SzSdkUnregisterDataSourceResponse[]>();
     // first get current configs datasources to make sure were not 
     // trying to re-register
     if(dataSources.length > 0) {
@@ -125,7 +128,9 @@ export class SzDataSourcesService {
             console.log(`conf: `, conf.definition);
             this.configManagerService.setDefaultConfig(conf.definition).pipe(
               takeUntil(this.unsubscribe$)
-            ).subscribe((newConfigId)=>{});
+            ).subscribe((newConfigId)=>{
+              retVal.next(resp)
+            });
           });
         });
       });
