@@ -24,9 +24,8 @@
   }
 
   .sz-search-results-total-summary {
-
-    color: var(--sz-search-results-header-color);
-    display: var(--sz-search-results-header-display);
+    color: var(--sz-search-results-summary-color);
+    display: var(--sz-search-results-summary-display);
     justify-content: space-between;
     align-items: center;
     padding: var(--sz-search-results-header-padding);
