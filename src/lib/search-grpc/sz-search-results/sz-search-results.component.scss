@@ -24,9 +24,8 @@
   }
 
   .sz-search-results-total-summary {
-
-    color: var(--sz-search-results-header-color);
-    display: var(--sz-search-results-header-display);
+    color: var(--sz-search-results-summary-color);
+    display: var(--sz-search-results-summary-display);
     justify-content: space-between;
     align-items: center;
     padding: var(--sz-search-results-header-padding);
@@ -62,15 +61,19 @@
 
     &.matches {
       background-color: var(--sz-search-results-matches-header-background-color);
+      color: var(--sz-search-results-matches-header-color);
     }
     &.possible-match {
       background-color: var(--sz-search-results-possible-match-header-background-color);
+      color: var(--sz-search-results-possible-match-header-color);
     }
     &.possibly-related {
       background-color: var(--sz-search-results-possibly-related-header-background-color);
+      color: var(--sz-search-results-possibly-related-header-color);
     }
     &.name-only-matches {
       background-color: var(--sz-search-results-name-only-matches-header-background-color);
+      color: var(--sz-search-results-name-only-matches-header-color);
     }
   }
 

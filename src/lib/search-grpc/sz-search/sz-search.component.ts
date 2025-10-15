@@ -648,7 +648,7 @@ export class SzSearchGrpcComponent implements OnInit, OnDestroy {
 
     // filter out by specific codes
     this.matchingAttributes = value;
-    console.log(`SzSearchComponent.inputAttributeTypes(${JSON.stringify(value, undefined, 2)})`);
+    //console.log(`SzSearchComponent.inputAttributeTypes(${JSON.stringify(value, undefined, 2)})`);
     this.matchingAttributes = this.filterAttributeTypesByAllowedTypes(value, this.allowedTypeAttributes);
   }
 
