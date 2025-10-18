@@ -118,8 +118,10 @@ export { SzHowStepStackComponent } from './lib/how/sz-how-step-stack.component';
 export { SzHowNavComponent } from './lib/how/sz-how-nav.component';
 export { SzHowVirtualEntityCardComponent } from './lib/how/cards/sz-how-virtual-entity-card.component';
 export { SzHowVirtualEntityDialog } from './lib/how/sz-how-virtual-entity-dialog.component';
+/** --------------------------   Data Mart -------------------------- */
+export * from './lib/services/http/sz-datamart-environment';
 
-/** --------------------------   gRPC Web */
+/** --------------------------   gRPC Web  -------------------------- */
 export * from './lib/configuration/sz-product-info/sz-product-info.component';
 export * from './lib/import/sz-import-files.component';
 export { SzSearchByIdGrpcComponent, SzSearchByIdFormParams } from './lib/search-grpc/sz-search/sz-search-by-id.component';

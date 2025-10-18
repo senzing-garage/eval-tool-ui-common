@@ -1,9 +1,9 @@
 import { Injectable, OnInit } from '@angular/core';
 import { BehaviorSubject, forkJoin, Observable, of, Subject, Subscriber, Subscription, throwError } from 'rxjs';
 
+/*
 import {
     ConfigService as SzConfigService, SzConfigResponse,
-    StatisticsService as SzStatisticsService,
     SzLoadedStats,
     SzSummaryStats,
     SzCrossSourceSummary,
@@ -24,7 +24,7 @@ import {
     SzRelation,
     SzMatchCounts,
     SzRelationCounts
-} from '@senzing/rest-api-client-ng';
+} from '@senzing/rest-api-client-ng';*/
 
 import { take, tap, map, catchError, takeUntil, filter, distinctUntilChanged } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
@@ -36,6 +36,24 @@ import { SzSdkDataSource } from '../models/grpc/config';
 import { SzGrpcEngineService } from './grpc/engine.service';
 import { SzEngineFlags } from '@senzing/sz-sdk-typescript-grpc-web';
 import { SzSdkEntityResponse, SzSdkResolvedEntity } from '../models/grpc/engine';
+
+/** start datamart related models */
+import { SzHttpStatisticsService } from './http/sz-statistics.service';
+import { SzEntityIdentifier } from './http/models/szEntityIdentifier';
+import { SzEntitiesPage } from './http/models/szEntitiesPage';
+import { SzRelationsPage } from './http/models/szRelationsPage';
+import { SzBoundType } from './http/models/szBoundType';
+import { SzEntityData } from './http/models/szEntityData';
+import { SzEntity } from './http/models/szEntity';
+import { SzRelation } from './http/models/szRelation';
+import { SzPagedEntitiesResponse } from './http/models/szPagedEntitiesResponse';
+import { SzPagedRelationsResponse } from './http/models/szPagedRelationsResponse';
+import { SzLoadedStats } from './http/models/szLoadedStats';
+import { SzSummaryStats } from './http/models/szSummaryStats';
+import { SzCrossSourceSummary } from './http/models/szCrossSourceSummary';
+import { SzCrossSourceSummaryResponse } from './http/models/szCrossSourceSummaryResponse';
+import { SzRelationCounts } from './http/models/szRelationCounts';
+import { SzMatchCounts } from './http/models/szMatchCounts';
 
 /**
  * Represents an object of a sampling dataset. When a user clicks on a venn diagram a number of 
@@ -384,7 +402,7 @@ export class SzStatSampleSet {
     constructor( 
         private parameters: SzStatSampleSetParameters,
         private prefs: SzPrefsService,
-        private statsService: SzStatisticsService, 
+        private statsService: SzHttpStatisticsService, 
         private engineService: SzGrpcEngineService,
         //private entityDataService: EntityDataService, 
         deferInitialRequest?: boolean) {
@@ -1158,7 +1176,7 @@ export class SzDataMartService {
         private dataSourcesService: SzDataSourcesService,
         //private entityDataService: EntityDataService,
         private engineService: SzGrpcEngineService,
-        private statsService: SzStatisticsService) {
+        private statsService: SzHttpStatisticsService) {
         if(!this._dataSources){
             this.getDataSources()
             .subscribe((dataSources) => {
