@@ -110,6 +110,7 @@ import { SzHowVirtualEntityCardComponent } from './how/cards/sz-how-virtual-enti
 import { SzHowVirtualEntityDialog } from './how/sz-how-virtual-entity-dialog.component';
 import { SzHowStepNodeComponent } from './how/sz-how-step-node.component';
 import { SzGrpcWebEnvironment } from '@senzing/sz-sdk-typescript-grpc-web';
+import { SzDataMartEnvironment } from './services/http/sz-datamart-environment';
 
 /**
  * Sets up a default set of service parameters for use
@@ -125,6 +126,21 @@ export function SzDefaultRestConfigurationFactory(): SzRestConfiguration {
     withCredentials: true
   });
 }
+/**
+ * Sets up a default set of datamart service parameters for use
+ * by the SDK Components.
+ *
+ * this is only used when no configuration parameters are set
+ * via the forRoot static method.
+ * @internal
+ */
+export function SzDefaultDataMartEnvFactory(): SzDataMartEnvironment {
+  return new SzDataMartEnvironment({
+    basePath: 'http://localhost:8080',
+    withCredentials: true
+  });
+}
+
 /**
  * Sets up a grpc web sdk environment with default connection parameters for use
  * by the SDK Components.
@@ -310,13 +326,17 @@ export class SenzingSdkModule {
    SenzingSdkModule.forRoot( SzRestConfigurationFactory )
    *
    */
-  public static forRoot(apiConfigFactory?: () => SzRestConfiguration, grpcEnvFactory?: () => SzGrpcWebEnvironment): ModuleWithProviders<SenzingSdkModule> {
+  public static forRoot(dataMartEnvFactory?: () => SzDataMartEnvironment, apiConfigFactory?: () => SzRestConfiguration, grpcEnvFactory?: () => SzGrpcWebEnvironment): ModuleWithProviders<SenzingSdkModule> {
     return {
         ngModule: SenzingSdkModule,
         providers: [
           {
             provide: SzRestConfiguration,
             useFactory: apiConfigFactory ? apiConfigFactory : SzDefaultRestConfigurationFactory
+          },
+          {
+            provide: 'DATAMART_ENVIRONMENT',
+            useFactory: dataMartEnvFactory ? dataMartEnvFactory : SzDefaultDataMartEnvFactory
           },
           {
             provide: 'GRPC_ENVIRONMENT',

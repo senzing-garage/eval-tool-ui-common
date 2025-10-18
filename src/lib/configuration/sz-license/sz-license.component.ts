@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subject, filter, takeUntil } from 'rxjs';
-import { SzLoadedStats } from '@senzing/rest-api-client-ng';
+//import { SzLoadedStats } from '@senzing/rest-api-client-ng';
 
 import { parseBool, parseNumber } from '../../common/utils';
 //import { SzAdminService } from '../../services/sz-admin.service';
@@ -11,6 +11,7 @@ import { SzLicenseUpgradeMouseEvent } from '../../models/event-license';
 import { SzProductLicenseResponse } from '../../models/grpc/product';
 import { SzGrpcProductService } from '../../services/grpc/product.service';
 import { SzShortNumberPipe } from '../../pipes/shortnumber.pipe';
+import { SzLoadedStats } from '../../services/http/models/szLoadedStats';
 
 /**
  * A simple "license info" component.
@@ -30,7 +31,8 @@ import { SzShortNumberPipe } from '../../pipes/shortnumber.pipe';
     imports: [CommonModule, SzShortNumberPipe],
     styleUrls: ['./sz-license.component.scss'],
     providers:[
-        { provide: SzGrpcProductService, useClass: SzGrpcProductService}
+      { provide: SzDataMartService, useClass: SzDataMartService },
+      { provide: SzGrpcProductService, useClass: SzGrpcProductService }
     ]
 })
 export class SzLicenseInfoComponent implements OnInit {
