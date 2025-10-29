@@ -1,4 +1,4 @@
-# eval-tool-ui-common
+# sz-sdk-components-grpc-web
 
 If you are beginning your journey with
 [Senzing](https://senzing.com/),
@@ -17,7 +17,7 @@ Heck, it may not even be appropriate for your application of Senzing!
 This project is for the [gRPC Web](https://github.com/grpc/grpc-web) version of Senzing&reg; SDK components that can be used in other projects. This project is in early, but active development and is not ready for use.
 
 
-[![npm build](https://github.com/senzing-garage/eval-tool-ui-common/actions/workflows/npm-build.yaml/badge.svg)](https://github.com/senzing-garage/eval-tool-ui-common/actions/workflows/npm-build.yaml)
-[![npm version](https://badge.fury.io/js/%40senzing%2Fsdk-components-grpc-web.svg)](https://badge.fury.io/js/%40senzing%2Feval-tool-ui-common)
-![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/senzing/eval-tool-ui-common?color=%2300c4ff&logo=latest%20tag)
-![GitHub package.json version](https://img.shields.io/github/package-json/v/senzing/eval-tool-ui-common?color=orange&logo=latest&logoColor=blue)
+[![npm build](https://github.com/senzing-garage/sz-sdk-components-grpc-web/actions/workflows/npm-build.yaml/badge.svg)](https://github.com/senzing-garage/sz-sdk-components-grpc-web/actions/workflows/npm-build.yaml)
+[![npm version](https://badge.fury.io/js/%40senzing%2Fsdk-components-grpc-web.svg)](https://badge.fury.io/js/%40senzing%2Fsz-sdk-components-grpc-web)
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/senzing/sz-sdk-components-grpc-web?color=%2300c4ff&logo=latest%20tag)
+![GitHub package.json version](https://img.shields.io/github/package-json/v/senzing/sz-sdk-components-grpc-web?color=orange&logo=latest&logoColor=blue)
