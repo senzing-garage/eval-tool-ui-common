@@ -1,6 +1,6 @@
 {
   "name": "@senzing/eval-tool-ui-common",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "scripts": {
     "ng": "ng",
     "start": "ng build @senzing/eval-tool-ui-common && ng serve",
@@ -73,7 +73,7 @@
     "@angular/platform-browser-dynamic": "^19.2.11",
     "@angular/router": "^19.2.11",
     "@senzing/rest-api-client-ng": "^8.0.0",
-    "@senzing/sz-sdk-typescript-grpc-web": "4.0.0-beta.3.0",
+    "@senzing/sz-sdk-typescript-grpc-web": "file:../sz-sdk-typescript-grpc/dist/@senzing/senzing-sz-sdk-typescript-grpc-web-4.0.0-beta.4.0.tgz",
     "d3": "^7.8.4",
     "document-register-element": "^1.14.10",
     "ngx-json-viewer": "^3.2.1",
@@ -111,10 +111,10 @@
     "wait-on": "^7.2.0"
   },
   "optionalDependencies": {
+    "@fontsource/material-icons": "^4.2.4",
+    "@fontsource/roboto": "^4.2.2",
     "express": "^4.21.2",
     "http-proxy-middleware": "^2.0.1",
-    "serve-static": "^1.14.1",
-    "@fontsource/material-icons": "^4.2.4",
-    "@fontsource/roboto": "^4.2.2"
+    "serve-static": "^1.14.1"
   }
 }

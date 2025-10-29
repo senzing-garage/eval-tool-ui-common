@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "examples",
   "projects": {
-    "@senzing/sz-sdk-components-grpc-web": {
+    "@senzing/eval-tool-ui-common": {
       "projectType": "library",
       "root": "",
       "sourceRoot": "src",
@@ -43,7 +43,7 @@
         }
       }
     },
-    "@senzing/sz-sdk-components-grpc-web/examples/search-with-results-and-details": {
+    "@senzing/eval-tool-ui-common/examples/search-with-results-and-details": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -155,14 +155,14 @@
           "options": {
             "port": 4300,
             "proxyConfig": "proxy.conf.json",
-            "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/search-with-results-and-details:build"
+            "buildTarget": "@senzing/eval-tool-ui-common/examples/search-with-results-and-details:build"
           },
           "configurations": {
             "production": {
-              "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/search-with-results-and-details:build:production"
+              "buildTarget": "@senzing/eval-tool-ui-common/examples/search-with-results-and-details:build:production"
             },
             "development": {
-              "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/search-with-results-and-details:build:development"
+              "buildTarget": "@senzing/eval-tool-ui-common/examples/search-with-results-and-details:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -170,12 +170,12 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/search-with-results-and-details:build"
+            "buildTarget": "@senzing/eval-tool-ui-common/examples/search-with-results-and-details:build"
           }
         }
       }
     },
-    "@senzing/sz-sdk-components-grpc-web/examples/search-in-graph": {
+    "@senzing/eval-tool-ui-common/examples/search-in-graph": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -322,29 +322,29 @@
           "options": {
             "port": 4300,
             "proxyConfig": "proxy.conf.json",
-            "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/search-in-graph:build"
+            "buildTarget": "@senzing/eval-tool-ui-common/examples/search-in-graph:build"
           },
           "configurations": {
             "production": {
-              "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/search-in-graph:build:production"
+              "buildTarget": "@senzing/eval-tool-ui-common/examples/search-in-graph:build:production"
             },
             "debug": {
-              "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/search-in-graph:build:debug"
+              "buildTarget": "@senzing/eval-tool-ui-common/examples/search-in-graph:build:debug"
             },
             "development": {
-              "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/search-in-graph:build:development"
+              "buildTarget": "@senzing/eval-tool-ui-common/examples/search-in-graph:build:development"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/search-in-graph:build"
+            "buildTarget": "@senzing/eval-tool-ui-common/examples/search-in-graph:build"
           }
         }
       }
     },
-    "@senzing/sz-sdk-components-grpc-web/examples/search-with-spinner": {
+    "@senzing/eval-tool-ui-common/examples/search-with-spinner": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -453,23 +453,23 @@
           "options": {
             "port": 4300,
             "proxyConfig": "proxy.conf.json",
-            "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/search-with-spinner:build"
+            "buildTarget": "@senzing/eval-tool-ui-common/examples/search-with-spinner:build"
           },
           "configurations": {
             "production": {
-              "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/search-with-spinner:build:production"
+              "buildTarget": "@senzing/eval-tool-ui-common/examples/search-with-spinner:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/search-with-spinner:build"
+            "buildTarget": "@senzing/eval-tool-ui-common/examples/search-with-spinner:build"
           }
         }
       }
     },
-    "@senzing/sz-sdk-components-grpc-web/examples/data-table": {
+    "@senzing/eval-tool-ui-common/examples/data-table": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -584,26 +584,26 @@
           "options": {
             "port": 4300,
             "proxyConfig": "proxy.conf.json",
-            "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/data-table:build"
+            "buildTarget": "@senzing/eval-tool-ui-common/examples/data-table:build"
           },
           "configurations": {
             "production": {
-              "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/data-table:build:production"
+              "buildTarget": "@senzing/eval-tool-ui-common/examples/data-table:build:production"
             },
             "development": {
-              "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/data-table:build:development"
+              "buildTarget": "@senzing/eval-tool-ui-common/examples/data-table:build:development"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/data-table:build"
+            "buildTarget": "@senzing/eval-tool-ui-common/examples/data-table:build"
           }
         }
       }
     },
-    "@senzing/sz-sdk-components-grpc-web/examples/charts": {
+    "@senzing/eval-tool-ui-common/examples/charts": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -718,26 +718,26 @@
           "options": {
             "port": 4300,
             "proxyConfig": "proxy.conf.json",
-            "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/charts:build"
+            "buildTarget": "@senzing/eval-tool-ui-common/examples/charts:build"
           },
           "configurations": {
             "production": {
-              "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/charts:build:production"
+              "buildTarget": "@senzing/eval-tool-ui-common/examples/charts:build:production"
             },
             "development": {
-              "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/charts:build:development"
+              "buildTarget": "@senzing/eval-tool-ui-common/examples/charts:build:development"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/charts:build"
+            "buildTarget": "@senzing/eval-tool-ui-common/examples/charts:build"
           }
         }
       }
     },
-    "@senzing/sz-sdk-components-grpc-web/examples/graph": {
+    "@senzing/eval-tool-ui-common/examples/graph": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -852,26 +852,26 @@
           "options": {
             "port": 4300,
             "proxyConfig": "proxy.conf.json",
-            "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/graph:build"
+            "buildTarget": "@senzing/eval-tool-ui-common/examples/graph:build"
           },
           "configurations": {
             "production": {
-              "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/graph:build:production"
+              "buildTarget": "@senzing/eval-tool-ui-common/examples/graph:build:production"
             },
             "development": {
-              "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/graph:build:development"
+              "buildTarget": "@senzing/eval-tool-ui-common/examples/graph:build:development"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/graph:build"
+            "buildTarget": "@senzing/eval-tool-ui-common/examples/graph:build"
           }
         }
       }
     },
-    "@senzing/sz-sdk-components-grpc-web/examples/search-with-prefs": {
+    "@senzing/eval-tool-ui-common/examples/search-with-prefs": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -991,26 +991,26 @@
           "options": {
             "port": 4300,
             "proxyConfig": "proxy.conf.json",
-            "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/search-with-prefs:build"
+            "buildTarget": "@senzing/eval-tool-ui-common/examples/search-with-prefs:build"
           },
           "configurations": {
             "production": {
-              "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/search-with-prefs:build:production"
+              "buildTarget": "@senzing/eval-tool-ui-common/examples/search-with-prefs:build:production"
             },
             "development": {
-              "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/search-with-prefs:build:development"
+              "buildTarget": "@senzing/eval-tool-ui-common/examples/search-with-prefs:build:development"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/search-with-prefs:build"
+            "buildTarget": "@senzing/eval-tool-ui-common/examples/search-with-prefs:build"
           }
         }
       }
     },
-    "@senzing/sz-sdk-components-grpc-web/examples/search-by-id": {
+    "@senzing/eval-tool-ui-common/examples/search-by-id": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -1119,18 +1119,18 @@
           "options": {
             "port": 4300,
             "proxyConfig": "proxy.conf.json",
-            "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/search-by-id:build"
+            "buildTarget": "@senzing/eval-tool-ui-common/examples/search-by-id:build"
           },
           "configurations": {
             "production": {
-              "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/search-by-id:build:production"
+              "buildTarget": "@senzing/eval-tool-ui-common/examples/search-by-id:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/search-by-id:build"
+            "buildTarget": "@senzing/eval-tool-ui-common/examples/search-by-id:build"
           }
         }
       }
@@ -1514,7 +1514,7 @@
         }
       }
     },
-    "@senzing/sz-sdk-components-grpc-web/examples/with-how-features": {
+    "@senzing/eval-tool-ui-common/examples/with-how-features": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -1629,10 +1629,10 @@
           },
           "configurations": {
             "production": {
-              "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/with-how-features:build:production"
+              "buildTarget": "@senzing/eval-tool-ui-common/examples/with-how-features:build:production"
             },
             "development": {
-              "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/with-how-features:build:development"
+              "buildTarget": "@senzing/eval-tool-ui-common/examples/with-how-features:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -1640,7 +1640,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/with-how-features:build"
+            "buildTarget": "@senzing/eval-tool-ui-common/examples/with-how-features:build"
           }
         },
         "test": {
@@ -1663,7 +1663,7 @@
         }
       }
     },
-    "@senzing/sz-sdk-components-grpc-web/examples/with-why-features": {
+    "@senzing/eval-tool-ui-common/examples/with-why-features": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -1778,10 +1778,10 @@
           },
           "configurations": {
             "production": {
-              "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/with-why-features:build:production"
+              "buildTarget": "@senzing/eval-tool-ui-common/examples/with-why-features:build:production"
             },
             "development": {
-              "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/with-why-features:build:development"
+              "buildTarget": "@senzing/eval-tool-ui-common/examples/with-why-features:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -1789,7 +1789,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "@senzing/sz-sdk-components-grpc-web/examples/with-why-features:build"
+            "buildTarget": "@senzing/eval-tool-ui-common/examples/with-why-features:build"
           }
         },
         "test": {
@@ -2129,126 +2129,6 @@
             ],
             "styles": [
               "examples/grpc/search/src/styles.scss"
-            ],
-            "scripts": []
-          }
-        }
-      }
-    },
-    "app": {
-      "projectType": "application",
-      "schematics": {
-        "@schematics/angular:component": {
-          "style": "scss",
-          "skipTests": true
-        },
-        "@schematics/angular:class": {
-          "skipTests": true
-        },
-        "@schematics/angular:directive": {
-          "skipTests": true
-        },
-        "@schematics/angular:guard": {
-          "skipTests": true
-        },
-        "@schematics/angular:interceptor": {
-          "skipTests": true
-        },
-        "@schematics/angular:pipe": {
-          "skipTests": true
-        },
-        "@schematics/angular:resolver": {
-          "skipTests": true
-        },
-        "@schematics/angular:service": {
-          "skipTests": true
-        }
-      },
-      "root": "examples/app",
-      "sourceRoot": "examples/app/src",
-      "prefix": "app",
-      "architect": {
-        "build": {
-          "builder": "@angular-devkit/build-angular:application",
-          "options": {
-            "outputPath": "dist/app",
-            "index": "examples/app/src/index.html",
-            "browser": "examples/app/src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
-            "tsConfig": "examples/app/tsconfig.app.json",
-            "inlineStyleLanguage": "scss",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "examples/app/public"
-              }
-            ],
-            "styles": [
-              "src/lib/scss/styles.scss",
-              "src/lib/scss/themes/senzing.css",
-              "examples/app/src/app/scss/styles.scss",
-              "examples/app/src/app/scss/theme.scss"
-            ],
-            "scripts": []
-          },
-          "configurations": {
-            "production": {
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
-                }
-              ],
-              "outputHashing": "all"
-            },
-            "development": {
-              "optimization": false,
-              "extractLicenses": false,
-              "sourceMap": true
-            }
-          },
-          "defaultConfiguration": "production"
-        },
-        "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
-          "configurations": {
-            "production": {
-              "buildTarget": "app:build:production"
-            },
-            "development": {
-              "buildTarget": "app:build:development"
-            }
-          },
-          "defaultConfiguration": "development"
-        },
-        "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n"
-        },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ],
-            "tsConfig": "examples/app/tsconfig.spec.json",
-            "inlineStyleLanguage": "scss",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "examples/app/public"
-              }
-            ],
-            "styles": [
-              "examples/app/src/styles.scss"
             ],
             "scripts": []
           }

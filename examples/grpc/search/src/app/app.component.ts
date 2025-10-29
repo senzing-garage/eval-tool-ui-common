@@ -3,20 +3,20 @@ import { Component, ViewChild } from '@angular/core';
 import { 
   SzEntityDetailGrpcComponent,
   SzEntityIdentifier, SzEntitySearchParams
-} from '@senzing/sz-sdk-components-grpc-web';
+} from '@senzing/eval-tool-ui-common';
 
 // new grpc components
 import {
   SzSearchGrpcComponent, 
   SzSearchResultsGrpcComponent,
   SzGrpcConfigManagerService
-} from '@senzing/sz-sdk-components-grpc-web';
+} from '@senzing/eval-tool-ui-common';
 // new grpc models
 import { 
   SzSdkSearchResolvedEntity, 
   SzSdkSearchResult,
   SzGrpcConfig,
-} from '@senzing/sz-sdk-components-grpc-web';
+} from '@senzing/eval-tool-ui-common';
 
 //import { SzSdkSearchResult } from 'src/lib/models/grpc/engine';
 //import { SzGrpcConfig } from 'src/lib/services/grpc/config.service';
