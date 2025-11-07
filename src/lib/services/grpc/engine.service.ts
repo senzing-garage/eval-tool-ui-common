@@ -215,6 +215,7 @@ export class SzGrpcEngineService {
       console.log(`how report by id from grpc...`);
       if(this.szEnvironment && this.szEnvironment.engine) {
         this.szEnvironment?.engine?.howEntityByEntityId(entityId, flags).then((resp) => {
+          console.log(`how response: `, resp);
           retVal.next(JSON.parse(resp as string));
         })
       }

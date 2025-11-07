@@ -2,7 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, ViewChild } from '@angular/core';
 import { 
   SzEntityDetailGrpcComponent,
-  SzEntityIdentifier, SzEntitySearchParams
+  SzEntityIdentifier, SzEntitySearchParams,
+  SzHowEntityGrpcComponent
 } from '@senzing/eval-tool-ui-common';
 
 // new grpc components
@@ -26,7 +27,8 @@ import {
   selector: 'app-root',
   imports: [
     CommonModule,
-    SzSearchGrpcComponent, SzSearchResultsGrpcComponent, SzEntityDetailGrpcComponent
+    SzSearchGrpcComponent, SzSearchResultsGrpcComponent, SzEntityDetailGrpcComponent,
+    SzHowEntityGrpcComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
@@ -98,6 +100,9 @@ export class AppComponent {
       this._showEntityDetail  = false;
       this._showHowReport     = false;
     }
+  }
+  onHowDataChange(evt) {
+    console.log(`onHowDataChange: `, evt);
   }
 
   public onHowButtonClick(howEvent) {

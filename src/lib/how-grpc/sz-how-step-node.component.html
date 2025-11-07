@@ -1,0 +1,55 @@
+<ul [class.tree]="isFinal" *ngIf="isFinal">
+    <li class="top-level" *ngIf="isFinal">
+        final entity card
+        <!--<sz-how-final-entity-card
+        [attr.virtual-id]="data.resolvedVirtualEntityId"
+        [data]="data"
+        [virtualEntitiesById]="virtualEntitiesById"></sz-how-final-entity-card>-->
+    </li>
+    <li class="top-level-children">
+        <ul class="hide-on-group-collapsed" *ngIf="hasChildren && !isStack">
+            <li *ngFor="let step of children; let groupInd=index;">
+                [ child step node ]
+                <!--<sz-how-step-node
+                [attr.step-index]="groupInd"
+                [attr.step-number]="step.stepNumber"
+                [attr.virtual-id]="step.resolvedVirtualEntityId"
+                [data]="step"
+                [virtualEntitiesById]="virtualEntitiesById"></sz-how-step-node>-->
+            </li>
+        </ul>
+    </li>
+</ul>
+<div *ngIf="!isFinal">
+    <div *ngIf="isSingleton">[ singleton card ]</div>
+    <!--<sz-how-singleton-card *ngIf="isSingleton"
+        [attr.step-number]="data.stepNumber"
+        [attr.virtual-id]="data.resolvedVirtualEntityId"
+        [data]="data"
+        [virtualEntitiesById]="virtualEntitiesById"></sz-how-singleton-card>-->
+    <div *ngIf="!isStack && !isFinal && !isSingleton">[ virtual entity step ]</div>
+
+    <!--<sz-how-step-card *ngIf="!isStack && !isFinal && !isSingleton"
+            [attr.step-number]="data.stepNumber"
+            [attr.virtual-id]="data.resolvedVirtualEntityId"
+            [data]="data"
+            [virtualEntitiesById]="virtualEntitiesById"
+            ></sz-how-step-card>-->
+    <div *ngIf="isStack">[ step stack ]</div>
+    <!--<sz-how-step-stack *ngIf="isStack"
+    [attr.step-number]="data.stepNumber"
+    [attr.virtual-id]="data.resolvedVirtualEntityId"
+    [data]="dataAsNode"
+    [virtualEntitiesById]="virtualEntitiesById"
+    ></sz-how-step-stack>-->
+    <!--<ul class="hide-on-group-collapsed" *ngIf="hasChildren && !isStack">
+        <li *ngFor="let step of children; let groupInd=index;">
+            <sz-how-step-node
+            [attr.step-index]="groupInd"
+            [attr.step-number]="step.stepNumber"
+            [attr.virtual-id]="step.resolvedVirtualEntityId"
+            [data]="step"
+            [virtualEntitiesById]="virtualEntitiesById"></sz-how-step-node>
+        </li>
+    </ul>-->
+</div>

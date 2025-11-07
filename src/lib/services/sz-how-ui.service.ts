@@ -422,6 +422,18 @@ export class SzHowUIService {
       })
     )
   }
+  
+  public getHowDataForEntityViaGrpc(entityId: SzEntityIdentifier): Observable<SzHowEntityResponse> {
+    
+    return this.engineDataService.howEntityByEntityId(
+        entityId as number
+    ).pipe(
+      tap((r) => {
+        // clear out any old data on response
+        this.clear();
+      })
+    )
+  }
   /**
    * Get all parent nodes of a specific child node.
    * This is a recursive method used for tree 
