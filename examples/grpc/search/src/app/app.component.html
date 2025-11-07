@@ -29,7 +29,15 @@
   <sz-entity-detail-grpc
     #entityDetailComponent
     [showRecordWhyUtilities]="false"
-    [showEntityHowFunction]="false"
+    [showEntityHowFunction]="true"
     [entityId]="currentlySelectedEntityId"></sz-entity-detail-grpc>
+</div>
+<div *ngIf="showHowReport">
+  <sz-how-entity-grpc
+  #howGraph
+  [entityId]="currentlySelectedEntityId"
+  showNavigation="true"
+  (dataChanged)="onHowDataChange($event)"
+></sz-how-entity-grpc>
 </div>
 <!-- end entity detail -->

@@ -120,6 +120,55 @@ export interface SzSdkFindNetworkResponse {
     ENTITY_PATHS: SzSdkFindNetworkNetworkPath[]
 }
 
+export interface SzSdkVirtualEntity {
+    VIRTUAL_ENTITY_ID: string,
+    MEMBER_RECORDS: {
+        "INTERNAL_ID": number,
+        "RECORDS": {DATA_SOURCE: string, RECORD_ID: string}[]
+    }[]
+}
+
+export interface SzSdkHowResolutionStep {
+    STEP: number,
+    VIRTUAL_ENTITY_1: SzSdkVirtualEntity,
+    VIRTUAL_ENTITY_2: SzSdkVirtualEntity,
+    INBOUND_VIRTUAL_ENTITY_ID: string,
+    RESULT_VIRTUAL_ENTITY_ID: string,
+    MATCH_INFO: {
+        "MATCH_KEY": string,
+        "ERRULE_CODE": string,
+        "CANDIDATE_KEYS": {
+            "ADDR_KEY": {"FEAT_ID": number,"FEAT_DESC": string}[],
+        }
+    },
+    FEATURE_SCORES: {
+        [key: string] : {
+            "INBOUND_FEAT_ID": number,
+            "INBOUND_FEAT_DESC": string,
+            "INBOUND_FEAT_USAGE_TYPE": string,
+            "CANDIDATE_FEAT_ID": 2,
+            "CANDIDATE_FEAT_DESC": string,
+            "CANDIDATE_FEAT_USAGE_TYPE": string,
+            "SCORE": number,
+            "ADDITIONAL_SCORES"?: {
+                "FULL_SCORE": number
+            },
+            "SCORE_BUCKET": string,
+            "SCORE_BEHAVIOR": string
+        }[]
+    }
+}
+
+export interface SzSdkHowEntityResponse {
+    HOW_RESULTS: {
+        RESOLUTION_STEPS: SzSdkHowResolutionStep[],
+        FINAL_STATE: {
+            NEED_REEVALUATION:0,
+            VIRTUAL_ENTITIES: SzSdkVirtualEntity[]
+        }
+    }
+}
+
 /*
 export interface SzGraphNetworkResponse extends SzSdkFindNetworkResponse {
     ENTITIES: {

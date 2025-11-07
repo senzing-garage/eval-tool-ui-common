@@ -99,16 +99,17 @@ import { SzWhyEntityDialog } from './why/sz-why-entity.component';
 import { SzWhyEntitiesDialog } from './why/sz-why-entities.component';
 import { SzWhyReportBaseComponent } from './why/sz-why-report-base.component';
 // how related
-import { SzHowEntityComponent } from './how/sz-how-entity.component';
-import { SzHowFinalEntityCardComponent } from './how/cards/sz-how-final-entity-card.component';
-import { SzHowNavComponent } from './how/sz-how-nav.component';
-import { SzHowStepCardComponent } from './how/cards/sz-how-step-card.component';
-import { SzHowSingletonCardComponent } from './how/cards/sz-how-singleton-card.component';
-import { SzHowStepStackComponent } from './how/sz-how-step-stack.component';
+//import { SzHowEntityComponent } from './how/sz-how-entity.component';
+//import { SzHowFinalEntityCardComponent } from './how/cards/sz-how-final-entity-card.component';
+//import { SzHowNavComponent } from './how/sz-how-nav.component';
+//import { SzHowStepCardComponent } from './how/cards/sz-how-step-card.component';
+//import { SzHowSingletonCardComponent } from './how/cards/sz-how-singleton-card.component';
+//import { SzHowStepStackComponent } from './how/sz-how-step-stack.component';
 import { SzHowUIService } from './services/sz-how-ui.service';
-import { SzHowVirtualEntityCardComponent } from './how/cards/sz-how-virtual-entity-card.component';
-import { SzHowVirtualEntityDialog } from './how/sz-how-virtual-entity-dialog.component';
-import { SzHowStepNodeComponent } from './how/sz-how-step-node.component';
+//import { SzHowVirtualEntityCardComponent } from './how/cards/sz-how-virtual-entity-card.component';
+//import { SzHowVirtualEntityDialog } from './how/sz-how-virtual-entity-dialog.component';
+//import { SzHowStepNodeComponent } from './how/sz-how-step-node.component';
+
 import { SzGrpcWebEnvironment } from '@senzing/sz-sdk-typescript-grpc-web';
 import { SzDataMartEnvironment } from './services/http/sz-datamart-environment';
 
@@ -203,15 +204,15 @@ const SzGrpcEnvInjector = new InjectionToken<SzGrpcWebEnvironment>("SzGrpcWebEnv
         //SzGraphControlComponent,
         //SzGraphComponent,
         //SzGraphFilterComponent,
-        SzHowEntityComponent,
-        SzHowFinalEntityCardComponent,
-        SzHowNavComponent,
-        SzHowSingletonCardComponent,
-        SzHowStepCardComponent,
-        SzHowStepNodeComponent,
-        SzHowStepStackComponent,
-        SzHowVirtualEntityCardComponent,
-        SzHowVirtualEntityDialog,
+        //SzHowEntityComponent,
+        //SzHowFinalEntityCardComponent,
+        //SzHowNavComponent,
+        //SzHowSingletonCardComponent,
+        //SzHowStepCardComponent,
+        //SzHowStepNodeComponent,
+        //SzHowStepStackComponent,
+        //SzHowVirtualEntityCardComponent,
+        //SzHowVirtualEntityDialog,
         //SzLicenseInfoComponent,
         //SzOrderedMapEntries,
         //SzMultiSelectButtonComponent,
@@ -262,13 +263,13 @@ const SzGrpcEnvInjector = new InjectionToken<SzGrpcWebEnvironment>("SzGrpcWebEnv
         //SzGraphComponent,
         //SzGraphControlComponent,
         //SzGraphFilterComponent,
-        SzHowEntityComponent,
-        SzHowNavComponent,
-        SzHowSingletonCardComponent,
-        SzHowStepNodeComponent,
-        SzHowStepStackComponent,
-        SzHowVirtualEntityCardComponent,
-        SzHowVirtualEntityDialog,
+        //SzHowEntityComponent,
+        //SzHowNavComponent,
+        //SzHowSingletonCardComponent,
+        //SzHowStepNodeComponent,
+        //SzHowStepStackComponent,
+        //SzHowVirtualEntityCardComponent,
+        //SzHowVirtualEntityDialog,
         //SzLicenseInfoComponent,
         //SzOrderedMapEntries,
         SzPoweredByComponent,

@@ -1307,7 +1307,7 @@ export class SzEntityDetailGrpcComponent implements OnInit, OnDestroy, AfterView
     })
     if(this._entityId){
       // check to see if entity has how steps, if not disable how functions
-      this.howUIService.getHowDataForEntity(this._entityId).pipe(
+      this.howUIService.getHowDataForEntityViaGrpc(this._entityId).pipe(
         takeUntil(this.unsubscribe$),
         take(1)
       ).subscribe({

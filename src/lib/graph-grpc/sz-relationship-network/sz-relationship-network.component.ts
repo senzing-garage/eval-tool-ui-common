@@ -3071,14 +3071,15 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
   }
 
   static nodeTooltipText(d: any) {
-    //console.log('nodeTooltipText: ', d);
+    console.log('nodeTooltipText: ', d);
     let retVal = "<strong>Entity ID</strong>: " + d.entityId +
       "<br/><strong>Name</strong>: " + d.name;
-    if(d.address && d.address !== null) {
-      retVal += "<br/><strong>Address</strong>: " + d.address;
+    if(d.address && d.address !== null && d.address.FEAT_DESC) {
+        retVal += "<br/><strong>Address</strong>: " + d.address.FEAT_DESC;
+      //retVal += "<br/><strong>Address</strong>: " + d.address;
     }
-    if(d.phone && d.phone !== null) {
-      retVal += "<br/><strong>Phone</strong>: " + d.phone;
+    if(d.phone && d.phone !== null && d.phone.FEAT_DESC) {
+      retVal += "<br/><strong>Phone</strong>: " + d.phone.FEAT_DESC;
     }
     if(d.dataSources && d.dataSources.forEach && d.dataSources.length > 0) {
       let dsNamesCeil = 10;
@@ -3093,8 +3094,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
         retVal += `+${d.dataSources.length - dsNamesCeil} more..`;
       }
     }
-    /*
-    if(d.relationshipMatchKeys) {
+    /*if(d.relationshipMatchKeys) {
       retVal += "<br/><strong>match key</strong>: <br/>";
       retVal += `<li>${d.relationshipMatchKeys}</li>`;
     }
@@ -3105,7 +3105,8 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
         retVal += `<li>${mkt}</li>`;
       });
       retVal += "</ul>";
-    }
+    }*/
+    /*
     if(d.coreRelationshipMatchKeyTokens && d.coreRelationshipMatchKeyTokens.forEach && d.coreRelationshipMatchKeyTokens.length > 0) {
       retVal += "<br/><strong>core match keys</strong>: <br/>";
       retVal += "<ul>";
