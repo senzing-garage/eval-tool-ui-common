@@ -2,8 +2,9 @@ import { Component, OnInit, Input, OnDestroy, HostBinding } from '@angular/core'
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { DataSource } from '@angular/cdk/collections';
 import { 
-    EntityDataService as SzEntityDataService, 
-    SzResolutionStep, SzVirtualEntityRecord, SzFeatureScore 
+    //EntityDataService as SzEntityDataService, 
+    //SzResolutionStep, SzVirtualEntityRecord, 
+    //SzFeatureScore 
 } from '@senzing/rest-api-client-ng';
 import { SzConfigDataService } from '../services/sz-config-data.service';
 import { SzResolutionStepDisplayType, SzResolvedVirtualEntity } from '../models/data-how';
@@ -15,6 +16,7 @@ import { CommonModule } from '@angular/common';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
+import { SzSdkHowFeatureScore, SzSdkHowResolutionStep, SzSdkVirtualEntity, SzSdkVirtualEntityRecord } from '../models/grpc/engine';
 
 /**
  * @internal 
@@ -30,7 +32,7 @@ export interface SzHowNavComponentParameterCounts {
 /** 
  * @internal
  * model that extends a resolution step with display specific metadata used in the matches list */
-export interface SzResolutionStepListItem extends SzResolutionStep {
+export interface SzResolutionStepListItem extends SzSdkHowResolutionStep {
     actionType: SzResolutionStepDisplayType,
     title: string,
     cssClasses?: string[],
@@ -70,7 +72,7 @@ export class SzHowNavComponent implements OnInit, OnDestroy {
      * @internal
      * object of steps to navigate keyed by virtualId
      */
-    private _stepMap: {[key: string]: SzResolutionStep} = {};
+    private _stepMap: {[key: string]: SzSdkHowResolutionStep} = {};
     /** 
      * @internal
      * map of virtual entities keyed by virtualId
@@ -102,20 +104,20 @@ export class SzHowNavComponent implements OnInit, OnDestroy {
         this._parameterCounts = this.getParameterCounts();
     }
     /** an object of steps whos key value is the virtual id of the step */
-    @Input() set stepsByVirtualId(value: {[key: string]: SzResolutionStep}) {
+    @Input() set stepsByVirtualId(value: {[key: string]: SzSdkHowResolutionStep}) {
         this._stepMap = value;
         this._parameterCounts = this.getParameterCounts();
     }
     /** an object of steps whos key value is the virtual id of the step */
-    get stepsByVirtualId(): {[key: string]: SzResolutionStep} {
+    get stepsByVirtualId(): {[key: string]: SzSdkHowResolutionStep} {
         return this._stepMap;
     }
     /** returns an array of steps regardless of step type  */
-    get allSteps(): SzResolutionStep[] {
+    get allSteps(): SzSdkHowResolutionStep[] {
         let retVal = [];
         if(this._stepMap) {
             let _steps = (Object.values(this._stepMap));
-            _steps[0].resolvedVirtualEntityId
+            _steps[0].RESULT_VIRTUAL_ENTITY_ID
             retVal = _steps;
         }
         return retVal;
@@ -153,41 +155,29 @@ export class SzHowNavComponent implements OnInit, OnDestroy {
         return retVal;
     }
     /** returns a array of resolution steps that merge virtual entities together */
-    get mergeSteps(): SzResolutionStep[] {
+    get mergeSteps(): SzSdkHowResolutionStep[] {
         let retVal = undefined;
         if(this._stepMap && Object.keys(this._stepMap) && Object.keys(this._stepMap).length > 0) {
             // we have steps, do we have merge steps
             let stepsThatAreMerges = [];
             let steps = Object.values(this._stepMap);
-            let _tVal = steps.filter((step: SzResolutionStep) => {
+            let _tVal = steps.filter((step: SzSdkHowResolutionStep) => {
                 // check if merge step
-                if(!(step.candidateVirtualEntity.singleton && 
-                    step.inboundVirtualEntity.singleton) && 
-                    (step.candidateVirtualEntity.singleton === false || step.inboundVirtualEntity.singleton === false)
-                ) {
-                    return true;
-                }
-                return false;
+                return SzHowUIService.isVirtualEntityMergeStep(step);
             });
         }
         return retVal;
     }
     /** returns a array of resolution steps that add a record to a previously created virtual entity */
-    get addRecordSteps(): SzResolutionStep[] {
+    get addRecordSteps(): SzSdkHowResolutionStep[] {
         let retVal = undefined;
         if(this._stepMap && Object.keys(this._stepMap) && Object.keys(this._stepMap).length > 0) {
             // we have steps, do we have merge steps
             let stepsThatAreMerges = [];
             let steps = Object.values(this._stepMap);
-            let _tVal = steps.filter((step: SzResolutionStep) => {
+            let _tVal = steps.filter((step: SzSdkHowResolutionStep) => {
                 // check if merge step
-                if(!(step.candidateVirtualEntity.singleton && 
-                    step.inboundVirtualEntity.singleton) && 
-                    (step.candidateVirtualEntity.singleton === true || step.inboundVirtualEntity.singleton === true)
-                ) {
-                    return true;
-                }
-                return false;
+                return SzHowUIService.isAddRecordStep(step);
             });
             if(_tVal) {
                 retVal = _tVal;
@@ -196,18 +186,15 @@ export class SzHowNavComponent implements OnInit, OnDestroy {
         return retVal;
     }
     /** returns a array of resolution steps where both the inbound AND candidate entities are singletons */
-    get createEntitySteps(): SzResolutionStep[] {
+    get createEntitySteps(): SzSdkHowResolutionStep[] {
         let retVal = undefined;
         if(this._stepMap && Object.keys(this._stepMap) && Object.keys(this._stepMap).length > 0) {
             // we have steps, do we have merge steps
             let stepsThatAreMerges = [];
             let steps = Object.values(this._stepMap);
-            let _tVal = steps.filter((step: SzResolutionStep) => {
+            let _tVal = steps.filter((step: SzSdkHowResolutionStep) => {
                 // check if merge step
-                if(step.candidateVirtualEntity.singleton && step.inboundVirtualEntity.singleton) {
-                    return true;
-                }
-                return false;
+                return SzHowUIService.isCreateEntityStep(step);
             });
             retVal = _tVal;
         }
@@ -301,7 +288,7 @@ export class SzHowNavComponent implements OnInit, OnDestroy {
         let retVal: SzResolutionStepListItem[];
         if(this._stepMap) {
             let _steps = (Object.values(this._stepMap));
-            retVal = _steps.map((_s: SzResolutionStep) => {
+            retVal = _steps.map((_s: SzSdkHowResolutionStep) => {
                 let _t: SzResolutionStepListItem = Object.assign({
                     actionType: this.getStepListCardType(_s),
                     cssClasses: this.getStepListItemCssClasses(_s), 
@@ -339,42 +326,42 @@ export class SzHowNavComponent implements OnInit, OnDestroy {
             if(this._filterByLowScoringNames || this.filterByLowScoringAddresses || this.filterByLowScoringPhoneNumbers) {
                 _hasParamsChecked = true;
                 let hasLowScoringFeature = false;
-                if(this._filterByLowScoringNames && step.matchInfo && step.matchInfo.featureScores && step.matchInfo.featureScores['NAME']){
+                if(this._filterByLowScoringNames && step.FEATURE_SCORES && step.FEATURE_SCORES['NAME']){
                     // has name features
-                    let nameScores = step.matchInfo.featureScores['NAME'];
+                    let nameScores = SzHowUIService.getFeatureScoreByType('NAME', step);
                     // we only assign if value is false,
                     // that way the default is false UNLESS the condition is true
                     if(!hasLowScoringFeature) {
-                        hasLowScoringFeature = nameScores.some((featScore: SzFeatureScore) => {
-                            return !(featScore.score > this.lowScoringFeatureThreshold);
+                        hasLowScoringFeature = nameScores.some((featScore: SzSdkHowFeatureScore) => {
+                            return !(featScore.SCORE > this.lowScoringFeatureThreshold);
                         });
                         if(hasLowScoringFeature) {
                             //console.log('HAS LOW SCORING NAME!!', step);
                         }
                     }
                 }
-                if(this.filterByLowScoringAddresses && step.matchInfo && step.matchInfo.featureScores && step.matchInfo.featureScores['ADDRESS']){
+                if(this.filterByLowScoringAddresses && step.FEATURE_SCORES && step.FEATURE_SCORES['ADDRESS']){
                     // has name features
-                    let nameScores = step.matchInfo.featureScores['ADDRESS'];
+                    let nameScores = SzHowUIService.getFeatureScoreByType('ADDRESS', step);
                     // we only assign if value is false,
                     // that way the default is false UNLESS the condition is true
                     if(!hasLowScoringFeature) {
-                        hasLowScoringFeature = nameScores.some((featScore: SzFeatureScore) => {
-                            return !(featScore.score > this.lowScoringFeatureThreshold);
+                        hasLowScoringFeature = nameScores.some((featScore: SzSdkHowFeatureScore) => {
+                            return !(featScore.SCORE > this.lowScoringFeatureThreshold);
                         });
                         if(hasLowScoringFeature) {
                             //console.log('HAS LOW SCORING ADDRESS!!', step);
                         }
                     }
                 }
-                if(this.filterByLowScoringPhoneNumbers && step.matchInfo && step.matchInfo.featureScores && step.matchInfo.featureScores['PHONE']) {
+                if(this.filterByLowScoringPhoneNumbers && step.FEATURE_SCORES && step.FEATURE_SCORES['PHONE']) {
                     // has phone features
-                    let phoneScores = step.matchInfo.featureScores['PHONE'];
+                    let phoneScores = SzHowUIService.getFeatureScoreByType('PHONE', step);
                     // we only assign if value is false,
                     // that way the default is false UNLESS the condition is true
                     if(!hasLowScoringFeature) {
-                        hasLowScoringFeature = phoneScores.some((featScore: SzFeatureScore) => {
-                            return !(featScore.score > this.lowScoringFeatureThreshold);
+                        hasLowScoringFeature = phoneScores.some((featScore: SzSdkHowFeatureScore) => {
+                            return !(featScore.SCORE > this.lowScoringFeatureThreshold);
                         });
                         if(hasLowScoringFeature) {
                             //console.log('HAS LOW SCORING PHONE!!', step);
@@ -472,28 +459,31 @@ export class SzHowNavComponent implements OnInit, OnDestroy {
             if(step.actionType == SzResolutionStepDisplayType.MERGE) {
                 retVal.MERGE = retVal.MERGE+1;
             }
-            if(step.matchInfo && step.matchInfo.featureScores && step.matchInfo.featureScores['NAME'] && step.matchInfo.featureScores['NAME'].some){
+            if(step.MATCH_INFO && step.FEATURE_SCORES && step.FEATURE_SCORES['NAME'] && step.FEATURE_SCORES['NAME'].some){
                 // check for low scoring name
-                let allFeaturesAreLowScoring = step.matchInfo.featureScores['NAME'].every((featScore: SzFeatureScore) => {
-                    return !(featScore.score > this.lowScoringFeatureThreshold);
+                let _featScores = SzHowUIService.getFeatureScoreByType('NAME', step);
+                let allFeaturesAreLowScoring = _featScores.every((featScore: SzSdkHowFeatureScore) => {
+                    return !(featScore.SCORE > this.lowScoringFeatureThreshold);
                 });
                 if(allFeaturesAreLowScoring) {
                     retVal.LOW_SCORE_NAME = retVal.LOW_SCORE_NAME+1;
                 }
             }
-            if(step.matchInfo && step.matchInfo.featureScores && step.matchInfo.featureScores['ADDRESS'] && step.matchInfo.featureScores['ADDRESS'].some){
-                // check for low scoring name
-                let allFeaturesAreLowScoring = step.matchInfo.featureScores['ADDRESS'].every((featScore: SzFeatureScore) => {
-                    return !(featScore.score > this.lowScoringFeatureThreshold);
+            if(step.MATCH_INFO && step.FEATURE_SCORES && step.FEATURE_SCORES['ADDRESS'] && step.FEATURE_SCORES['ADDRESS'].some){
+                // check for low scoring address
+                let _featScores = SzHowUIService.getFeatureScoreByType('ADDRESS', step);
+                let allFeaturesAreLowScoring = _featScores.every((featScore: SzSdkHowFeatureScore) => {
+                    return !(featScore.SCORE > this.lowScoringFeatureThreshold);
                 });
                 if(allFeaturesAreLowScoring) {
                     retVal.LOW_SCORE_ADDRESS = retVal.LOW_SCORE_ADDRESS+1;
                 }
             }
-            if(step.matchInfo && step.matchInfo.featureScores && step.matchInfo.featureScores['PHONE'] && step.matchInfo.featureScores['PHONE'].some){
-                // check for low scoring name
-                let allFeaturesAreLowScoring = step.matchInfo.featureScores['PHONE'].every((featScore: SzFeatureScore) => {
-                    return !(featScore.score > this.lowScoringFeatureThreshold);
+            if(step.MATCH_INFO && step.FEATURE_SCORES && step.FEATURE_SCORES['PHONE'] && step.FEATURE_SCORES['PHONE'].some){
+                // check for low scoring phone
+                let _featScores = SzHowUIService.getFeatureScoreByType('PHONE', step);
+                let allFeaturesAreLowScoring = _featScores.every((featScore: SzSdkHowFeatureScore) => {
+                    return !(featScore.SCORE > this.lowScoringFeatureThreshold);
                 });
                 if(allFeaturesAreLowScoring) {
                     retVal.LOW_SCORE_PHONE = retVal.LOW_SCORE_PHONE+1;
@@ -509,17 +499,34 @@ export class SzHowNavComponent implements OnInit, OnDestroy {
      * @internal 
      * get a array of recordId's present in a particular step.
      */
-    private getStepListItemRecords(step: SzResolutionStep): string[] {
+    private getStepListItemRecords(step: SzSdkHowResolutionStep): string[] {
         let retVal = [];
-        if(step && step.candidateVirtualEntity && step.candidateVirtualEntity.records && step.candidateVirtualEntity.singleton) {
-            retVal = retVal.concat(step.candidateVirtualEntity.records.map((rec: SzVirtualEntityRecord)=>{
-                return rec.recordId;
-            }));
+        let _isEntity1Singleton = SzHowUIService.isVirtualEntitySingleton(step.VIRTUAL_ENTITY_1);
+        let _isEntity2Singleton = SzHowUIService.isVirtualEntitySingleton(step.VIRTUAL_ENTITY_2);
+        let getRecordIdsForVirtualEntity = (_virtualEntity: SzSdkVirtualEntity) => {
+            let _isEntitySingleton = SzHowUIService.isVirtualEntitySingleton(_virtualEntity);
+            let _retVal = [];
+            if(_virtualEntity && _virtualEntity.MEMBER_RECORDS && _isEntitySingleton) {
+                _virtualEntity.MEMBER_RECORDS.forEach((_memberRecord)=>{
+                    if(_memberRecord.RECORDS){
+                        _retVal = _retVal.concat(_memberRecord.RECORDS.map((_record)=>{
+                            return _record.RECORD_ID;
+                        }))
+                    }
+                });
+            }
         }
-        if(step && step.inboundVirtualEntity && step.inboundVirtualEntity.records && step.inboundVirtualEntity.singleton) {
-            retVal = retVal.concat(step.inboundVirtualEntity.records.map((rec: SzVirtualEntityRecord)=>{
+        if(step && step.VIRTUAL_ENTITY_1 && step.VIRTUAL_ENTITY_1.MEMBER_RECORDS && _isEntity1Singleton) {
+            retVal = retVal.concat(getRecordIdsForVirtualEntity(step.VIRTUAL_ENTITY_1));
+            /*retVal = retVal.concat(step.candidateVirtualEntity.records.map((rec: SzVirtualEntityRecord)=>{
                 return rec.recordId;
-            }));
+            }));*/
+        }
+        if(step && step.VIRTUAL_ENTITY_2 && step.VIRTUAL_ENTITY_2.MEMBER_RECORDS && _isEntity2Singleton) {
+            retVal = retVal.concat(getRecordIdsForVirtualEntity(step.VIRTUAL_ENTITY_2));
+            /*retVal = retVal.concat(step.inboundVirtualEntity.records.map((rec: SzVirtualEntityRecord)=>{
+                return rec.recordId;
+            }));*/
         }
         return retVal;
     }
@@ -527,17 +534,26 @@ export class SzHowNavComponent implements OnInit, OnDestroy {
      * @internal 
      * get a array of datasources present in a particular step.
      */
-    private getStepListItemDataSources(step: SzResolutionStep): string[] {
+    private getStepListItemDataSources(step: SzSdkHowResolutionStep): string[] {
         let retVal = [];
-        if(step && step.candidateVirtualEntity && step.candidateVirtualEntity.records) {
-            retVal = retVal.concat(step.candidateVirtualEntity.records.map((rec: SzVirtualEntityRecord)=>{
-                return rec.dataSource;
-            }));
+        let getDataSourcesForVirtualEntity = (_virtualEntity: SzSdkVirtualEntity) => {
+            //let _isEntitySingleton = SzHowUIService.isVirtualEntitySingleton(_virtualEntity);
+            let _retVal = [];
+            if(_virtualEntity && _virtualEntity.MEMBER_RECORDS) {
+                _virtualEntity.MEMBER_RECORDS.forEach((_memberRecord)=>{
+                    if(_memberRecord.RECORDS){
+                        _retVal = _retVal.concat(_memberRecord.RECORDS.map((_record)=>{
+                            return _record.DATA_SOURCE;
+                        }))
+                    }
+                });
+            }
         }
-        if(step && step.inboundVirtualEntity && step.inboundVirtualEntity.records) {
-            retVal = retVal.concat(step.inboundVirtualEntity.records.map((rec: SzVirtualEntityRecord)=>{
-                return rec.dataSource;
-            }));
+        if(step && step.VIRTUAL_ENTITY_1 && step.VIRTUAL_ENTITY_1.MEMBER_RECORDS) {
+            retVal = retVal.concat(getDataSourcesForVirtualEntity(step.VIRTUAL_ENTITY_1));
+        }
+        if(step && step.VIRTUAL_ENTITY_2 && step.VIRTUAL_ENTITY_2.MEMBER_RECORDS) {
+            retVal = retVal.concat(getDataSourcesForVirtualEntity(step.VIRTUAL_ENTITY_2));
         }
         return retVal;
     }
@@ -557,21 +573,21 @@ export class SzHowNavComponent implements OnInit, OnDestroy {
             });
             retVal = retVal.concat(step.title.split(' '));
         }
-        if(step && step.matchInfo && step.matchInfo.featureScores && Object.keys(step.matchInfo.featureScores).length > 0) {
-            for(let fKey in step.matchInfo.featureScores) {
-                let featBucket = step.matchInfo.featureScores[fKey];
+        if(step && step.FEATURE_SCORES && Object.keys(step.FEATURE_SCORES).length > 0) {
+            for(let fKey in step.FEATURE_SCORES) {
+                let featBucket = step.FEATURE_SCORES[fKey];
                 if(featBucket && featBucket.length > 0) {
                     // sort featBucket by highest score
                     featBucket = featBucket.sort((featA, featB) => {
-                        return (featA.score > featB.score) ? -1 : 1;
+                        return (featA.SCORE > featB.SCORE) ? -1 : 1;
                     });
                     // just take the top 1 result
                     if(featBucket && featBucket[0]) {
-                        if(featBucket[0] && featBucket[0].inboundFeature && !retVal.includes(featBucket[0].inboundFeature.featureValue)) {
-                            retVal.push(featBucket[0].inboundFeature.featureValue);
+                        if(featBucket[0] && featBucket[0].INBOUND_FEAT_DESC && !retVal.includes(featBucket[0].INBOUND_FEAT_DESC)) {
+                            retVal.push(featBucket[0].INBOUND_FEAT_DESC);
                         }
-                        if(featBucket[0] && featBucket[0].candidateFeature && !retVal.includes(featBucket[0].candidateFeature.featureValue)) {
-                            retVal.push(featBucket[0].candidateFeature.featureValue);
+                        if(featBucket[0] && featBucket[0].CANDIDATE_FEAT_DESC && !retVal.includes(featBucket[0].CANDIDATE_FEAT_DESC)) {
+                            retVal.push(featBucket[0].CANDIDATE_FEAT_DESC);
                         }
                     }
                 }
@@ -606,22 +622,22 @@ export class SzHowNavComponent implements OnInit, OnDestroy {
      * @internal
      * get the type of card that the step will be displayed as.
      */
-    private getStepListCardType(step: SzResolutionStep): SzResolutionStepDisplayType {
+    private getStepListCardType(step: SzSdkHowResolutionStep): SzResolutionStepDisplayType {
         return SzHowUIService.getResolutionStepCardType(step);
     }
     /**
      * @internal
      * get the title of a step to display in matches list
      */
-    private getStepListItemTitle(step: SzResolutionStep): string {
+    private getStepListItemTitle(step: SzSdkHowResolutionStep): string {
         let retVal = '';
-        if(step.candidateVirtualEntity.singleton && step.inboundVirtualEntity.singleton) {
+        if(SzHowUIService.isCreateEntityStep(step)) {
             // both items are records
             retVal = 'Create Virtual Entity';
-        } else if(!step.candidateVirtualEntity.singleton && !step.inboundVirtualEntity.singleton) {
+        } else if(SzHowUIService.isVirtualEntityMergeStep(step)) {
             // both items are virtual entities
             retVal = 'Merge Interim Entities';
-        } else if(!(step.candidateVirtualEntity.singleton && step.inboundVirtualEntity.singleton) && (step.candidateVirtualEntity.singleton === false || step.inboundVirtualEntity.singleton === false)) {
+        } else if(SzHowUIService.isAddRecordStep(step)) {
             // one of the items is record, the other is virtual
             retVal = 'Add Record to Virtual Entity';
         }
@@ -631,9 +647,27 @@ export class SzHowNavComponent implements OnInit, OnDestroy {
      * @internal
      * get the description for a step that is displayed in the matches list. 
      */
-    private getStepListItemDescription(step: SzResolutionStep): {text: string, cssClasses: string[]}[] {
+    private getStepListItemDescription(step: SzSdkHowResolutionStep): {text: string, cssClasses: string[]}[] {
         let retVal = [];
+
         if(step){
+            let _isSingleton = SzHowUIService.isVirtualEntitySingleton(step.VIRTUAL_ENTITY_1);
+
+            if(step.VIRTUAL_ENTITY_1 && SzHowUIService.isVirtualEntitySingleton(step.VIRTUAL_ENTITY_1)) {
+                step.VIRTUAL_ENTITY_1.MEMBER_RECORDS.forEach((_memberRecord)=>{
+                    retVal = retVal.concat(_memberRecord.RECORDS.map((rec: SzSdkVirtualEntityRecord) => {
+                        return {text: (rec.DATA_SOURCE + ':'+ rec.RECORD_ID), cssClasses: ['candidate','singleton']};
+                    }));
+                });
+            }
+            if(step.VIRTUAL_ENTITY_2 && SzHowUIService.isVirtualEntitySingleton(step.VIRTUAL_ENTITY_2)) {
+                step.VIRTUAL_ENTITY_2.MEMBER_RECORDS.forEach((_memberRecord)=>{
+                    retVal = retVal.concat(_memberRecord.RECORDS.map((rec: SzSdkVirtualEntityRecord) => {
+                        return {text: (rec.DATA_SOURCE + ':'+ rec.RECORD_ID), cssClasses: ['candidate','singleton']};
+                    }));
+                });
+            }
+            /*
             if(step.candidateVirtualEntity) {
                 if(step.candidateVirtualEntity.singleton && step.candidateVirtualEntity.records) {
                     retVal = retVal.concat(step.candidateVirtualEntity.records.map((rec: SzVirtualEntityRecord) => {
@@ -651,8 +685,8 @@ export class SzHowNavComponent implements OnInit, OnDestroy {
                 } else {
                     retVal.push({text: (`Virtual Entity ${step.inboundVirtualEntity.virtualEntityId}`), cssClasses: ['inbound']});
                 }
-            }
-            retVal.push({text: (`Virtual Entity ${step.resolvedVirtualEntityId}`), cssClasses: ['resolved']});
+            }*/
+            retVal.push({text: (`Virtual Entity ${step.RESULT_VIRTUAL_ENTITY_ID}`), cssClasses: ['resolved']});
         }
         return retVal;
     }
@@ -660,7 +694,7 @@ export class SzHowNavComponent implements OnInit, OnDestroy {
      * @internal
      * get the css classes to apply to steps in the matches list.
      */
-    private getStepListItemCssClasses(step: SzResolutionStep) {
+    private getStepListItemCssClasses(step: SzSdkHowResolutionStep) {
         let listItemVerb    = this.getStepListCardType(step);
         let cssClasses      = [];
         if(listItemVerb === SzResolutionStepDisplayType.ADD)    { cssClasses = cssClasses.concat(['record', 'add']); }
@@ -673,7 +707,7 @@ export class SzHowNavComponent implements OnInit, OnDestroy {
     // ---------------------------------------- end filtered collection getters
 
     constructor(
-        public entityDataService: SzEntityDataService,
+        //public entityDataService: SzEntityDataService,
         public configDataService: SzConfigDataService,
         private howUIService: SzHowUIService
     ){}
@@ -703,7 +737,7 @@ export class SzHowNavComponent implements OnInit, OnDestroy {
      * when a step is clicked this method collapses all other currently expanded steps, and expands the 
      * step specified and all ancestors in it's tree.
      */
-    public stepClicked(step: SzResolutionStep) {
-        this.howUIService.selectStep(step.resolvedVirtualEntityId);
+    public stepClicked(step: SzSdkHowResolutionStep) {
+        this.howUIService.selectStep(step.RESULT_VIRTUAL_ENTITY_ID);
     }
 }
