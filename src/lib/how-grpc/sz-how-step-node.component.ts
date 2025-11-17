@@ -1,13 +1,14 @@
 import { Component, OnInit, Input, OnDestroy, HostBinding } from '@angular/core';
 import { 
     EntityDataService as SzEntityDataService, 
-    SzResolutionStep
+    //SzResolutionStep
 } from '@senzing/rest-api-client-ng';
 import { SzConfigDataService } from '../services/sz-config-data.service';
 import { SzResolutionStepListItemType, SzResolutionStepNode, SzResolvedVirtualEntity } from '../models/data-how';
 import { Subject } from 'rxjs';
 import { SzHowUIService } from '../services/sz-how-ui.service';
 import { CommonModule } from '@angular/common';
+import { SzSdkHowResolutionStep } from 'src/public-api';
 
 /**
  * Represents a step node in a How Report. Step Nodes wrap Step cards
@@ -34,7 +35,7 @@ import { CommonModule } from '@angular/common';
 export class SzHowStepNodeComponent implements OnInit, OnDestroy {
     /** subscription to notify subscribers to unbind */
     public unsubscribe$ = new Subject<void>();
-    private _data: SzResolutionStepNode | SzResolutionStep;
+    private _data: SzResolutionStepNode | SzSdkHowResolutionStep;
     private _virtualEntitiesById: Map<string, SzResolvedVirtualEntity>;
     private _highlighted: boolean = false;
     private _hasChildStacksCached: boolean;
@@ -69,10 +70,10 @@ export class SzHowStepNodeComponent implements OnInit, OnDestroy {
     @Input() public set virtualEntitiesById(value: Map<string, SzResolvedVirtualEntity>) {
         this._virtualEntitiesById = value;
     }
-    @Input() set data(value: SzResolutionStepNode | SzResolutionStep) {
+    @Input() set data(value: SzResolutionStepNode | SzSdkHowResolutionStep) {
         this._data = value;
     }
-    get data() : SzResolutionStepNode | SzResolutionStep {
+    get data() : SzResolutionStepNode | SzSdkHowResolutionStep {
         return this._data;
     }
     get dataAsNode(): SzResolutionStepNode {
@@ -97,7 +98,7 @@ export class SzHowStepNodeComponent implements OnInit, OnDestroy {
         }
     }
     public get id(): string {
-        return this.isStep ? (this._data as SzResolutionStep).resolvedVirtualEntityId : (this._data as SzResolutionStepNode).id;
+        return this.isStep ? (this._data as SzSdkHowResolutionStep).RESULT_VIRTUAL_ENTITY_ID : (this._data as SzResolutionStepNode).id;
     }
     public get isStack() {
         let _d = this._data;
@@ -122,7 +123,7 @@ export class SzHowStepNodeComponent implements OnInit, OnDestroy {
         return (this._data as SzResolutionStepNode).children && (this._data as SzResolutionStepNode).children.length > 0;
     }
     public get isSingleton(): boolean {
-        return this._data && (this._data as SzResolutionStepNode).singleton ? true : false;
+        return this._data && SzHowUIService.isVirtualEntitySingleton((this._data as SzResolutionStepNode)) ? true : false;
     }
     public get hasChildStacks(): boolean {
         let _d = this._data as SzResolutionStepNode;
@@ -135,7 +136,7 @@ export class SzHowStepNodeComponent implements OnInit, OnDestroy {
         }
         return this._hasChildStacksCached ? true : false;
     }
-    public get children(): Array<SzResolutionStepNode | SzResolutionStep> {
+    public get children(): Array<SzResolutionStepNode | SzSdkHowResolutionStep> {
         if(this.hasChildren) {
             return (this._data as SzResolutionStepNode).children;
         }

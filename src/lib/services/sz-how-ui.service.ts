@@ -12,7 +12,7 @@ import { SzPrefsService } from './sz-prefs.service';
 import { SzResolutionStepDisplayType, SzResolutionStepListItemType, SzResolutionStepNode } from '../models/data-how';
 import { SzGrpcEngineService } from './grpc/engine.service';
 import { SzGrpcConfigManagerService } from './grpc/configManager.service';
-import { SzSdkHowEntityResponse, SzSdkHowResolutionStep, SzSdkVirtualEntity, SzSdkVirtualEntityRecord } from '../models/grpc/engine';
+import { SzSdkHowEntityResponse, SzSdkHowFeatureScore, SzSdkHowResolutionStep, SzSdkVirtualEntity, SzSdkVirtualEntityRecord } from '../models/grpc/engine';
 
 /**
  * Provides methods, eventing, and utilities used to display the 
@@ -1060,11 +1060,67 @@ export class SzHowUIService {
    * entity came together.
    * @param entityId 
    */
-  public static getHowDataForEntity(entityId: SzEntityIdentifier): Observable<any> {
+  public static getHowDataForEntity(entityId: SzEntityIdentifier, flags?: BigInt | number): Observable<any> {
     return this._engineGrpcService.howEntityByEntityId(
-        entityId as number
+        entityId as number,
+        flags
     )
   }
+
+  public static getVirtualEntityByRecordIds(recordKeys: Array<[string, string | number]>, flags?: BigInt | number): Observable<any> {
+    return this._engineGrpcService.getVirtualEntityByRecordId(recordKeys, flags);
+  }
+
+  public static isAddRecordStep(step: SzSdkHowResolutionStep) {
+    return SzHowUIService.isMergeStep(step, true);
+  }
+
+  public static isVirtualEntityMergeStep(step: SzSdkHowResolutionStep) {
+    return SzHowUIService.isMergeStep(step, false);
+  }
+
+  public static isMergeStep(step: SzSdkHowResolutionStep, addRecordMerge = false) {
+    let isVirtualEntity1Singleton = SzHowUIService.isVirtualEntitySingleton(step.VIRTUAL_ENTITY_1); 
+    let isVirtualEntity2Singleton = SzHowUIService.isVirtualEntitySingleton(step.VIRTUAL_ENTITY_2);
+    if(!addRecordMerge) {
+      if(!(
+        isVirtualEntity1Singleton && 
+        isVirtualEntity2Singleton) &&
+        (isVirtualEntity1Singleton === false || isVirtualEntity2Singleton === false)
+      ) {
+        return true;
+      }
+      return false;
+    } else {
+      if(!(
+        isVirtualEntity1Singleton && 
+        isVirtualEntity2Singleton) &&
+        (isVirtualEntity1Singleton === true || isVirtualEntity2Singleton === true)
+      ) {
+        return true;
+      }
+      return false;
+    }
+    return false;
+  }
+  public static isCreateEntityStep(step: SzSdkHowResolutionStep) {
+    let isVirtualEntity1Singleton = SzHowUIService.isVirtualEntitySingleton(step.VIRTUAL_ENTITY_1); 
+    let isVirtualEntity2Singleton = SzHowUIService.isVirtualEntitySingleton(step.VIRTUAL_ENTITY_2);
+
+    if(isVirtualEntity1Singleton && isVirtualEntity2Singleton) {
+      return true;
+    }
+    return false
+  }
+
+  public static getFeatureScoreByType(featureKey: string, step: SzSdkHowResolutionStep)  {
+    let retVal: SzSdkHowFeatureScore[] = [];
+    if(step && step.FEATURE_SCORES && step.FEATURE_SCORES[ featureKey ]) {
+      return step.FEATURE_SCORES[ featureKey ];
+    }
+    return retVal;
+  }
+
   /**
    * Get the type of `CARD` that should be displayed. Possible results are: 
    * - `ADD` when a step added a singleton record to resolution
@@ -1103,10 +1159,24 @@ export class SzHowUIService {
     return undefined;
   }
 
+  public static getStepsByVirtualIds(steps: SzSdkHowResolutionStep[]): {[key: string]: SzSdkHowResolutionStep} {
+    let retVal = {};
+    if(steps && steps.length > 0 && steps.forEach) {
+      steps.forEach((step) => {
+        if(step.RESULT_VIRTUAL_ENTITY_ID) { 
+          retVal[ step.RESULT_VIRTUAL_ENTITY_ID ] = step;
+        }
+      });
+    }
+    return retVal;
+  }
+
+
+
   public static isVirtualEntitySingleton(virtualEntity: SzSdkVirtualEntity): boolean {
     let retVal = false;
     if(virtualEntity && virtualEntity.MEMBER_RECORDS) {
-      if(virtualEntity.MEMBER_RECORDS.length === 1) {
+      if(virtualEntity.MEMBER_RECORDS.length === 1 && virtualEntity.MEMBER_RECORDS[0] && virtualEntity.MEMBER_RECORDS[0].RECORDS && virtualEntity.MEMBER_RECORDS[0].RECORDS.length === 1) {
         // if there's only one record it's a singleton
         retVal = true;
         return retVal;
@@ -1128,7 +1198,7 @@ export class SzHowUIService {
           return retVal;
         }
       }
-      virtualEntity.MEMBER_RECORDS
+      //virtualEntity.MEMBER_RECORDS
     }
     return retVal;
   }

@@ -94,6 +94,7 @@ export class SzGrpcEngineService {
       }
       return retVal.asObservable();
     }
+
     public getGraphEntityNetwork(entityIds: Array<number | string>, maxDegrees?: number, buildOutDegrees?: number, buildOutMaxEntities?: number, flags: BigInt | number = SzEngineFlags.SZ_ENTITY_DEFAULT_FLAGS): Observable<SzNetorkGraphCompositeResponse | SzError> {
       let retVal    = new Subject<SzNetorkGraphCompositeResponse | SzError>();
       let requests  = [];
@@ -121,6 +122,18 @@ export class SzGrpcEngineService {
       }
       return retVal.asObservable();
     }
+
+    public getVirtualEntityByRecordId(recordKeys: Array<[string, string | number]>, flags: BigInt | number = SzEngineFlags.SZ_ENTITY_DEFAULT_FLAGS): Observable<any | SzError> {
+      let retVal = new Subject<SzSdkEntityResponse | SzError>();
+      console.log(`getting virtual entity by record id from grpc...`, recordKeys);
+      if(this.szEnvironment && this.szEnvironment.engine) {
+        this.szEnvironment?.engine?.getVirtualEntityByRecordId(recordKeys, flags).then((resp) => {
+          retVal.next(JSON.parse(resp as string));
+        })
+      }
+      return retVal.asObservable();
+    }
+
     public searchByAttributes(attributes: string | Map<any, any> | {[key: string] : any}, flags: BigInt | number = SzEngineFlags.SZ_SEARCH_BY_ATTRIBUTES_DEFAULT_FLAGS, searchProfile: string = ""): Observable<any | SzError> {
         let retVal = new Subject<string | SzError>();
         let flagss: BigInt = SzEngineFlags.SZ_SEARCH_BY_ATTRIBUTES_DEFAULT_FLAGS | 

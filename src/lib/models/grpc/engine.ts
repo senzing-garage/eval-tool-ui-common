@@ -142,6 +142,22 @@ export interface SzSdkVirtualEntity {
      */
     MEMBER_RECORDS?: SzSdkVirtualEntityMemberRecord[]
 }
+
+export interface SzSdkHowFeatureScore {
+    "INBOUND_FEAT_ID": number,
+    "INBOUND_FEAT_DESC": string,
+    "INBOUND_FEAT_USAGE_TYPE": string,
+    "CANDIDATE_FEAT_ID": number,
+    "CANDIDATE_FEAT_DESC": string,
+    "CANDIDATE_FEAT_USAGE_TYPE": string,
+    "SCORE": number,
+    "ADDITIONAL_SCORES"?: {
+        "FULL_SCORE": number
+    },
+    "SCORE_BUCKET": string,
+    "SCORE_BEHAVIOR": string
+}
+
 /**
  * Describes a single step in describing how an entity was created.  Each step consists of either the formation of a new \"virtual entity\" from two records, the adding of a record to an existing virtual entity to create a new virtual entity, or the resolving of two virtual entities into a new virtual entity consisting of all the records.
  */
@@ -161,24 +177,27 @@ export interface SzSdkHowResolutionStep {
         "MATCH_KEY": string,
         "ERRULE_CODE": string,
         "CANDIDATE_KEYS": {
-            "ADDR_KEY": {"FEAT_ID": number,"FEAT_DESC": string}[],
+            [key: string]: {"FEAT_ID": number,"FEAT_DESC": string}[],
         }
+        /*"CANDIDATE_KEYS": {
+            "ADDR_KEY": {"FEAT_ID": number,"FEAT_DESC": string}[],
+        }*/
     },
     FEATURE_SCORES?: {
-        [key: string] : {
-            "INBOUND_FEAT_ID": number,
-            "INBOUND_FEAT_DESC": string,
-            "INBOUND_FEAT_USAGE_TYPE": string,
-            "CANDIDATE_FEAT_ID": number,
-            "CANDIDATE_FEAT_DESC": string,
-            "CANDIDATE_FEAT_USAGE_TYPE": string,
-            "SCORE": number,
-            "ADDITIONAL_SCORES"?: {
-                "FULL_SCORE": number
-            },
-            "SCORE_BUCKET": string,
-            "SCORE_BEHAVIOR": string
-        }[]
+        [key: string] : SzSdkHowFeatureScore[]
+    }
+}
+/**
+ * Describes the result of the \"how entity\" operation as a mapping of non-singleton virtual entity ID's to their corresponding `SzResolutionStep` instances as well as an array of `SzVirtualEntity` instances describing the possible final states for the entity. **NOTE**: If there are more than one possible final states then the entity requires reevaluation, while a result with a single final state does not require reevaluation.
+ */
+export interface SzSdkHowEntityResults {
+    /**
+     * The array of `SzSdkHowResolutionStep` instances describing how the virtual entity was formed.  Since singleton virtual entities are base building blocks, they do not have an associated how step.  They are simply formed by the loading of a record to the repository.
+     */
+    RESOLUTION_STEPS: SzSdkHowResolutionStep[],
+    FINAL_STATE: {
+        NEED_REEVALUATION: boolean,
+        VIRTUAL_ENTITIES: SzSdkVirtualEntity[]
     }
 }
 
@@ -186,16 +205,7 @@ export interface SzSdkHowResolutionStep {
  * Describes the result of the \"how entity\" operation as a mapping of non-singleton virtual entity ID's to their corresponding `SzResolutionStep` instances as well as an array of `SzVirtualEntity` instances describing the possible final states for the entity. **NOTE**: If there are more than one possible final states then the entity requires reevaluation, while a result with a single final state does not require reevaluation.
  */
 export interface SzSdkHowEntityResponse {
-    HOW_RESULTS: {
-        /**
-         * The array of `SzSdkHowResolutionStep` instances describing how the virtual entity was formed.  Since singleton virtual entities are base building blocks, they do not have an associated how step.  They are simply formed by the loading of a record to the repository.
-         */
-        RESOLUTION_STEPS: SzSdkHowResolutionStep[],
-        FINAL_STATE: {
-            NEED_REEVALUATION: boolean,
-            VIRTUAL_ENTITIES: SzSdkVirtualEntity[]
-        }
-    }
+    HOW_RESULTS: SzSdkHowEntityResults
 }
 
 /*

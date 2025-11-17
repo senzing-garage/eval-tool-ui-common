@@ -39,7 +39,7 @@
       <nav>
         <ul>
           <li *ngFor="let step of filteredListSteps" [ngClass]="step.cssClasses" (click)="stepClicked(step)">
-            <h3>{{step.stepNumber}}. {{step.title}}</h3>
+            <h3>{{step.STEP}}. {{step.title}}</h3>
             <ul>
               <li *ngFor="let descLine of step.description" [ngClass]="descLine.cssClasses">{{descLine.text}}</li>
             </ul>
