@@ -1,6 +1,6 @@
 import { Inject, Injectable, signal } from '@angular/core';
 import { SzEngineFlags, SzError, SzGrpcWebConfig, SzGrpcWebEnvironment, SzGrpcWebEnvironmentOptions } from '@senzing/sz-sdk-typescript-grpc-web';
-import { Observable, Subject, take, takeUntil } from 'rxjs';
+import { Observable, Subject, take, takeUntil, throwError } from 'rxjs';
 import { SzProductLicenseResponse, SzProductVersionResponse } from '../../models/grpc/product';
 import { SzGrpcConfig } from './config.service';
 import { isNotNull } from '../../common/utils';
@@ -175,7 +175,11 @@ export class SzGrpcEngineService {
         this.szEnvironment?.engine?.findNetworkByEntityId(entityIds, maxDegrees, buildOutDegrees, buildOutMaxEntities, flags).then((resp) => {
           console.log(`\t\tfindNetworkByEntityId(${(entityIds as Array<number | string>).join(',')}) promises resolved: `, JSON.parse(resp as string));
           retVal.next(JSON.parse(resp as string));
-        })
+        }).catch((err) => {
+          console.error(`findNetworkByEntityId 1: Exception: `+ err.message);
+          retVal.error(err);
+          throw err;
+        });
       }
       return retVal.asObservable();
     }
@@ -226,6 +230,8 @@ export class SzGrpcEngineService {
         // Make GRPC Environment an injection token
         @Inject('GRPC_ENVIRONMENT') private szEnvironment: SzGrpcWebEnvironment
     ) {
+      szEnvironment.addEventListener('connectionChange', () => {
 
+      })
     }
 }
