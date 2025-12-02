@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ChangeDetectorRef, OnDestroy, Inject } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Subject  } from 'rxjs';
@@ -31,6 +31,7 @@ import { MatInputModule } from '@angular/material/input';
 import { SzSdkSearchResolvedEntity, SzSdkSearchResult } from '../../models/grpc/engine';
 import { SzSdkConfigAttr } from '../../models/grpc/config';
 import { SzGrpcConfigManagerService } from '../../services/grpc/configManager.service';
+import { SzGrpcWebEnvironment } from '@senzing/sz-sdk-typescript-grpc-web';
 
 /** @internal */
 interface SzSearchFormParams {
@@ -890,7 +891,8 @@ export class SzSearchGrpcComponent implements OnInit, OnDestroy {
     private folios: SzFoliosService,
     private dialog: MatDialog,
     private bottomSheet: MatBottomSheet,
-    public breakpointObserver: BreakpointObserver) {
+    public breakpointObserver: BreakpointObserver,
+    @Inject('GRPC_ENVIRONMENT') private szEnvironment: SzGrpcWebEnvironment) {
 
       this.prefs.searchForm.prefsChanged.pipe(
         takeUntil(this.unsubscribe$)
@@ -930,6 +932,10 @@ export class SzSearchGrpcComponent implements OnInit, OnDestroy {
           this.search_history = folio.history;
         }
         //console.log('search history from folio service updated: ', folio.history, this.search_history);
+      });
+
+      this.szEnvironment.addEventListener('connectionChange', () => {
+        console.log(`grpc connectionChange from inside search box`);
       });
   }
 
@@ -1164,7 +1170,7 @@ export class SzSearchGrpcComponent implements OnInit, OnDestroy {
 
     if(Object.keys(searchParams).length <= 0){
       // do not perform search if criteria are empty
-      this.searchException.next(new Error("null criteria")); //TODO: remove in breaking change release
+      //this.searchException.next(new Error("null criteria")); //TODO: remove in breaking change release
       this.exception.next( new Error("null criteria") );
       return;
     }
@@ -1173,16 +1179,19 @@ export class SzSearchGrpcComponent implements OnInit, OnDestroy {
     this.searchService.searchByAttributes(searchParams).pipe(
       takeUntil(this.unsubscribe$)
     )
-    .subscribe((res) => {
-      const totalResults = res ? res.length : 0;
-      this.searchResultsJSON = JSON.stringify(res, null, 4);
-      this.searchEnd.emit(totalResults);
-      this.searchService.setSearchResults(res);
-      this.searchResults.next(res);
-    }, (err)=>{
-      this.searchEnd.emit();
-      this.searchException.next( err ); //TODO: remove in breaking change release
-      this.exception.next( err );
+    .subscribe({
+      next: (res) => {
+        const totalResults = res ? res.length : 0;
+        this.searchResultsJSON = JSON.stringify(res, null, 4);
+        this.searchEnd.emit(totalResults);
+        this.searchService.setSearchResults(res);
+        this.searchResults.next(res);
+      },
+      error: (err)=>{
+        this.searchEnd.emit();
+        //this.searchException.next( err ); //TODO: remove in breaking change release
+        this.exception.next( err );
+      }
     });
 
     this.searchParameters.next(this.searchService.getSearchParams());

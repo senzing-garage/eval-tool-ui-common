@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ElementRef, ViewChild, AfterViewInit, OnInit, OnDestroy, ChangeDetectorRef, TemplateRef, ViewContainerRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ElementRef, ViewChild, AfterViewInit, OnInit, OnDestroy, ChangeDetectorRef, TemplateRef, ViewContainerRef, Inject } from '@angular/core';
 import { SzSearchService } from '../../services/sz-search.service';
 import { tap, takeUntil, filter, take, map } from 'rxjs/operators';
 import { fromEvent, Subject, Subscription } from 'rxjs';
@@ -30,7 +30,7 @@ import { SzAlertMessageDialog } from '../../shared/alert-dialog/sz-alert-dialog.
 import { CommonModule } from '@angular/common';
 import { SzEntityDetailHeaderComponentGrpc } from './sz-entity-detail-header/header.component';
 import { SzGrpcEngineService } from '../../services/grpc/engine.service';
-import { SzEngineFlags } from '@senzing/sz-sdk-typescript-grpc-web';
+import { SzEngineFlags, SzGrpcWebEnvironment } from '@senzing/sz-sdk-typescript-grpc-web';
 import { SzSdkEntityRecord, SzSdkFindNetworkResponse } from '../../models/grpc/engine';
 import { SzRelatedEntityMatchLevel, SzResumeEntity, SzResumeRelatedEntity } from '../../models/SzResumeEntity';
 import { SzEntityDetailsSectionComponentGrpc } from './sz-entity-details-section/sz-entity-details-section.component';
@@ -814,6 +814,7 @@ export class SzEntityDetailGrpcComponent implements OnInit, OnDestroy, AfterView
     private searchService: SzSearchService,
     private engineService: SzGrpcEngineService,
     public viewContainerRef: ViewContainerRef,
+    @Inject('GRPC_ENVIRONMENT') private szEnvironment: SzGrpcWebEnvironment
   ) {}
 
   ngOnInit() {
@@ -832,6 +833,10 @@ export class SzEntityDetailGrpcComponent implements OnInit, OnDestroy, AfterView
       takeUntil(this.unsubscribe$),
       filter( () => this._updatePrefsOnChange ),
     ).subscribe( this.onPrefsChange.bind(this) );
+
+    this.szEnvironment.addEventListener('connectionChange', () => {
+      console.log(`grpc connectionChange from inside entity detail`);
+    });
   }
 
 
@@ -1089,55 +1094,7 @@ export class SzEntityDetailGrpcComponent implements OnInit, OnDestroy, AfterView
     if (this._entityId) {
       this.requestStart.emit(this._entityId);
 
-      this.findNetworkByEntityId(this._entityId).pipe(
-        tap(res => console.log('SzSearchService.findNetworkByEntityId: ' + this._entityId, res)),
-        takeUntil(this.unsubscribe$),
-        take(1)
-      ).subscribe({
-        next: (entity: any) => {
-          this.entity = entity;
-          this.onEntityDataChanged();
-          this.requestEnd.emit( entity );
-          this.dataChanged.next( entity );
-          /*if(this._showEntityHowFunction && (this._dynamicHowFeatures === true || 
-            this._showHowFunctionWarnings === true)) {
-            // check to see if entity has how steps, if not disable how functions
-            this.checkIfEntityHasHowSteps();
-          }*/
-        },
-        error: (err)=> {
-          this.requestEnd.emit( err );
-          this.exception.next( err );
-        }
-      });
-
-      /*
-      this.searchService.getEntityById(this._entityId, true).
-      pipe(
-        tap(res => console.log('SzSearchService.getEntityById: ' + this._entityId, res)),
-        takeUntil(this.unsubscribe$),
-        take(1)
-      ).
-      subscribe({
-        next: (entityData: SzEntityData) => {
-          // console.log('sz-entity-detail.onEntityIdChange: ', entityData);
-          this.entityDetailJSON = JSON.stringify(entityData, null, 4);
-          this.entity = entityData;
-          this.onEntityDataChanged();
-          this.requestEnd.emit( entityData );
-          this.dataChanged.next( entityData );
-          if(this._showEntityHowFunction && (this._dynamicHowFeatures === true || 
-            this._showHowFunctionWarnings === true)) {
-            // check to see if entity has how steps, if not disable how functions
-            this.checkIfEntityHasHowSteps();
-          }
-        }, 
-        error: (err)=> {
-          this.requestEnd.emit( err );
-          this.exception.next( err );
-        }
-      });
-      */
+      this.getEntityData();
     }
   }
 
@@ -1193,6 +1150,39 @@ export class SzEntityDetailGrpcComponent implements OnInit, OnDestroy, AfterView
         return result;
       })
     )
+  }
+  /**
+   * retrieves the entity data for use by other methods.
+   * not intended for customer implementation use.
+   * @internal 
+   */
+  private getEntityData(retryAttempt?: number) {
+      this.findNetworkByEntityId(this._entityId).pipe(
+        tap(res => console.log('SzSearchService.findNetworkByEntityId: ' + this._entityId, res)),
+        takeUntil(this.unsubscribe$),
+        take(1)
+      ).subscribe({
+        next: (entity: any) => {
+          this.entity = entity;
+          this.onEntityDataChanged();
+          this.requestEnd.emit( entity );
+          this.dataChanged.next( entity );
+          /*if(this._showEntityHowFunction && (this._dynamicHowFeatures === true || 
+            this._showHowFunctionWarnings === true)) {
+            // check to see if entity has how steps, if not disable how functions
+            this.checkIfEntityHasHowSteps();
+          }*/
+        },
+        error: (err)=> {
+          console.log(`SzSearchService.exception: `, err);
+          this.requestEnd.emit( err );
+          this.exception.next( err );
+          if(!retryAttempt || retryAttempt && retryAttempt < 5) {
+            // retry in "1" sec
+            //setTimeout(this.getEntityData.bind(this, retryAttempt+1), 2000);
+          }
+        }
+      });
   }
   
   /** @internal */
