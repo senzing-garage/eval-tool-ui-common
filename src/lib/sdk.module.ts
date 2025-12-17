@@ -152,7 +152,7 @@ export function SzDefaultDataMartEnvFactory(): SzDataMartEnvironment {
  */
 export function SzDefaultGrpcEnvFactory(): SzGrpcWebEnvironment {
   return new SzGrpcWebEnvironment({
-    connectionString: `http://localhost:8262/grpc`
+    connectionString: `http://localhost:8261`
   });
 }
 

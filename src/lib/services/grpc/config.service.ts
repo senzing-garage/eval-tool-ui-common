@@ -3,7 +3,7 @@ import { SzGrpcWebConfig } from '@senzing/sz-sdk-typescript-grpc-web';
 import { Subject } from 'rxjs';
 import { SzSdkConfigAttr, SzSdkConfigFeatureType, SzSdkConfigJson, SzSdkDataSource } from '../../models/grpc/config';
 import { SzSdkEntityFeature } from "../../models/grpc/engine";
-import { SzAttrClass, SzFeatureType } from "../../models/SzFeatureTypes";
+import { SzAttrClass, SzFeatureType } from "../../models/grpc/SzFeatureTypes";
 import { SzSdkUnregisterDataSourceResponse } from '../../models/data-sources';
 //import { SzProductLicenseResponse, SzProductVersionResponse } from '../../models/grpc/product';
 

@@ -1,4 +1,4 @@
-import { SzAttrClass } from '../SzFeatureTypes';
+import { SzAttrClass } from './SzFeatureTypes';
 
 export interface SzSdkDataSource {
     DSRC_ID: number,
