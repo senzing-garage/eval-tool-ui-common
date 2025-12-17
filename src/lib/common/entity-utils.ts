@@ -1,7 +1,7 @@
 import { SzResolvedEntity } from "@senzing/rest-api-client-ng";
 import { SzSdkConfigAttr } from "../models/grpc/config";
 import { SzSdkEntityFeature, SzSdkSearchResolvedEntity } from "../models/grpc/engine";
-import { SzAttrClass, SzFeatureType } from "../models/SzFeatureTypes";
+import { SzAttrClass, SzFeatureType } from "../models/grpc/SzFeatureTypes";
 import { SzGrpcConfigManagerService } from "../services/grpc/configManager.service";
 import { SzResumeEntity } from "../models/SzResumeEntity";
 

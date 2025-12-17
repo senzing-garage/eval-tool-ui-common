@@ -13,7 +13,7 @@ import { SzSdkEntityFeature, SzSdkEntityRecord, SzSdkSearchResolvedEntity, SzSdk
 import {  SzResumeRelatedEntity } from '../../../models/SzResumeEntity';
 import { getEntityFeaturesByType, getStringEntityFeatures } from '../../../common/entity-utils';
 import { SzGrpcConfigManagerService } from '../../../services/grpc/configManager.service';
-import { SzAttrClass, SzFeatureType } from '../../../models/SzFeatureTypes';
+import { SzAttrClass, SzFeatureType } from '../../../models/grpc/SzFeatureTypes';
 
 /**
  * @internal

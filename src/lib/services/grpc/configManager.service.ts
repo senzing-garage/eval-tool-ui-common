@@ -4,7 +4,7 @@ import { Observable, Subject, take, takeUntil } from 'rxjs';
 import { SzProductLicenseResponse, SzProductVersionResponse } from '../../../lib/models/grpc/product';
 import { SzGrpcConfig } from './config.service';
 import { SzSdkConfigAttr, SzSdkConfigFeatureType, SzSdkConfigJson } from '../../models/grpc/config';
-import { SzAttrClass, SzFeatureType } from '../../models/SzFeatureTypes';
+import { SzAttrClass, SzFeatureType } from '../../models/grpc/SzFeatureTypes';
 
 @Injectable({
   providedIn: 'root'

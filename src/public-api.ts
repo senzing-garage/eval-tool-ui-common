@@ -135,7 +135,7 @@ export { SzEntityRecordViewerComponent } from './lib/record/sz-entity-record-vie
 export * from './lib/models/grpc/config';
 export * from './lib/models/grpc/engine';
 export * from './lib/models/grpc/product';
-export * from './lib/models/SzFeatureTypes';
+export * from './lib/models/grpc/SzFeatureTypes';
 export * from './lib/models/SzNetworkGraph';
 export * from './lib/models/SzResumeEntity';
 // services
@@ -143,6 +143,7 @@ export { SzGrpcConfig } from './lib/services/grpc/config.service';
 export { SzGrpcConfigManagerService } from './lib/services/grpc/configManager.service';
 export { SzGrpcEngineService }  from './lib/services/grpc/engine.service';
 export { SzGrpcProductService }  from './lib/services/grpc/product.service';
+export { SzStatisticsService } from './lib/services/statistics.service';
 
 /** export some members of rest client to ease type use */
 export {
