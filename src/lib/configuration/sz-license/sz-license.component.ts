@@ -12,6 +12,7 @@ import { SzProductLicenseResponse } from '../../models/grpc/product';
 import { SzGrpcProductService } from '../../services/grpc/product.service';
 import { SzShortNumberPipe } from '../../pipes/shortnumber.pipe';
 import { SzLoadedStats } from '../../services/http/models/szLoadedStats';
+import { MatButtonModule } from '@angular/material/button';
 
 /**
  * A simple "license info" component.
@@ -28,7 +29,11 @@ import { SzLoadedStats } from '../../services/http/models/szLoadedStats';
 @Component({
     selector: 'sz-license',
     templateUrl: './sz-license.component.html',
-    imports: [CommonModule, SzShortNumberPipe],
+    imports: [
+      CommonModule, 
+      MatButtonModule,
+      SzShortNumberPipe
+    ],
     styleUrls: ['./sz-license.component.scss'],
     providers:[
       { provide: SzDataMartService, useClass: SzDataMartService },
@@ -111,6 +116,7 @@ export class SzLicenseInfoComponent implements OnInit {
     const limit = this.licenseInfo.recordLimit;
     if (limit === null || limit === undefined) return 0;
     if (limit === 0) return 1;
+    if (!this._recordCount || this._recordCount === 0) return 0;
     return (this._recordCount / limit);
   }
 
@@ -168,8 +174,11 @@ export class SzLicenseInfoComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.dmService.onCountStats.pipe(filter( (val) => val !== undefined)).subscribe( (resp: SzLoadedStats) => {
+    this.dmService.onCountStats.pipe(
+      filter( (val) => val !== undefined)
+    ).subscribe( (resp: SzLoadedStats) => {
       this._countStats = resp;
+      console.log(`count stats: `, this._countStats);
       if(this._countStats.totalRecordCount) {
         this._recordCount = this._countStats.totalRecordCount;
       }
@@ -178,12 +187,19 @@ export class SzLicenseInfoComponent implements OnInit {
        takeUntil(this.unsubscribe$)
     ).subscribe((resp: SzProductLicenseResponse) => {
       this._licenseInfo = resp;
+      console.log(`license info: `, this._licenseInfo);
     })
     // if "openUpgradeButtonLink" is true then redirect to senzing.com on click
     this.upgradeLicense.pipe(
       takeUntil(this.unsubscribe$),
       filter(() => this._openUpgradeButtonLink)
-    ).subscribe(this.handleUpgradeLicenseClick)
+    ).subscribe(this.handleUpgradeLicenseClick);
+
+    // trigger data retrieval if no count stats
+    if(!this._countStats) {
+      let temp = this.dmService.loadedStatistics;
+      console.log(`default count stats: `, temp);
+    }
   }
 
   public handleUpgradeButtonClicked(event: Event) {

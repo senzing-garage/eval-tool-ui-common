@@ -21,7 +21,34 @@ import { SzCrossSourcePagingComponent } from './sz-cross-source-results.pager';
 import { SzCrossSourceSummaryMatchKeyPickerDialog } from '../../summary/cross-source/sz-cross-source-matchkey-picker.component';
 import { SzOrderedMapEntries } from '../../pipes/mapentries.pipe';
 /** deprecate ? */
-import { SzEntity, SzEntityData, SzEntityIdentifier, SzMatchedRecord, SzRecord, SzRelation } from '@senzing/rest-api-client-ng';
+/*
+import { 
+  SzEntity, 
+  //SzEntityData, 
+  //SzEntityIdentifier, 
+  //SzMatchedRecord, 
+  SzRecord, 
+  SzRelation 
+} from '../../models/statistics/public-api';*/
+import { SzEntityIdentifier } from '../../services/http/models/szEntityIdentifier';
+import { SzEntitiesPage } from '../../services/http/models/szEntitiesPage';
+import { SzRelationsPage } from '../../services/http/models/szRelationsPage';
+import { SzBoundType } from '../../services/http/models/szBoundType';
+import { SzEntityData } from '../../services/http/models/szEntityData';
+import { SzEntity } from '../../services/http/models/szEntity';
+import { SzRecord } from '../../services/http/models/szRecord';
+import { SzMatchedRecord } from '../../services/http/models/szMatchedRecord';
+import { SzRelation } from '../../services/http/models/szRelation';
+import { SzPagedEntitiesResponse } from '../../services/http/models/szPagedEntitiesResponse';
+import { SzPagedRelationsResponse } from '../../services/http/models/szPagedRelationsResponse';
+import { SzLoadedStats } from '../../services/http/models/szLoadedStats';
+import { SzSummaryStats } from '../../services/http/models/szSummaryStats';
+import { SzCrossSourceSummary } from '../../services/http/models/szCrossSourceSummary';
+import { SzCrossSourceSummaryResponse } from '../../services/http/models/szCrossSourceSummaryResponse';
+import { SzRelationCounts } from '../../services/http/models/szRelationCounts';
+import { SzMatchCounts } from '../../services/http/models/szMatchCounts';
+
+//import { SzSdkEntityResponse, SzSdkResolvedEntity, SzSdkRelatedEntity } from '../../models/grpc/engine'
 
 /**
  * Data Table with specific overrides and formatting for displaying 
@@ -280,13 +307,13 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
     /** @internal */
     private _onNoData: Subject<boolean> = new Subject();
     /** @internal */
-    private _onEntityIdClick: Subject<SzEntityIdentifier> = new Subject();
+    private _onEntityIdClick: Subject<number> = new Subject();
     /** aggregate observeable for when the component is either loading data, transforming data, or rendering. */
     @Output() loading: Observable<SzStatsSampleTableLoadingEvent> = this._loading.asObservable();
     /** when requests have completed but there are no results available to display */
     @Output() onNoData: Observable<boolean> = this._onNoData.asObservable();
     /** when either a "entityId" or "relatedEntityId" is clicked on */
-    @Output() onEntityIdClick: Observable<SzEntityIdentifier> = this._onEntityIdClick.asObservable();
+    @Output() onEntityIdClick: Observable<number> = this._onEntityIdClick.asObservable();
 
     // --------------------------------- getters and setters ---------------------------------
     /** custom formatting for specific cells 
@@ -797,7 +824,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
     /** emit an entityId click programatically. (used in id field context menu) */
     public openEntityById(value: any) {
       console.log(`open entity: `, value);
-      this._onEntityIdClick.next(value as SzEntityIdentifier);
+      this._onEntityIdClick.next(value as number);
     }
     /** open the matchKey filtering dialog */
     public openFilterDialog() {
@@ -951,7 +978,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
     override onCellClick(cellName: string, data: any, event?: MouseEvent, element?: HTMLElement) { 
       console.log(`on${cellName}Click: `, event, data);
       if((cellName === 'relatedEntityId' || cellName === 'entityId') && data) {
-        this._onEntityIdClick.next(data as SzEntityIdentifier);
+        this._onEntityIdClick.next(data as number);
       }
       this.cellClick.emit({key: cellName, value: data});
       if(element) {
@@ -1060,7 +1087,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
       // flatten/normalize data so we can display it
       let transformed: SzStatSampleEntityTableItem[] = data.map((item: SzEntityData | SzRelation) => {
         // is it a relation or a entity
-        let isRelation = (item as SzEntityData).resolvedEntity ? false : true;
+        let isRelation = (item as SzRelation).entity ? false : true;
         if(isRelation) {
           // base item is entity
           let baseItem  = (item as SzRelation).entity as SzDataTableEntity;

@@ -1,10 +1,38 @@
-import { SzLoadedStats, SzSourceLoadedStats, SzLoadedStatsResponse, SzResolvedEntity, SzRelatedEntity, SzRecord, SzMatchedRecord, SzEntityRecord, SzRelation, SzEntity, SzBoundType, SzCrossSourceSummary } from "@senzing/rest-api-client-ng";
+import { SzSdkEntityRelatedRecord, SzSdkRelatedEntity, SzSdkResolvedEntity } from "./grpc/engine";
+import { 
+    SzLoadedStats, 
+    SzSourceLoadedStats, 
+    //SzLoadedStatsResponse, 
+    //SzResolvedEntity, 
+    //SzRelatedEntity,
+    SzRecord, 
+    //SzMatchedRecord, 
+    //SzEntityRecord,
+    SzRelation, 
+    SzEntity, 
+    SzBoundType, 
+    SzCrossSourceSummary 
+} from "./statistics/public-api";
 import { Observable } from "rxjs";
+//import { SzBoundType } from '../services/http/models/szBoundType';
+import { SzCrossSourceMatchCounts } from '../services/http/models/szCrossSourceMatchCounts';
+import { SzCrossSourceRelationCounts } from '../services/http/models/szCrossSourceRelationCounts';
+//import { SzCrossSourceSummary } from '../services/http/models/szCrossSourceSummary';
+import { SzEntityRecord } from '../services/http/models/szEntityRecord';
+//import { SzLoadedStats } from '../services/http/models/szLoadedStats';
+import { SzMatchedRecord } from '../services/http/models/szMatchedRecord';
+import { SzRelatedEntity } from '../services/http/models/szRelatedEntity';
+import { SzResolvedEntity } from '../services/http/models/szResolvedEntity';
+import { SzRelationCounts } from '../services/http/models/szRelationCounts';
+import { SzRelationsPage } from '../services/http/models/szRelationsPage';
+//import { SzSourceLoadedStats } from '../services/http/models/szSourceLoadedStats';
+import { SzSourceSummary } from '../services/http/models/szSourceSummary';
+import { SzSummaryStats } from '../services/http/models/szSummaryStats';
 
-export interface SzCountStatsForDataSourcesResponse extends SzLoadedStatsResponse {
+//export interface SzCountStatsForDataSourcesResponse extends SzLoadedStatsResponse {
     /** override with extended */
-    data?: SzStatCountsForDataSources;
-}
+//    data?: SzStatCountsForDataSources;
+//}
 export interface SzStatCountsForDataSources extends SzLoadedStats {
     /** we add pending count so app can optionally inject values */
     totalPendingCount?: number, 
@@ -54,7 +82,7 @@ export interface SzStatSampleEntityTableItem extends SzResolvedEntity {
     relatedEntities?: SzDataTableRelatedEntity[],
     relatedEntity?: SzDataTableRelatedEntity,
     recordCount?: number,
-    records?: SzRecord[] | SzMatchedRecord[],
+    records?: SzRecord[],
     rows?: SzStatSampleEntityTableRow[],
     dataType?: SzStatSampleEntityTableRowType;
 }

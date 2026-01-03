@@ -28,7 +28,7 @@ import {
 
 import { take, tap, map, catchError, takeUntil, filter, distinctUntilChanged } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
-import { SzCountStatsForDataSourcesResponse, SzCrossSourceCount, SzDataTableEntitiesPagingParameters, SzDataTableRelation, SzDataTableRelationsPagingParameters, SzStatCountsForDataSources, SzStatSampleSetPageChangeEvent, SzStatSampleSetParameters, sampleDataSourceChangeEvent } from '../models/stats';
+import { SzCrossSourceCount, SzDataTableEntitiesPagingParameters, SzDataTableRelation, SzDataTableRelationsPagingParameters, SzStatCountsForDataSources, SzStatSampleSetPageChangeEvent, SzStatSampleSetParameters, sampleDataSourceChangeEvent } from '../models/stats';
 import { SzPrefsService } from '../services/sz-prefs.service';
 import { SzDataSourcesService } from './sz-datasources.service';
 import { SzCrossSourceSummaryCategoryType } from '../models/stats';
@@ -38,7 +38,9 @@ import { SzEngineFlags } from '@senzing/sz-sdk-typescript-grpc-web';
 import { SzSdkEntityResponse, SzSdkResolvedEntity } from '../models/grpc/engine';
 
 /** start datamart related models */
-import { SzHttpStatisticsService } from './http/sz-statistics.service';
+//import { SzHttpStatisticsService } from './http/sz-statistics.service';
+import { SzStatisticsService } from './statistics.service';
+
 import { SzEntityIdentifier } from './http/models/szEntityIdentifier';
 import { SzEntitiesPage } from './http/models/szEntitiesPage';
 import { SzRelationsPage } from './http/models/szRelationsPage';
@@ -402,7 +404,7 @@ export class SzStatSampleSet {
     constructor( 
         private parameters: SzStatSampleSetParameters,
         private prefs: SzPrefsService,
-        private statsService: SzHttpStatisticsService, 
+        private statsService: SzStatisticsService, 
         private engineService: SzGrpcEngineService,
         //private entityDataService: EntityDataService, 
         deferInitialRequest?: boolean) {
@@ -1176,7 +1178,7 @@ export class SzDataMartService {
         private dataSourcesService: SzDataSourcesService,
         //private entityDataService: EntityDataService,
         private engineService: SzGrpcEngineService,
-        private statsService: SzHttpStatisticsService) {
+        private statsService: SzStatisticsService) {
         if(!this._dataSources){
             this.getDataSources()
             .subscribe((dataSources) => {
@@ -1306,8 +1308,8 @@ export class SzDataMartService {
         if(dataSource1 && dataSource2) {
             return this.statsService.getCrossSourceSummaryStatistics(dataSource1, dataSource2, matchKey).pipe(
                 tap((response) => {
-                    if(response && response.data) {
-                        this.onCrossSourceSummaryStats.next(response.data);
+                    if(response) {
+                        this.onCrossSourceSummaryStats.next(response);
                     }
                 }),
                 catchError((err)=> {
@@ -1319,8 +1321,8 @@ export class SzDataMartService {
         } else if(dataSource1) {
             return this.statsService.getCrossSourceSummaryStatistics(dataSource1, dataSource1, matchKey).pipe(
                 tap((response) => {
-                    if(response && response.data) {
-                        this.onCrossSourceSummaryStats.next(response.data);
+                    if(response && response) {
+                        this.onCrossSourceSummaryStats.next(response);
                     }
                 }),
                 catchError((err)=> {
@@ -1332,8 +1334,8 @@ export class SzDataMartService {
         } else if(dataSource2) {
             return this.statsService.getCrossSourceSummaryStatistics(dataSource2, dataSource2, matchKey).pipe(
                 tap((response) => {
-                    if(response && response.data) {
-                        this.onCrossSourceSummaryStats.next(response.data);
+                    if(response && response) {
+                        this.onCrossSourceSummaryStats.next(response);
                     }
                 }),
                 catchError((err)=> {
@@ -1396,15 +1398,22 @@ export class SzDataMartService {
             })
         );
     }
+    public getEntitySizeCount(entitySize: number) {
+        return this.statsService.getEntitySizeCount(entitySize);
+    }
     /** get number of entity and records per datasource for each datasource from the api surface */
-    public getLoadedStatistics(): Observable<SzCountStatsForDataSourcesResponse> {
+    public getLoadedStatistics(): Observable<SzStatCountsForDataSources> {
+        let intSub = new Subject<SzStatCountsForDataSources>;
+        let retVal = intSub.asObservable();
+
         this._loadedStatisticsInFlight = true;
-        return this.statsService.getLoadedStatistics().pipe(
+        this.statsService.getLoadedStatistics().pipe(
             tap((response) => {
                 console.log('getLoadedStatistics: ', response);
-                if(response && response.data) {
-                    this._loadedStatistics = response.data;
-                    this.onCountStats.next(response.data);
+                if(response && response) {
+                    this._loadedStatistics = response;
+                    this.onCountStats.next(response);
+                    intSub.next(response as unknown as SzLoadedStats);
                 }
                 this._loadedStatisticsInFlight = false;
             }),
@@ -1414,6 +1423,7 @@ export class SzDataMartService {
                 return err;
             })
         )
+        return retVal;
     }
     /* Gets the summary statistics for each data source versus every other  data source including itself.*/
     public getSummaryStatistics() {
@@ -1423,9 +1433,9 @@ export class SzDataMartService {
         return this.statsService.getSummaryStatistics(undefined, undefined, this._onlyShowLoadedSummaryStatistics).pipe(
             tap((response) => {
                 console.log('getSummaryStatistics: ', response);
-                if(response && response.data) {
-                    this._summaryStatistics = response.data;
-                    this.onSummaryStats.next(response.data);
+                if(response && response) {
+                    this._summaryStatistics = response;
+                    this.onSummaryStats.next(response);
                 }
                 this._summaryStatisticsInFlight = false;
             }),
