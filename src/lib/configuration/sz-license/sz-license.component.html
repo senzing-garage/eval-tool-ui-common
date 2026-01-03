@@ -1,7 +1,7 @@
 <ul class="license-messages">
     <li *ngIf="!limitInvalid">
         <ng-template #evalLicenseUsage [ngIf]="trialLicense" [ngIfElse]="licenseUsage">
-            Using {{licenseLimitRatio | percent:'1.0-0'}} of your {{recordLimit | SzShortNumber}} evaluation license.
+            Using {{licenseLimitRatio | percent:'1.0-0'}} of your {{recordLimit | SzShortNumber}} record evaluation license.
         </ng-template>
         <ng-template #licenseUsage>
             Using {{licenseLimitRatio | percent:'1.0-0'}} of your {{recordLimit | SzShortNumber}} record license.

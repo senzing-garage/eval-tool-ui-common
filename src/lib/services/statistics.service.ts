@@ -37,7 +37,10 @@ import { BASE_PATH, COLLECTION_FORMATS }                     from './http/variab
 //import { SzStatsConfiguration }                              from './http/configuration';
 import { SzDataMartEnvironmentParameters, SzDataMartEnvironment } from './http/sz-datamart-environment';
 
-@Injectable()
+//@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
 export class SzStatisticsService {
 
     protected basePath = 'http://localhost:8261';

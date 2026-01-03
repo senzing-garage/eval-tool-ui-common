@@ -15,6 +15,7 @@ export interface SzProductVersionResponse {
 }
 
 export interface SzProductLicenseResponse {
+    "advSearch"?: string,
     "customer"?: string,
     "contract"?: string,
     "issueDate"?: Date,

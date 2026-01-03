@@ -5,7 +5,7 @@ import { Observable, Subject } from 'rxjs';
 import * as d3 from 'd3-selection';
 import * as d3Shape from 'd3-shape';
 
-import { SzDataSourcesResponseData } from '@senzing/rest-api-client-ng';
+//import { SzDataSourcesResponseData } from '@senzing/rest-api-client-ng';
 import { isValueTypeOfArray, parseBool, parseNumber, parseSzIdentifier, sortDataSourcesByIndex } from '../../common/utils';
 import { SzRecordCountDataSource, SzStatCountsForDataSources } from '../../models/stats';
 import { SzDataMartService } from '../../services/sz-datamart.service';
@@ -42,7 +42,10 @@ import { MatTooltipModule } from '@angular/material/tooltip';
       MatTooltipModule,
       SzShortNumberPipe, SzDecimalPercentPipe
     ],
-    styleUrls: ['./sz-donut.component.scss']
+    styleUrls: ['./sz-donut.component.scss'],
+    providers:[
+      { provide: SzDataMartService, useClass: SzDataMartService }
+    ]
 })
 export class SzRecordStatsDonutChart implements OnInit, OnDestroy {
   /** subscription to notify subscribers to unbind */
@@ -263,7 +266,7 @@ export class SzRecordStatsDonutChart implements OnInit, OnDestroy {
     public prefs: SzPrefsService,
     private cd: ChangeDetectorRef,
     private dataMartService: SzDataMartService,
-    private dataSourcesService: SzDataSourcesService
+    private dataSourcesService: SzDataSourcesService,
   ) {}
 
   /**
@@ -548,23 +551,23 @@ export class SzRecordStatsDonutChart implements OnInit, OnDestroy {
     }
     private getDataSourceRecordCounts(): Observable<SzRecordCountDataSource[]> {
       return this.dataMartService.getLoadedStatistics().pipe(
-        map((response)=> {
+        map((response: SzStatCountsForDataSources)=> {
 
           console.info(`SzRecordStatsDonutChart.getDataSourceRecordCounts(): response: `, response);
-          if(response && response.data) {
-            this.extendData(response.data);
+          if(response) {
+            this.extendData(response);
 
-            if(response.data.totalEntityCount) {
-              this._totalEntityCount = response.data.totalEntityCount;
+            if(response.totalEntityCount) {
+              this._totalEntityCount = response.totalEntityCount;
             }
-            if(response.data.totalRecordCount) {
-              this._totalRecordCount = response.data.totalRecordCount;
+            if(response.totalRecordCount) {
+              this._totalRecordCount = response.totalRecordCount;
             }
             /*if(response.data.totalUnmatchedRecordCount) {
               this._totalUnmatchedRecordCount = response.data.totalUnmatchedRecordCount
             }*/
-            if(response.data.dataSourceCounts && response.data.dataSourceCounts.length > 0){
-              this.dataSourceCounts = response.data.dataSourceCounts;
+            if(response.dataSourceCounts && response.dataSourceCounts.length > 0){
+              this.dataSourceCounts = response.dataSourceCounts;
             }
           }
           return this.dataSourceCounts;
