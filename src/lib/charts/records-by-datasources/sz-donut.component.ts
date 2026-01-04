@@ -308,7 +308,7 @@ export class SzRecordStatsDonutChart implements OnInit, OnDestroy {
         if(this._dataSourceCounts && this._dataSources) {
           this.dataChanged.next(this._dataSourceCounts);
         } else {
-          console.warn('huh?', dataSources);
+          console.warn('datasources?', dataSources);
         }
       },
       error: (err) => {
@@ -323,9 +323,12 @@ export class SzRecordStatsDonutChart implements OnInit, OnDestroy {
       next: (recordCounts: SzRecordCountDataSource[])=>{
         if(this._dataSourceCounts && this._dataSources) {
           this.dataChanged.next(this._dataSourceCounts);
+        } else {
+          console.warn('record counts for datasources?', recordCounts, this._dataSourceCounts, this._dataSources);
         }
       },
       error: (err) => {
+        console.error(`huh? `, err);
         this.exception.next(err);
       }
     });
@@ -550,6 +553,7 @@ export class SzRecordStatsDonutChart implements OnInit, OnDestroy {
       return dsCode
     }
     private getDataSourceRecordCounts(): Observable<SzRecordCountDataSource[]> {
+      console.log(`SzRecordStatsDonutChart.getDataSourceRecordCounts...`);
       return this.dataMartService.getLoadedStatistics().pipe(
         map((response: SzStatCountsForDataSources)=> {
 

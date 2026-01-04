@@ -1407,9 +1407,11 @@ export class SzDataMartService {
         let retVal = intSub.asObservable();
 
         this._loadedStatisticsInFlight = true;
+        console.log('getLoadedStatistics...');
         this.statsService.getLoadedStatistics().pipe(
+            take(1),
             tap((response) => {
-                console.log('getLoadedStatistics: ', response);
+                console.log('getLoadedStatistics response: ', response);
                 if(response && response) {
                     this._loadedStatistics = response;
                     this.onCountStats.next(response);
@@ -1422,7 +1424,7 @@ export class SzDataMartService {
                 console.error('error: ', err);
                 return err;
             })
-        )
+        ).subscribe();
         return retVal;
     }
     /* Gets the summary statistics for each data source versus every other  data source including itself.*/
