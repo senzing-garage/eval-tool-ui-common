@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Observable, Subject, forkJoin, of } from 'rxjs';
 import { skipWhile, take, takeUntil } from 'rxjs/operators';
 
-import { SzCrossSourceSummary, SzMatchCounts, SzRelationCounts } from '@senzing/rest-api-client-ng';
+//import { SzCrossSourceSummary, SzMatchCounts, SzRelationCounts } from '@senzing/rest-api-client-ng';
 import { SzPrefsService } from '../../services/sz-prefs.service';
 import { SzCrossSourceCount, SzCrossSourceSummaryCategoryType, SzCrossSourceSummaryResponses, SzCrossSourceSummarySelectionClickEvent } from '../../models/stats';
 import { SzDataMartService } from '../../services/sz-datamart.service';
@@ -12,6 +12,10 @@ import { parseBool } from '../../common/utils';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { SzCrossSourceSummaryMatchKeyPickerDialog } from './sz-cross-source-matchkey-picker.component';
 import { SzVennDiagramsComponent } from '../../charts/versus/sz-venn-diagram.component';
+
+import { SzCrossSourceSummary } from '../../models/statistics/szCrossSourceSummary';
+import { SzMatchCounts } from '../../models/statistics/szMatchCounts';
+import { SzRelationCounts } from '../../models/statistics/szRelationCounts';
 
 /**
  * Embeddable Venn Diagrams component that illustrates:
@@ -274,7 +278,7 @@ export class SzCrossSourceSummaryComponent implements OnInit, OnDestroy {
     if(data && data.toDataSource) {
       this._toDataSourceSummaryData = data.toDataSource;
     }
-    console.warn(`onCrossSourceDataChanged: `, this._fromDataSourceSummaryData, this._crossSourceSummaryData, this._toDataSourceSummaryData);
+    console.warn(`onCrossSourceDataChanged: `, data, this._fromDataSourceSummaryData, this._crossSourceSummaryData, this._toDataSourceSummaryData);
   }
   public get legendFrom(): string {
     let retVal = 'A';

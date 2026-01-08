@@ -6,8 +6,10 @@ import { SzGraphPrefs, SzPrefsService } from '../../services/sz-prefs.service';
 import { take, takeUntil, tap } from 'rxjs/operators';
 import { Observable, Subject } from 'rxjs';
 //import { camelToKebabCase, underscoresToDashes, getMapKeyByValue } from '../../common/utils';
-import { SzCrossSourceSummary, SzSummaryStats } from '@senzing/rest-api-client-ng';
+//import { SzCrossSourceSummary, SzSummaryStats } from '@senzing/rest-api-client-ng';
 //import { isValueTypeOfArray, parseBool, parseNumber, parseSzIdentifier, sortDataSourcesByIndex } from '../../common/utils';
+import { SzCrossSourceSummary } from '../../models/statistics/szCrossSourceSummary';
+import { SzSummaryStats } from '../../models/statistics/szSummaryStats';
 import { SzCrossSourceSummaryCategoryType, SzCrossSourceSummaryCategoryTypeToMatchLevel, SzCrossSourceSummarySelectionEvent, SzRecordCountDataSource } from '../../models/stats';
 import { SzDataMartService } from '../../services/sz-datamart.service';
 import { SzDataSourcesService } from '../../services/sz-datasources.service';
@@ -31,8 +33,7 @@ import { SzSdkDataSource } from '../../models/grpc/config';
       MatIconButton,
       MatMenuModule,
       MatButtonModule
-    ],
-    standalone: true
+    ]
 })
 export class SzCrossSourceSelectComponent implements OnInit, AfterViewInit, OnDestroy {
   /** subscription to notify subscribers to unbind */
@@ -544,12 +545,14 @@ export class SzCrossSourceSelectComponent implements OnInit, AfterViewInit, OnDe
 
   public setToDataSource(dataSource: string | SzSdkDataSource) {
     setTimeout(() => {
-      if (!dataSource || !SzCrossSourceSelectComponent.dataSourcesInclude(dataSource, this.dataSources)) {
+      if (this.dataSources && SzCrossSourceSelectComponent.dataSourcesInclude(dataSource, this.dataSources)) {
         this.toDataSource = dataSource;
         this.stepFromNone = (this.toDataSource === this.fromDataSource);
         console.log(`to datasource: ${dataSource}|${this.toDataSource}`);
         //this.currentProjectService.setAttribute(TO_DATA_SOURCE_KEY, dataSource);
         //this.onSummaryDataChanged();
+      } else {
+        console.warn(`to datasource failure: "${dataSource}"|"${this.toDataSource}"`, this.dataSources);
       }
     });
   }

@@ -34,11 +34,11 @@
     </button>-->
 </div>
 <div [class.loading]="isLoading" class="data-table-container">
-    <sz-cross-source-results sz-venn-dt *ngIf="showTable"
+    <!--<sz-cross-source-results sz-venn-dt *ngIf="showTable"
     (loading)="onTableLoading($event)"
     (onEntityIdClick)="onEntityIdClick($event)"
     (cellClick)="onTableCellClick($event)"></sz-cross-source-results>
     <div class="spinner-container">
         <ng-content select=".spinner"></ng-content>
-    </div>
+    </div>-->
 </div>
