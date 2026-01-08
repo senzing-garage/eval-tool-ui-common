@@ -1316,7 +1316,7 @@ export class SzDataMartService {
                     console.error('error: ', err);
                     return err;
                 }),
-                map((response: SzCrossSourceSummaryResponse)=> response.data)
+                map((response: SzCrossSourceSummary)=> response as SzCrossSourceSummary)
             );
         } else if(dataSource1) {
             return this.statsService.getCrossSourceSummaryStatistics(dataSource1, dataSource1, matchKey).pipe(
@@ -1329,7 +1329,7 @@ export class SzDataMartService {
                     console.error('error: ', err);
                     return err;
                 }),
-                map((response: SzCrossSourceSummaryResponse)=> response.data)
+                map((response: SzCrossSourceSummary)=> response as SzCrossSourceSummary)
             );
         } else if(dataSource2) {
             return this.statsService.getCrossSourceSummaryStatistics(dataSource2, dataSource2, matchKey).pipe(
@@ -1342,7 +1342,7 @@ export class SzDataMartService {
                     console.error('error: ', err);
                     return err;
                 }),
-                map((response: SzCrossSourceSummaryResponse)=> response.data)
+                map((response: SzCrossSourceSummary)=> response as SzCrossSourceSummary)
             );
         } else {
             throw new Error('at least one datasource must be selected for cross-source statistics. datasouces may be the same to compare to self.');
