@@ -1,37 +1,10 @@
 import { Injectable, OnInit } from '@angular/core';
 import { BehaviorSubject, forkJoin, Observable, of, Subject, Subscriber, Subscription, throwError } from 'rxjs';
-
-/*
-import {
-    ConfigService as SzConfigService, SzConfigResponse,
-    SzLoadedStats,
-    SzSummaryStats,
-    SzCrossSourceSummary,
-    SzCrossSourceSummaryResponse,
-    SzDataSourcesResponseData,
-    SzPagedEntitiesResponse,
-    SzEntitiesPage,
-    SzBoundType,
-    SzEntityIdentifier,
-    SzEntity,
-    SzEntityData,
-    SzEntityIdentifiers,
-    //EntityDataService,
-    SzEntityResponse,
-    SzDetailLevel,
-    SzPagedRelationsResponse,
-    SzRelationsPage,
-    SzRelation,
-    SzMatchCounts,
-    SzRelationCounts
-} from '@senzing/rest-api-client-ng';*/
-
 import { take, tap, map, catchError, takeUntil, filter, distinctUntilChanged } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { SzCrossSourceCount, SzDataTableEntitiesPagingParameters, SzDataTableRelation, SzDataTableRelationsPagingParameters, SzStatCountsForDataSources, SzStatSampleSetPageChangeEvent, SzStatSampleSetParameters, sampleDataSourceChangeEvent } from '../models/stats';
 import { SzPrefsService } from '../services/sz-prefs.service';
 import { SzDataSourcesService } from './sz-datasources.service';
-import { SzCrossSourceSummaryCategoryType } from '../models/stats';
 import { SzSdkDataSource } from '../models/grpc/config';
 import { SzGrpcEngineService } from './grpc/engine.service';
 import { SzEngineFlags } from '@senzing/sz-sdk-typescript-grpc-web';
@@ -42,20 +15,20 @@ import { SzSdkEntityResponse, SzSdkResolvedEntity } from '../models/grpc/engine'
 import { SzStatisticsService } from './statistics.service';
 
 import { SzEntityIdentifier } from './http/models/szEntityIdentifier';
-import { SzEntitiesPage } from './http/models/szEntitiesPage';
-import { SzRelationsPage } from './http/models/szRelationsPage';
-import { SzBoundType } from './http/models/szBoundType';
-import { SzEntityData } from './http/models/szEntityData';
-import { SzEntity } from './http/models/szEntity';
-import { SzRelation } from './http/models/szRelation';
+import { SzEntitiesPage } from '../models/statistics/szEntitiesPage';
+import { SzRelationsPage } from '../models/statistics/szRelationsPage';
+import { SzBoundType } from '../models/statistics/szBoundType';
+//import { SzEntityData } from './http/models/szEntityData';
+import { SzEntity } from '../models/statistics/szEntity';
 import { SzPagedEntitiesResponse } from './http/models/szPagedEntitiesResponse';
 import { SzPagedRelationsResponse } from './http/models/szPagedRelationsResponse';
 import { SzLoadedStats } from './http/models/szLoadedStats';
 import { SzSummaryStats } from './http/models/szSummaryStats';
 import { SzCrossSourceSummary } from './http/models/szCrossSourceSummary';
-import { SzCrossSourceSummaryResponse } from './http/models/szCrossSourceSummaryResponse';
 import { SzRelationCounts } from './http/models/szRelationCounts';
 import { SzMatchCounts } from './http/models/szMatchCounts';
+import { SzSampleSetEntitiesPage,SzSampleSetRelationsPage, SzSampleSetEntity, SzSampleSetRelation } from '../models/data-sampling';
+import { SzCrossSourceSummaryCategoryType } from '../models/stats';
 
 /**
  * Represents an object of a sampling dataset. When a user clicks on a venn diagram a number of 
@@ -82,9 +55,9 @@ export class SzStatSampleSet {
     /** @internal */
     private _entities               = new Map<SzEntityIdentifier, SzSdkResolvedEntity>();
     /** @internal */
-    private _entityPages: Map<number, SzEntitiesPage>       = new Map<number, SzEntitiesPage>();
+    private _entityPages: Map<number, SzSampleSetEntitiesPage>       = new Map<number, SzSampleSetEntitiesPage>();
     /** @internal */
-    private _relationPages: Map<number, SzRelationsPage>    = new Map<number, SzRelationsPage>();
+    private _relationPages: Map<number, SzSampleSetRelationsPage>    = new Map<number, SzSampleSetRelationsPage>();
     /** @internal */
     private _doNotFetchOnParameterChange                    = false;
     /** @internal */
@@ -143,7 +116,7 @@ export class SzStatSampleSet {
     public set boundType(value: SzBoundType) {
         if(this._requestParameters) this._requestParameters.boundType = value;
     }
-    public get currentPage(): SzEntitiesPage | SzRelationsPage {
+    public get currentPage(): SzSampleSetEntitiesPage | SzSampleSetRelationsPage {
         if(this._isRelationsResponse && this._relationPages.has(this._currentPage)) {
             return this._relationPages.get(this._currentPage);
         } else if(this._entityPages.has(this._currentPage)) {
@@ -151,24 +124,24 @@ export class SzStatSampleSet {
         }
         return undefined;
     }
-    public get currentPageEntities(): SzEntityData[] {
+    public get currentPageEntities(): SzSampleSetEntity[] {
         if(this._entityPages.has(this._currentPage)) {
             let _entities   = this._entityPages.get(this._currentPage).entities;
             if(_entities && _entities.map) {
-                return _entities.map((res: SzEntity) => {
-                    return this._entities.has(res.entityId) ? this._entities.get(res.entityId) : {};
+                return _entities.map((res: SzSampleSetEntity) => {
+                    return this._entities.has(res.entity.ENTITY_ID) ? this._entities.get(res.entity.ENTITY_ID) : {};
                 });
             }
         }
         return undefined;
     }
-    public get currentPageRelations(): SzRelation[] {
+    public get currentPageRelations(): SzSampleSetRelation[] {
         if(this._relationPages.has(this._currentPage)) {
             return this._relationPages.get(this._currentPage).relations;
         }
         return undefined;
     }
-    public get currentPageResults(): SzEntityData[] | SzRelation[] {
+    public get currentPageResults(): SzSampleSetEntity[] | SzSampleSetRelation[] {
         if(this._isRelationsResponse) {
             return this.currentPageRelations;
         } else {
@@ -374,7 +347,7 @@ export class SzStatSampleSet {
 
     // -------------------------------- event subjects and observables --------------------------------
 
-    private _onDataUpdated: BehaviorSubject<SzEntityData[] | SzRelation[]>      = new BehaviorSubject<SzEntityData[]>(undefined);
+    private _onDataUpdated: BehaviorSubject<SzSampleSetEntity[] | SzSampleSetRelation[]>      = new BehaviorSubject<SzSampleSetEntity[] | SzSampleSetRelation[]>(undefined);
     private _onPagingUpdated: BehaviorSubject<SzStatSampleSetPageChangeEvent>   = new BehaviorSubject<SzStatSampleSetPageChangeEvent>(undefined)
     private _loading: BehaviorSubject<boolean>                                  = new BehaviorSubject<boolean>(undefined);
     private _onNoResults: BehaviorSubject<boolean>                              = new BehaviorSubject<boolean>(undefined);
@@ -594,10 +567,10 @@ export class SzStatSampleSet {
             console.log(`\t\t\tcalling versus "${apiMethod}(${dataSource1},${dataSource2}, ${matchKey}, ${principle}, ${bound}, ${boundType}, ${pageSize}, ${sampleSize})"`);
             // dataSourceCode: string, vsDataSourceCode: string, matchKey?: string, principle?: string, bound?: string, boundType?: SzBoundType, pageSize?: number, sampleSize?: number, observe?: 'body', reportProgress?: boolean
             return _disAmbiMethod.call(this.statsService, dataSource1, dataSource2, matchKey, principle, bound, boundType, pageSize, sampleSize).pipe(
-                tap((response: SzPagedEntitiesResponse | SzPagedRelationsResponse) => {
+                tap((response: SzEntitiesPage | SzRelationsPage) => {
                     console.log(`got cross source entity id's or relations: `, response);
-                    if(response && response.data) {
-                        //this.onCrossSourceSummaryStats.next(response.data);
+                    if(response && response) {
+                        //this.onCrossSourceSummaryStats.next(response);
                     }
                 }),
                 catchError((err)=> {
@@ -605,19 +578,19 @@ export class SzStatSampleSet {
                     this._onNoResults.next(true);
                     return err;
                 }),
-                map((response: SzPagedEntitiesResponse | SzPagedRelationsResponse) => {
-                    return response.data;
-                })
+                /*map((response: SzEntitiesPage | SzRelationsPage) => {
+                    return response;
+                })*/
             )
         } else {
             console.log(`\t\t\tcalling "${apiMethod}(${dataSource1}, ${matchKey}, ${principle}, ${bound}, ${boundType}, ${pageSize}, ${sampleSize})"`);
             // dataSourceCode: string, matchKey?: string, principle?: string, bound?: number, boundType?: SzBoundType, pageSize?: number, sampleSize?: number, observe?: 'body', reportProgress?: boolean
             return _disAmbiMethod.call(this.statsService, dataSource1, matchKey, principle, bound, boundType, pageSize, sampleSize).pipe(
-                tap((response: SzPagedEntitiesResponse) => {
+                tap((response: SzEntitiesPage) => {
                     console.log(`got single source sample entity ids: `, response);
 
-                    if(response && response.data) {
-                        //this.onCrossSourceSummaryStats.next(response.data);
+                    if(response && response) {
+                        //this.onCrossSourceSummaryStats.next(response);
                     } else {
                         this._onNoResults.next(true);
                     }
@@ -627,9 +600,9 @@ export class SzStatSampleSet {
                     this._onNoResults.next(true);
                     return err;
                 }),
-                map((response: SzPagedEntitiesResponse) => {
-                    return response.data;
-                })
+                /*map((response: SzEntitiesPage) => {
+                    return response;
+                })*/
             )
         }
     }
@@ -647,14 +620,76 @@ export class SzStatSampleSet {
             takeUntil(this.unsubscribe$),
             filter((data: SzEntitiesPage | SzRelationsPage) => {
                 return this._dataSource1 !== undefined || this._dataSource2 !== undefined ? true : false;
+            }),
+            map((data: SzEntitiesPage | SzRelationsPage) => {
+                console.log(`performing transform on sampleset page: `, data);
+                if((data as SzEntitiesPage).entities) {
+                    let _oldStyleEntities = (data as SzEntitiesPage).entities;
+                    let remappedEntities: SzSampleSetEntity[] = _oldStyleEntities.map((entity: SzEntity)=>{
+                        let _retValue: SzSampleSetEntity = {
+                            entity: {
+                                ENTITY_ID: entity.entityId,
+                                ENTITY_NAME: entity.entityName,
+                                RECORDS: entity.records.map((_record)=> {
+                                    return {
+                                        RECORD_ID: _record.recordId,
+                                        MATCH_KEY: _record.matchKey,
+                                        DATA_SOURCE: _record.dataSource,
+                                        ERRULE_CODE: _record.principle
+                                    }
+                                })
+                            }
+                        };
+                        return _retValue;
+                    });
+                    (data as SzSampleSetEntitiesPage).entities = remappedEntities;
+                }
+                if((data as SzRelationsPage).relations) {
+                    let _oldStyleRelations = (data as SzRelationsPage).relations;
+                    let _remappedEntities: SzSampleSetRelation[] = _oldStyleRelations.map((_relation) => {
+                        let _retValue: SzSampleSetRelation = {
+                            entity: {
+                                ENTITY_ID: _relation.entity.entityId,
+                                ENTITY_NAME: _relation.entity.entityName,
+                                RECORDS: _relation.entity.records.map((_record)=> {
+                                    return {
+                                        RECORD_ID: _record.recordId,
+                                        MATCH_KEY: _record.matchKey,
+                                        DATA_SOURCE: _record.dataSource,
+                                        ERRULE_CODE: _record.principle
+                                    }
+                                })
+                            },
+                            relatedEntity: {
+                                ENTITY_ID: _relation.relatedEntity.entityId,
+                                ENTITY_NAME: _relation.relatedEntity.entityName,
+                                ERRULE_CODE: _relation.principle,
+                                MATCH_KEY: _relation.matchKey,
+                                RECORDS: _relation.relatedEntity.records.map((_record)=> {
+                                    return {
+                                        RECORD_ID: _record.recordId,
+                                        MATCH_KEY: _record.matchKey,
+                                        DATA_SOURCE: _record.dataSource,
+                                        ERRULE_CODE: _record.principle
+                                    }
+                                })
+                            }
+                        }
+                        
+                        return _retValue;
+                    });
+
+                    (data as unknown as SzSampleSetRelationsPage).relations = _remappedEntities;
+                }
+                return (data as unknown as SzSampleSetRelationsPage);
             })
-        ).subscribe((data: SzEntitiesPage | SzRelationsPage) => {
-            let isEntityResponse        = (data as SzEntitiesPage).entities ? true : false; 
+        ).subscribe((data: SzSampleSetEntitiesPage | SzSampleSetRelationsPage | void) => {
+            let isEntityResponse        = (data as SzSampleSetEntitiesPage).entities ? true : false; 
             this._isRelationsResponse   = !isEntityResponse;
             console.timeLog('SzStatSampleSet.getSampleDataFromParameters()', ': got sampleset page: ', data);
 
             if(isEntityResponse) {
-                let _dataPage               = (data as SzEntitiesPage);
+                let _dataPage               = (data as SzSampleSetEntitiesPage);
                 this._entityPages.set(this._currentPage, _dataPage);
                 let _currentPageEntities   = _dataPage.entities;
                 if(!_dataPage || (_dataPage && _dataPage.totalEntityCount === 0)) {
@@ -662,10 +697,10 @@ export class SzStatSampleSet {
                     return;
                 }
                 // get exploded entity data
-                let entitiesToRequest = _currentPageEntities.filter((ent: SzEntity) => {
-                    return !this._entities.has(ent.entityId);
-                }).map((ent: SzEntity) => {
-                    return ent.entityId;
+                let entitiesToRequest = _currentPageEntities.filter((ent: SzSampleSetEntity) => {
+                    return !this._entities.has(ent.entity.ENTITY_ID);
+                }).map((ent: SzSampleSetEntity) => {
+                    return ent.entity.ENTITY_ID;
                 });
 
                 const _extendEntityData = (edata: SzSdkResolvedEntity[] | undefined) => {
@@ -728,7 +763,7 @@ export class SzStatSampleSet {
                 //console.timeLog('SzStatSampleSet.getSampleDataFromParameters()', ': get entity data: ', entitiesToRequest);
             } else {
                 // expand "relations" nodes with more complete data
-                let _dataPage              = (data as SzRelationsPage);
+                let _dataPage              = (data as SzSampleSetRelationsPage);
                 let _currentPageRelations  = _dataPage.relations;
                 // no results
                 if(!_dataPage || (_dataPage && _dataPage.totalRelationCount === 0)) {
@@ -737,9 +772,9 @@ export class SzStatSampleSet {
                 }
                 // get entity ids
                 let entitiesToRequest  = [];
-                _currentPageRelations.forEach((rel: SzRelation) => {
-                    let _entId  = rel && rel.entity && rel.entity.entityId ? rel.entity.entityId : undefined;
-                    let _relId  = rel && rel.relatedEntity && rel.relatedEntity.entityId ? rel.relatedEntity.entityId : undefined;
+                _currentPageRelations.forEach((rel: SzSampleSetRelation) => {
+                    let _entId  = rel && rel.entity && rel.entity.ENTITY_ID ? rel.entity.ENTITY_ID : undefined;
+                    let _relId  = rel && rel.relatedEntity && rel.relatedEntity.ENTITY_ID ? rel.relatedEntity.ENTITY_ID : undefined;
                     if(_entId && !this._entities.has(_entId) && entitiesToRequest.indexOf(_entId) < 0) { entitiesToRequest.push(_entId); }
                     if(_relId && !this._entities.has(_relId) && entitiesToRequest.indexOf(_relId) < 0) { entitiesToRequest.push(_relId); }
                 });
@@ -754,30 +789,30 @@ export class SzStatSampleSet {
                         })
                     }
                     // now extend records with real data
-                    _currentPageRelations.forEach((rel: SzRelation) => {
-                        if(this._entities.has(rel.entity.entityId)) {
-                            let _fullEnt        = this._entities.get(rel.entity.entityId);
+                    _currentPageRelations.forEach((rel: SzSampleSetRelation) => {
+                        if(this._entities.has(rel.entity.ENTITY_ID)) {
+                            let _fullEnt        = this._entities.get(rel.entity.ENTITY_ID);
                             // extend records first
                             let _fullEntRecsMap = new Map();
                             _fullEnt.RECORDS.map((rec) => {
                                 _fullEntRecsMap.set(rec.DATA_SOURCE+'|'+rec.RECORD_ID, rec);
                             })
                             
-                            rel.entity.records  = rel.entity.records.map((eRec) => {
-                                return _fullEntRecsMap.get(eRec.dataSource+'|'+eRec.recordId);
+                            rel.entity.RECORDS  = rel.entity.RECORDS.map((eRec) => {
+                                return _fullEntRecsMap.get(eRec.DATA_SOURCE+'|'+eRec.RECORD_ID);
                             });
                             // now extend ent with props from full ent (minus) the records
                             rel.entity = Object.assign(Object.assign({}, _fullEnt), rel.entity);
                         }
-                        if(this._entities.has(rel.relatedEntity.entityId)) {
-                            let _fullEnt        = this._entities.get(rel.relatedEntity.entityId);
+                        if(this._entities.has(rel.relatedEntity.ENTITY_ID)) {
+                            let _fullEnt        = this._entities.get(rel.relatedEntity.ENTITY_ID);
                             let _fullEntRecsMap = new Map();
                             _fullEnt.RECORDS.map((rec) => {
                                 _fullEntRecsMap.set(rec.DATA_SOURCE+'|'+rec.RECORD_ID, rec);
                             })
-                            rel.relatedEntity.records  = rel.relatedEntity.records.map((eRec) => {
+                            rel.relatedEntity.RECORDS  = rel.relatedEntity.RECORDS.map((eRec) => {
                                 //let _moddedRec          = Object.assign({}, _fullEntRecsMap.get(eRec.dataSource+'|'+eRec.recordId), {matchKey: rel.matchKey ? rel.matchKey : undefined, matchLevel: undefined});
-                                return _fullEntRecsMap.get(eRec.dataSource+'|'+eRec.recordId);
+                                return _fullEntRecsMap.get(eRec.DATA_SOURCE+'|'+eRec.RECORD_ID);
                                 //return _moddedRec;
                             });
                             // now extend ent with props from full ent (minus) the records
@@ -1109,7 +1144,7 @@ export class SzDataMartService {
     /* @internal */
     private _onSampleResultChange$:     Subscription;
     /* @internal */
-    public  _onSampleResultChange:      BehaviorSubject<SzEntityData[] | SzRelation[] | undefined> = new BehaviorSubject<SzEntityData[] | undefined>(undefined);
+    public  _onSampleResultChange:      BehaviorSubject<SzSampleSetRelation[] | SzSampleSetEntity[] | undefined> = new BehaviorSubject<SzSampleSetRelation[] | SzSampleSetEntity[] | undefined>(undefined);
     /* @internal */
     private _onSamplePageUpdated$:      Subscription;
     /* @internal */

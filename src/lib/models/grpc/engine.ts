@@ -78,7 +78,7 @@ export interface SzSdkRelatedEntity  extends SzSdkBaseEntity {
     IS_AMBIGUOUS?: 0 | 1,
     IS_DISCLOSED?: 0 | 1,
     MATCH_KEY: string,
-    MATCH_LEVEL_CODE: SzSdkSearchMatchLevel,
+    MATCH_LEVEL_CODE?: SzSdkSearchMatchLevel,
     RECORDS?: SzSdkEntityRelatedRecord[]
 }
 

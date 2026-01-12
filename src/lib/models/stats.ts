@@ -1,4 +1,4 @@
-import { SzSdkEntityRelatedRecord, SzSdkRelatedEntity, SzSdkResolvedEntity } from "./grpc/engine";
+import { SzSdkEntityRecord, SzSdkEntityRelatedRecord, SzSdkRelatedEntity, SzSdkResolvedEntity } from "./grpc/engine";
 import { 
     SzLoadedStats, 
     SzSourceLoadedStats, 
@@ -28,6 +28,7 @@ import { SzRelationsPage } from '../services/http/models/szRelationsPage';
 //import { SzSourceLoadedStats } from '../services/http/models/szSourceLoadedStats';
 import { SzSourceSummary } from '../services/http/models/szSourceSummary';
 import { SzSummaryStats } from '../services/http/models/szSummaryStats';
+import { SzSampleSetRelation } from "./data-sampling";
 
 //export interface SzCountStatsForDataSourcesResponse extends SzLoadedStatsResponse {
     /** override with extended */
@@ -91,20 +92,19 @@ export interface SzStatsSampleTableLoadingEvent {
     inflight: boolean, 
     source: string
 }
-
-export interface SzDataTableEntity extends SzEntity {
+export interface SzDataTableEntity extends SzSdkResolvedEntity {
     dataType?: SzStatSampleEntityTableRowType;
 }
-export interface SzDataTableRelatedEntity extends SzRelatedEntity {
+export interface SzDataTableRelatedEntity extends SzSdkRelatedEntity {
     rows?: SzStatSampleEntityTableRow[],
     dataType?: SzStatSampleEntityTableRowType;
 }
-export interface SzDataTableRelation extends SzRelation {
+export interface SzDataTableRelation extends SzSampleSetRelation {
     entity: SzDataTableEntity;
-    relatedEntity: SzDataTableEntity;
+    relatedEntity: SzDataTableRelatedEntity;
 }
 
-export interface SzStatSampleEntityTableRowEntity extends SzEntity {
+export interface SzStatSampleEntityTableRowEntity extends SzSdkResolvedEntity {
 }
 
 export interface SzDataTableCellEvent {
@@ -139,7 +139,9 @@ export const SzStatSampleEntityTableRowType = {
     RELATED_RECORD: 'RELATED_RECORD' as SzStatSampleEntityTableRowType
 };
 
-export interface SzStatSampleEntityTableRow extends SzResolvedEntity, SzMatchedRecord {
+
+export interface SzStatSampleEntityTableRow extends SzSdkResolvedEntity, SzSdkEntityRecord {
+//export interface SzStatSampleEntityTableRow extends SzResolvedEntity, SzMatchedRecord {
     /**
      * The data source code identifying the data source from  which the record was loaded.
      */
