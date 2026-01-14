@@ -2,7 +2,7 @@ import { Injectable, OnInit } from '@angular/core';
 import { BehaviorSubject, forkJoin, Observable, of, Subject, Subscriber, Subscription, throwError } from 'rxjs';
 import { take, tap, map, catchError, takeUntil, filter, distinctUntilChanged } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
-import { SzCrossSourceCount, SzDataTableEntitiesPagingParameters, SzDataTableRelation, SzDataTableRelationsPagingParameters, SzStatCountsForDataSources, SzStatSampleSetPageChangeEvent, SzStatSampleSetParameters, sampleDataSourceChangeEvent } from '../models/stats';
+import { SzCrossSourceCount, SzDataTableEntitiesPagingParameters, SzDataTableRelationsPagingParameters, SzStatCountsForDataSources, SzStatSampleSetPageChangeEvent, SzStatSampleSetParameters, sampleDataSourceChangeEvent } from '../models/stats';
 import { SzPrefsService } from '../services/sz-prefs.service';
 import { SzDataSourcesService } from './sz-datasources.service';
 import { SzSdkDataSource } from '../models/grpc/config';
@@ -347,7 +347,7 @@ export class SzStatSampleSet {
 
     // -------------------------------- event subjects and observables --------------------------------
 
-    private _onDataUpdated: BehaviorSubject<SzSampleSetEntity[] | SzSampleSetRelation[]>      = new BehaviorSubject<SzSampleSetEntity[] | SzSampleSetRelation[]>(undefined);
+    private _onDataUpdated: BehaviorSubject<Array<SzSampleSetEntity | SzSampleSetRelation>>      = new BehaviorSubject<Array<SzSampleSetEntity | SzSampleSetRelation>>(undefined);
     private _onPagingUpdated: BehaviorSubject<SzStatSampleSetPageChangeEvent>   = new BehaviorSubject<SzStatSampleSetPageChangeEvent>(undefined)
     private _loading: BehaviorSubject<boolean>                                  = new BehaviorSubject<boolean>(undefined);
     private _onNoResults: BehaviorSubject<boolean>                              = new BehaviorSubject<boolean>(undefined);

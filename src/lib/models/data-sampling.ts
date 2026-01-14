@@ -1,4 +1,4 @@
-import { SzSdkEntityResponse, SzSdkRelatedEntity, SzSdkResolvedEntity } from '../models/grpc/engine';
+import { SzSdkEntityRecord, SzSdkEntityResponse, SzSdkRelatedEntity, SzSdkResolvedEntity } from '../models/grpc/engine';
 import { SzBoundType } from '../models/statistics/szBoundType';
 import { SzRelationType } from '../models/statistics/szRelationType';
 
@@ -121,4 +121,63 @@ export interface SzSampleSetEntitiesPage {
      * An array of `SzSampleSetEntity` instances describing the entities for the page. The array will be in ascending order of entity ID.
      */
     entities: Array<SzSampleSetEntity>;
+}
+
+export type SzSampleSetTableRowType = 'ENTITY' | 'ENTITY_RECORD' | 'RELATED' | 'RELATED_RECORD' | 'DEBUG' | 'DEBUG2';
+export const SzSampleSetTableRowType = {
+    ENTITY: 'ENTITY' as SzSampleSetTableRowType,
+    ENTITY_RECORD: 'ENTITY_RECORD' as SzSampleSetTableRowType,
+    DEBUG: 'DEBUG' as SzSampleSetTableRowType,
+    DEBUG2: 'DEBUG2' as SzSampleSetTableRowType,
+    RELATED: 'RELATED' as SzSampleSetTableRowType,
+    RELATED_RECORD: 'RELATED_RECORD' as SzSampleSetTableRowType
+};
+
+export interface SzSampleSetEntityTableRow extends SzSdkResolvedEntity {
+    /**
+     * The data source code identifying the data source from  which the record was loaded.
+     */
+    DATA_SOURCE?: string;
+    /**
+     * The record ID that uniquely identifies the record within the data source from which it was loaded.
+     */
+    //recordId?: string;
+    /**
+     * The optional match key describing why the record merged into the entity to which it belongs.  This may be absent or `null` if this record belongs to a single-record entity or if it was the inital record of the first multi-record entity to which it belonged (even if it later re-resolved into a larger entity).
+     */
+    //matchKey?: string;
+    /**
+     * The optioanl principle identifying the resolution rule that was used to merge the record into the entity to which it belonss.  This may be absent or `null` if this record belongs to a single-record entity or if it was the inital record of the first multi-record entity to which it belonged (even if it later re-resolved into a larger entity).
+     */
+    //principle?: string;
+    /**
+     * the type of data construct this row represents
+     */
+    DATA_TYPE?: SzSampleSetTableRowType
+}
+
+export interface SzSampleSetRelationTableRow extends SzSdkEntityRecord {
+    //export interface SzStatSampleEntityTableRow extends SzResolvedEntity, SzMatchedRecord {
+    /**
+     * the type of data construct this row represents
+     */
+    DATA_TYPE?: SzSampleSetTableRowType
+}
+
+export interface SzSampleSetEntityTableItem extends SzSampleSetEntity {
+    //relatedEntities?: SzDataTableRelatedEntity[],
+    relatedEntity?: SzDataTableRelatedEntity,
+    recordCount?: number,
+    records?: SzSdkEntityRecord[],
+    rows?: SzSampleSetEntityTableRow[],
+    dataType?: SzSampleSetTableRowType;
+}
+
+export interface SzDataTableEntity extends SzSdkResolvedEntity {
+    rows?: SzSampleSetEntityTableRow[],
+    dataType?: SzSampleSetTableRowType;
+}
+export interface SzDataTableRelatedEntity extends SzSdkRelatedEntity {
+    rows?: SzSampleSetRelationTableRow[],
+    dataType?: SzSampleSetTableRowType;
 }

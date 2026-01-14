@@ -11,7 +11,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { SzDataTable } from '../../shared/data-table/sz-data-table.component';
-import { SzCrossSourceSummaryCategoryType, SzCrossSourceSummaryCategoryTypeToMatchLevel, SzDataTableEntity, SzDataTableRelation, SzStatSampleEntityTableItem, SzStatSampleEntityTableRow, SzStatSampleEntityTableRowType, SzStatsSampleTableLoadingEvent } from '../../models/stats';
+import { SzCrossSourceSummaryCategoryType, SzCrossSourceSummaryCategoryTypeToMatchLevel, SzStatsSampleTableLoadingEvent } from '../../models/stats';
 import { SzPrefsService } from '../../services/sz-prefs.service';
 import { SzDataMartService } from '../../services/sz-datamart.service';
 import { SzCSSClassService } from '../../services/sz-css-class.service';
@@ -30,23 +30,22 @@ import {
   SzRecord, 
   SzRelation 
 } from '../../models/statistics/public-api';*/
-import { SzEntityIdentifier } from '../../services/http/models/szEntityIdentifier';
-import { SzEntitiesPage } from '../../services/http/models/szEntitiesPage';
-import { SzRelationsPage } from '../../services/http/models/szRelationsPage';
-import { SzBoundType } from '../../services/http/models/szBoundType';
-import { SzEntityData } from '../../services/http/models/szEntityData';
-import { SzEntity } from '../../services/http/models/szEntity';
-import { SzRecord } from '../../services/http/models/szRecord';
-import { SzMatchedRecord } from '../../services/http/models/szMatchedRecord';
-import { SzRelation } from '../../services/http/models/szRelation';
-import { SzPagedEntitiesResponse } from '../../services/http/models/szPagedEntitiesResponse';
-import { SzPagedRelationsResponse } from '../../services/http/models/szPagedRelationsResponse';
-import { SzLoadedStats } from '../../services/http/models/szLoadedStats';
-import { SzSummaryStats } from '../../services/http/models/szSummaryStats';
-import { SzCrossSourceSummary } from '../../services/http/models/szCrossSourceSummary';
-import { SzCrossSourceSummaryResponse } from '../../services/http/models/szCrossSourceSummaryResponse';
-import { SzRelationCounts } from '../../services/http/models/szRelationCounts';
-import { SzMatchCounts } from '../../services/http/models/szMatchCounts';
+//import { SzEntityData } from '../../services/http/models/szEntityData';
+//import { SzEntity } from '../../services/http/models/szEntity';
+//import { SzRecord } from '../../services/http/models/szRecord';
+//import { SzMatchedRecord } from '../../services/http/models/szMatchedRecord';
+//import { SzRelation } from '../../services/http/models/szRelation';
+import { 
+  SzSampleSetEntity, 
+  SzSampleSetRelation, 
+  SzSampleSetEntityTableItem, 
+  SzSampleSetEntityTableRow, 
+  SzSampleSetRelationTableRow,
+  SzSampleSetTableRowType,
+  SzDataTableEntity, 
+  SzDataTableRelatedEntity,
+} from '../../models/data-sampling';
+import { SzSdkEntityRecord } from '../../models/grpc/engine';
 
 //import { SzSdkEntityResponse, SzSdkResolvedEntity, SzSdkRelatedEntity } from '../../models/grpc/engine'
 
@@ -633,7 +632,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
      * Get the data table row count for a specific item. This is used to set the expand/collapse row-span for the 
      * entityId cells for the main entity row and it's related entity row (if not statType of "Matches")
      */
-    public getRowCountInSelectedDataSources(item: SzStatSampleEntityTableItem, dataType?: SzStatSampleEntityTableRowType[]) {
+    public getRowCountInSelectedDataSources(item: SzSampleSetEntityTableItem, dataType?: SzSampleSetTableRowType[]) {
       let retVal = 0;
       if(!dataType || (dataType && dataType.includes(item.dataType))) {
         // how would you check the datasource match on "SzStatSampleEntityTableItem"
@@ -643,8 +642,8 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
       if(item.rows && item.rows.length) {
         let _dataSourcesToMatch = this.dataMartService.sampleMatchLevel === SzCrossSourceSummaryCategoryTypeToMatchLevel.MATCHES ? [this.dataMartService.sampleDataSource1, this.dataMartService.sampleDataSource2] : [this.dataMartService.sampleDataSource1];
         let rowsInSelectedDataSources = item.rows.filter((row) => {
-          if(!dataType || (dataType && dataType.includes(row.dataType))) {
-            return (row.dataSource !== undefined && _dataSourcesToMatch.indexOf(row.dataSource) > -1) ? 1 : 0;
+          if(!dataType || (dataType && dataType.includes(row.DATA_TYPE))) {
+            return (row.DATA_TYPE !== undefined && _dataSourcesToMatch.indexOf(row.DATA_TYPE) > -1) ? 1 : 0;
           }
           return false;
         });
@@ -660,8 +659,8 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
           let _dataSourcesToMatch = this.dataMartService.sampleMatchLevel === SzCrossSourceSummaryCategoryTypeToMatchLevel.MATCHES ? [this.dataMartService.sampleDataSource1, this.dataMartService.sampleDataSource2] : this.dataMartService.sampleDataSource2 && this.dataMartService.sampleDataSource2 !== undefined ? [this.dataMartService.sampleDataSource2] : [this.dataMartService.sampleDataSource1];
           //retVal    += item.relatedEntity.rows.length;
           let rowsInSelectedDataSources = item.relatedEntity.rows.filter((row) => {
-            if(!dataType || (dataType && dataType.includes(row.dataType))) {
-              return (row.dataSource !== undefined && _dataSourcesToMatch.indexOf(row.dataSource) > -1) ? 1 : 0;
+            if(!dataType || (dataType && dataType.includes(row.DATA_TYPE))) {
+              return (row.DATA_TYPE !== undefined && _dataSourcesToMatch.indexOf(row.DATA_TYPE) > -1) ? 1 : 0;
             }
             return false;
           });
@@ -673,40 +672,40 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
     public getRowIndex() {
       return this.rowCount;
     }
-    public getRowSpanForEntityIdCell(rows: SzStatSampleEntityTableRow[]) {
+    public getRowSpanForEntityIdCell(rows: SzSampleSetEntityTableRow[]) {
       let retVal = 0;
       if(rows) {
         let rowsInSelectedDataSources = rows.filter((row) => {
-          return (row.dataSource !== undefined && [this.dataMartService.dataSource1, this.dataMartService.dataSource2].indexOf(row.dataSource) > -1) ? 1 : 0;
+          return (row.DATA_SOURCE !== undefined && [this.dataMartService.dataSource1, this.dataMartService.dataSource2].indexOf(row.DATA_SOURCE) > -1) ? 1 : 0;
         });
       }
       return retVal;
     }
     /** get the total data table row count for an entity or related entity. Optionally count only row types matching items in the "dataType" parameter. */
-    public getTotalRowCount(item: SzStatSampleEntityTableItem, dataType?: SzStatSampleEntityTableRowType[]) {
+    public getTotalRowCount(item: SzSampleSetEntityTableItem, dataType?: SzSampleSetTableRowType[]) {
       let retVal      = 0;
-      if(!dataType || (dataType && dataType.includes(SzStatSampleEntityTableRowType.ENTITY) && item.dataType === SzStatSampleEntityTableRowType.ENTITY)) {
+      if(!dataType || (dataType && dataType.includes(SzSampleSetTableRowType.ENTITY) && item.dataType === SzSampleSetTableRowType.ENTITY)) {
         retVal++;
       }
       if(item.rows && item.rows.length) {
         if(!dataType) {
           retVal      += item.rows.length;
         } else if(dataType) {
-          retVal      += item.rows.filter((row: SzStatSampleEntityTableRow) => {
-            return dataType.includes(row.dataType);
+          retVal      += item.rows.filter((row: SzSampleSetEntityTableRow) => {
+            return dataType.includes(row.DATA_TYPE);
           }).length;
         }
       }
       if(item.relatedEntity) {
-        if(!dataType || dataType.includes(SzStatSampleEntityTableRowType.RELATED)) {
+        if(!dataType || dataType.includes(SzSampleSetTableRowType.RELATED)) {
           retVal++;
         }
         if(item.relatedEntity.rows && item.relatedEntity.rows.length) {
           if(!dataType) {
             retVal    += item.relatedEntity.rows.length;
           } else if(dataType) {
-            retVal    += item.relatedEntity.rows.filter((row: SzStatSampleEntityTableRow) => {
-              return dataType.includes(row.dataType);
+            retVal    += item.relatedEntity.rows.filter((row: SzSampleSetRelationTableRow) => {
+              return dataType.includes(row.DATA_TYPE);
             }).length;
           }
         }
@@ -861,14 +860,14 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
     /** get the css vars for a particular result which is then used by the css for particular 
      * display states.
      */
-    public rowGroupStyle(item?: SzStatSampleEntityTableItem) {
+    public rowGroupStyle(item?: SzSampleSetEntityTableItem) {
       let retVal = '';
       retVal += '--column-count: '+ this.getColCount() +';';
       if(item) {
-        retVal += ' --entity-row-count: '+ this.getTotalRowCount(item, [SzStatSampleEntityTableRowType.ENTITY_RECORD]) +';';  
-        retVal += ' --selected-datasources-entity-row-count: '+ this.getRowCountInSelectedDataSources(item, [SzStatSampleEntityTableRowType.ENTITY_RECORD]) +';';  
-        retVal += ' --related-row-count: '+ this.getTotalRowCount(item, [SzStatSampleEntityTableRowType.RELATED_RECORD]) +';';
-        retVal += ' --selected-datasources-related-row-count: '+ this.getRowCountInSelectedDataSources(item, [SzStatSampleEntityTableRowType.RELATED_RECORD]) +';';  
+        retVal += ' --entity-row-count: '+ this.getTotalRowCount(item, [SzSampleSetTableRowType.ENTITY_RECORD]) +';';  
+        retVal += ' --selected-datasources-entity-row-count: '+ this.getRowCountInSelectedDataSources(item, [SzSampleSetTableRowType.ENTITY_RECORD]) +';';  
+        retVal += ' --related-row-count: '+ this.getTotalRowCount(item, [SzSampleSetTableRowType.RELATED_RECORD]) +';';
+        retVal += ' --selected-datasources-related-row-count: '+ this.getRowCountInSelectedDataSources(item, [SzSampleSetTableRowType.RELATED_RECORD]) +';';  
       }
       return retVal;
     }
@@ -1075,7 +1074,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
 
     /** when new sample set data has changed the data is transformed, indexes reset, 
      * and counts generated. */
-    private onSampleSetDataChange(data: SzEntityData[] | SzRelation[] | undefined) {
+    private onSampleSetDataChange(data: SzSampleSetRelation[] | SzSampleSetEntity[] | undefined) {
       if(data === undefined) {
         this.data = [];
         this._noData = true;
@@ -1085,52 +1084,63 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
       }
       this.resetRenderingIndexes();
       // flatten/normalize data so we can display it
-      let transformed: SzStatSampleEntityTableItem[] = data.map((item: SzEntityData | SzRelation) => {
+      let transformed: SzSampleSetEntityTableItem[] = data.map((item: SzSampleSetEntity | SzSampleSetRelation) => {
         // is it a relation or a entity
-        let isRelation = (item as SzRelation).entity ? false : true;
+        let isRelation = (item as SzSampleSetRelation).entity ? false : true;
         if(isRelation) {
-          // base item is entity
-          let baseItem  = (item as SzRelation).entity as SzDataTableEntity;
-          baseItem.dataType = SzStatSampleEntityTableRowType.ENTITY;
+          // base item is relation's entity
+          let baseItem  = (item as SzSampleSetRelation).entity as SzDataTableEntity;
+          console.log(`\tsetting relation baseItem: `, (item as SzSampleSetRelation), baseItem);
+          baseItem.dataType = SzSampleSetTableRowType.ENTITY;
           // related item is related entity
-          let relItem   = (item as SzRelation).relatedEntity as SzDataTableEntity;
-          relItem.dataType  = SzStatSampleEntityTableRowType.RELATED;
+          let relItem   = (item as SzSampleSetRelation).relatedEntity as SzDataTableEntity;
+          relItem.dataType  = SzSampleSetTableRowType.RELATED;
           
           // add "rows: SzStatSampleEntityTableRow[]" // SzStatSampleEntityTableRow
-          let _entRows = baseItem.records && baseItem.records.map ? baseItem.records.map((rec: SzRecord) => {
-            let retVal      = Object.assign({dataType: SzStatSampleEntityTableRowType.ENTITY_RECORD}, rec);
+          let _entRows = baseItem.RECORDS && baseItem.RECORDS.map ? baseItem.RECORDS.map((rec: SzSdkEntityRecord) => {
+            let retVal: SzSampleSetEntityTableRow      = Object.assign({
+              ENTITY_ID: baseItem.ENTITY_ID,
+              ENTITY_NAME: baseItem.ENTITY_NAME,
+              DATA_TYPE: SzSampleSetTableRowType.ENTITY_RECORD
+            }, rec);
             return retVal;
           }) : undefined;
 
-          let _relRows = relItem.records && relItem.records.map ? relItem.records.map((rec: SzRecord) => {
-            let retVal      = Object.assign({dataType: SzStatSampleEntityTableRowType.RELATED_RECORD}, rec);
+          let _relRows = relItem.RECORDS && relItem.RECORDS.map ? relItem.RECORDS.map((rec: SzSdkEntityRecord) => {
+            let retVal: SzSampleSetRelationTableRow      = Object.assign({dataType: SzSampleSetTableRowType.RELATED_RECORD}, rec);
             return retVal;
           }) : undefined;
 
           // mash them up in to one object
           return Object.assign(baseItem, {
             relatedEntity: Object.assign(
-              (item as SzRelation).relatedEntity, 
+              (item as SzSampleSetRelation).relatedEntity, 
               {
                 rows: _relRows, 
-                relatedEntityId:  (item as SzRelation).relatedEntity.entityId,
-                relatedMatchKey:  (item as SzRelation).matchKey,
-                relatedMatchType: (item as SzRelation).matchType
+                relatedEntityId:  (item as SzSampleSetRelation).entity.ENTITY_ID,
+                relatedMatchKey:  (item as SzSampleSetRelation).matchKey,
+                relatedMatchType: (item as SzSampleSetRelation).matchType
               }
             ), rows: _entRows});
         } else {
           // base item is entity
-          let baseItem = (item as SzEntityData).resolvedEntity as SzDataTableEntity;
-          baseItem.dataType = SzStatSampleEntityTableRowType.ENTITY;
+          let baseItem = (item as SzSampleSetEntity).entity as SzDataTableEntity;
+          //console.log(`\tsetting entity baseItem: `, (item as SzEntityData), baseItem);
+          console.log(`\tsetting entity baseItem: `, (item as SzSampleSetEntity), baseItem);
+          baseItem.dataType = SzSampleSetTableRowType.ENTITY;
 
           // add "rows: SzStatSampleEntityTableRow[]" // SzStatSampleEntityTableRow
-          let rows = baseItem.records && baseItem.records.map ? baseItem.records.map((rec: SzMatchedRecord) => {
-            let retVal: SzStatSampleEntityTableRow = rec;
-            retVal.dataType = SzStatSampleEntityTableRowType.ENTITY_RECORD;
+          let rows = baseItem.RECORDS && baseItem.RECORDS.map ? baseItem.RECORDS.map((rec: SzSdkEntityRecord) => {
+            let retVal: SzSampleSetEntityTableRow = Object.assign({
+              ENTITY_ID: baseItem.ENTITY_ID,
+              ENTITY_NAME: baseItem.ENTITY_NAME,
+              dataType: SzSampleSetTableRowType.ENTITY_RECORD
+            }, rec);
             return retVal;
           }) : undefined;
+
           // mash them up in to one object
-          return Object.assign(baseItem, {relatedEntities: (item as SzEntityData).relatedEntities, rows: rows});
+          return Object.assign(baseItem, {relatedEntities: (item as SzSampleSetEntity).relatedEntities, rows: rows});
         }
       });
       if(transformed && transformed.length > 0) {

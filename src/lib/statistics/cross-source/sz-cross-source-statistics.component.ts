@@ -19,6 +19,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { SzEntityData } from '../../services/http/models/szEntityData';
 //import { SzSourceSummary } from '../../models/statistics/szSourceSummary';
 import { SzEntityIdentifier } from '../../services/http/models/szEntityIdentifier';
+import { SzSampleSetEntity, SzSampleSetRelation } from '../../models/data-sampling';
 
 export interface dataSourceSelectionChangeEvent {
   dataSource1?: string,
@@ -94,7 +95,7 @@ export class SzCrossSourceStatistics implements OnInit, AfterViewInit, OnDestroy
   private   _onNewSampleSetRequested: Subject<boolean> = new Subject();
   @Output() onNewSampleSetRequested = this._onNewSampleSetRequested.asObservable();
   /** when a new sample set has completed it's data requests/initialization */
-  private _onNewSampleSet: Subject<SzEntityData[]> = new Subject();
+  private _onNewSampleSet: Subject<Array<SzSampleSetEntity | SzSampleSetRelation>> = new Subject();
   @Output() onNewSampleSet = this._onNewSampleSet.asObservable();
   /** aggregate observeable for when the component is "doing stuff" */
   private _loading: Subject<boolean> = new Subject();
@@ -393,7 +394,7 @@ export class SzCrossSourceStatistics implements OnInit, AfterViewInit, OnDestroy
       parameters.principle).pipe(
         takeUntil(this.unsubscribe$),
         take(1),
-        tap((data: SzEntityData[]) => {
+        tap((data) => {
           this._loading.next(false);
           this._onNewSampleSet.next(data);
         })

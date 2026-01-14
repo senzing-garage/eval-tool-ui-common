@@ -79,33 +79,15 @@ export interface SzCrossSourceSummarySelectionClickEvent extends MouseEvent {
     statType?: SzCrossSourceSummaryCategoryType
 }
 
-export interface SzStatSampleEntityTableItem extends SzResolvedEntity {
-    relatedEntities?: SzDataTableRelatedEntity[],
-    relatedEntity?: SzDataTableRelatedEntity,
-    recordCount?: number,
-    records?: SzRecord[],
-    rows?: SzStatSampleEntityTableRow[],
-    dataType?: SzStatSampleEntityTableRowType;
-}
-
 export interface SzStatsSampleTableLoadingEvent {
     inflight: boolean, 
     source: string
 }
-export interface SzDataTableEntity extends SzSdkResolvedEntity {
-    dataType?: SzStatSampleEntityTableRowType;
-}
-export interface SzDataTableRelatedEntity extends SzSdkRelatedEntity {
-    rows?: SzStatSampleEntityTableRow[],
-    dataType?: SzStatSampleEntityTableRowType;
-}
-export interface SzDataTableRelation extends SzSampleSetRelation {
+
+/*export interface SzDataTableRelation extends SzSampleSetRelation {
     entity: SzDataTableEntity;
     relatedEntity: SzDataTableRelatedEntity;
-}
-
-export interface SzStatSampleEntityTableRowEntity extends SzSdkResolvedEntity {
-}
+}*/
 
 export interface SzDataTableCellEvent {
     "key": string,
@@ -129,7 +111,7 @@ let _allColumns = [
     'Relationship Data'
   ];
 */
-export type SzStatSampleEntityTableRowType = 'ENTITY' | 'ENTITY_RECORD' | 'RELATED' | 'RELATED_RECORD' | 'DEBUG' | 'DEBUG2';
+/*export type SzStatSampleEntityTableRowType = 'ENTITY' | 'ENTITY_RECORD' | 'RELATED' | 'RELATED_RECORD' | 'DEBUG' | 'DEBUG2';
 export const SzStatSampleEntityTableRowType = {
     ENTITY: 'ENTITY' as SzStatSampleEntityTableRowType,
     ENTITY_RECORD: 'ENTITY_RECORD' as SzStatSampleEntityTableRowType,
@@ -137,32 +119,7 @@ export const SzStatSampleEntityTableRowType = {
     DEBUG2: 'DEBUG2' as SzStatSampleEntityTableRowType,
     RELATED: 'RELATED' as SzStatSampleEntityTableRowType,
     RELATED_RECORD: 'RELATED_RECORD' as SzStatSampleEntityTableRowType
-};
-
-
-export interface SzStatSampleEntityTableRow extends SzSdkResolvedEntity, SzSdkEntityRecord {
-//export interface SzStatSampleEntityTableRow extends SzResolvedEntity, SzMatchedRecord {
-    /**
-     * The data source code identifying the data source from  which the record was loaded.
-     */
-    dataSource?: string;
-    /**
-     * The record ID that uniquely identifies the record within the data source from which it was loaded.
-     */
-    recordId?: string;
-    /**
-     * The optional match key describing why the record merged into the entity to which it belongs.  This may be absent or `null` if this record belongs to a single-record entity or if it was the inital record of the first multi-record entity to which it belonged (even if it later re-resolved into a larger entity).
-     */
-    matchKey?: string;
-    /**
-     * The optioanl principle identifying the resolution rule that was used to merge the record into the entity to which it belonss.  This may be absent or `null` if this record belongs to a single-record entity or if it was the inital record of the first multi-record entity to which it belonged (even if it later re-resolved into a larger entity).
-     */
-    principle?: string;
-    /**
-     * the type of data construct this row represents
-     */
-    dataType?: SzStatSampleEntityTableRowType
-}
+};*/
 
 export interface SzDataTableRelationsPagingParameters {
     /**
