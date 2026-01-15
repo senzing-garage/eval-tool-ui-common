@@ -981,7 +981,10 @@ export class SzDataMartService {
         // ----------------------- sample set instance getters/setters -----------------------
     /** get the "from" datasource name assigned to the sample set instance */
     public get sampleDataSource1() {
-        return this.prefs.dataMart.sampleDataSource1;
+        if(this._sampleSet) {
+            return  this._sampleSet.dataSource1 ? this._sampleSet.dataSource1 : this.prefs.dataMart.sampleDataSource1;
+        }
+        return undefined;
     }
     /** set the "from" datasource name assigned to the sample set instance */
     public set sampleDataSource1(value: string) {
@@ -992,7 +995,10 @@ export class SzDataMartService {
     }
     /** get the "to" datasource name assigned to the sample set instance */
     public get sampleDataSource2() {
-        return this.prefs.dataMart.sampleDataSource2;
+        if(this._sampleSet) {
+            return  this._sampleSet.dataSource2 ? this._sampleSet.dataSource2 : this.prefs.dataMart.sampleDataSource1;
+        }
+        return undefined;
     }
     /** set the "to" datasource name assigned to the sample set instance */
     public set sampleDataSource2(value: string) {
