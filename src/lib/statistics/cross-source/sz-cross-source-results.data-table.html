@@ -237,9 +237,9 @@ sz-tooltip="Tooltip text">Get Grid Column Sizes</button>-->
             <!-- show rows for entity records -->
             <tr *ngFor="let rowQ of row.rows; let recordIndex=index;" 
                 [attr.data-row-index]="incrementRowCount()"
-                [attr.data-source]="rowQ.dataSource"
-                [class.data-source-selected]="isDataSourceSelected(rowQ.dataSource, 'sampleDataSource1')"
-                [class.data-source-not-selected]="!isDataSourceSelected(rowQ.dataSource, 'sampleDataSource1')"
+                [attr.data-source]="rowQ.DATA_SOURCE"
+                [class.data-source-selected]="isDataSourceSelected(rowQ.DATA_SOURCE, 'sampleDataSource1')"
+                [class.data-source-not-selected]="!isDataSourceSelected(rowQ.DATA_SOURCE, 'sampleDataSource1')"
                 class="row-record row-entity-record">
                 <td #cellRef [attr.data-record-index]="recordIndex+1" *ngFor="let col of this.selectableColumns | SzOrderedMapEntries" 
                     [attr.data-cell-order]="getCellOrder(col.key, getRowIndex())"
@@ -330,9 +330,9 @@ sz-tooltip="Tooltip text">Get Grid Column Sizes</button>-->
             <ng-container *ngIf="row.relatedEntity && row.relatedEntity.rows">
                 <tr *ngFor="let rowY of row.relatedEntity.rows; let recordIndex=index;" 
                 [attr.data-row-index]="incrementRowCount()"
-                [attr.data-source]="rowY.dataSource"
-                [class.data-source-selected]="isDataSourceSelected(rowY.dataSource, 'sampleDataSource2')"
-                [class.data-source-not-selected]="!isDataSourceSelected(rowY.dataSource, 'sampleDataSource2')"
+                [attr.data-source]="rowY.DATA_SOURCE"
+                [class.data-source-selected]="isDataSourceSelected(rowY.DATA_SOURCE, 'sampleDataSource2')"
+                [class.data-source-not-selected]="!isDataSourceSelected(rowY.DATA_SOURCE, 'sampleDataSource2')"
                 class="row-record row-related-record">
                     <td #cellRef [attr.data-record-index]="recordIndex+1" *ngFor="let col of this.selectableColumns | SzOrderedMapEntries" 
                         [attr.data-cell-order]="getCellOrder(col.key, getRowIndex())"

@@ -15,7 +15,7 @@ import { SzCrossSourceSummaryCategoryType, SzCrossSourceSummaryCategoryTypeToMat
 import { SzPrefsService } from '../../services/sz-prefs.service';
 import { SzDataMartService } from '../../services/sz-datamart.service';
 import { SzCSSClassService } from '../../services/sz-css-class.service';
-import { getMapKeyByValue, interpolateTemplate, parseBool } from '../../common/utils';
+import { camelToKebabCase, getMapKeyByValue, interpolateTemplate, parseBool, underscoresToDashes } from '../../common/utils';
 import { ConnectionPositionPair, Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { SzCrossSourcePagingComponent } from './sz-cross-source-results.pager';
 import { SzCrossSourceSummaryMatchKeyPickerDialog } from '../../summary/cross-source/sz-cross-source-matchkey-picker.component';
@@ -89,12 +89,12 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
     private _colDataCount: Map<string, number> = new Map();
     /** display the columns in this order */
     override _colOrder: Map<string,number> = new Map([
-      ['entityId', 0],
+      ['ENTITY_ID', 0],
       ['resolutionRuleCode', 1],
-      ['matchKey', 2],
+      ['MATCH_KEY', 2],
       ['relatedEntityId', 3],
-      ['dataSource', 4],
-      ['recordId', 5],
+      ['DATA_SOURCE', 4],
+      ['RECORD_ID', 5],
       ['nameData', 6],
       ['attributeData', 7],
       ['identifierData', 8],
@@ -108,12 +108,12 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
      * @internal
     */
     override _cols: Map<string,string> = new Map([
-      ['entityId', 'Entity ID'],
+      ['ENTITY_ID', 'Entity ID'],
       ['resolutionRuleCode', 'ER Code'],
-      ['matchKey', 'Match Key'],
+      ['MATCH_KEY', 'Match Key'],
       ['relatedEntityId', 'Related Entity'],
-      ['dataSource', 'Data Source'],
-      ['recordId', 'Record ID'],
+      ['DATA_SOURCE', 'Data Source'],
+      ['RECORD_ID', 'Record ID'],
       ['nameData', 'Name Data'],
       ['attributeData', 'Attribute Data'],
       ['identifierData', 'Identifier Data'],
@@ -148,11 +148,11 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
     /** different "matchLevel"s can have different columns displayed. */
     private _matchLevelToColumnsMap  = new Map<number, string[]>([
       [1,[
-        'entityId',
+        'ENTITY_ID',
         'resolutionRuleCode',
-        'matchKey',
-        'dataSource',
-        'recordId',
+        'MATCH_KEY',
+        'DATA_SOURCE',
+        'RECORD_ID',
         'nameData',
         'attributeData',
         'identifierData',
@@ -163,12 +163,12 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
         'otherData'
       ]],
       [2,[
-        'entityId',
+        'ENTITY_ID',
         /*'resolutionRuleCode',*/
-        'matchKey',
+        'MATCH_KEY',
         'relatedEntityId',
-        'dataSource',
-        'recordId',
+        'DATA_SOURCE',
+        'RECORD_ID',
         'nameData',
         'attributeData',
         'identifierData',
@@ -179,12 +179,12 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
         'otherData'
       ]],
       [3,[
-        'entityId',
+        'ENTITY_ID',
         /*'resolutionRuleCode',*/
-        'matchKey',
+        'MATCH_KEY',
         'relatedEntityId',
-        'dataSource',
-        'recordId',
+        'DATA_SOURCE',
+        'RECORD_ID',
         'nameData',
         'attributeData',
         'identifierData',
@@ -216,12 +216,12 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
      * @internal
     */
     override _selectableColumns: string[] = [
-      'entityId',
+      'ENTITY_ID',
       'resolutionRuleCode',
-      'matchKey',
+      'MATCH_KEY',
       'relatedEntityId',
       'dataSource',
-      'recordId',
+      'RECORD_ID',
       'nameData',
       'attributeData',
       'identifierData',
@@ -345,6 +345,11 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
     /** get counts of how many rows have values for a particular column */
     public get colDataCount(): Map<string, number> {
       return this._colDataCount;
+    }
+    override cellClass(fieldName: string, prefix?: string, suffix?: string) {
+        let fieldNameAsKebab = fieldName && fieldName.toUpperCase && fieldName.toUpperCase() === fieldName ? fieldName : camelToKebabCase(fieldName);
+        fieldNameAsKebab = underscoresToDashes(fieldNameAsKebab);
+        return (prefix !== undefined ? prefix+ '-' : '')+ fieldNameAsKebab + (suffix !== undefined ? '-' + suffix : '')
     }
     /** Sets the inline style tag for the entire data table. Mainly used for setting 
      * the grid column sizes. 
@@ -743,10 +748,12 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
     public isDataSourceSelected(dataSource: string, dataSourceName?: string) {
       // check if there is only "1" datasource, if row specifies to only match the second one and it's null flip it over to the first
       dataSourceName = dataSourceName && dataSourceName === 'sampleDataSource2' &&  this.dataMartService.sampleDataSource2 === undefined ? 'sampleDataSource1' : dataSourceName;
-      let _dataSourcesToMatch = this.dataMartService.sampleMatchLevel === SzCrossSourceSummaryCategoryTypeToMatchLevel.MATCHES ? [this.dataMartService.sampleDataSource1, this.dataMartService.sampleDataSource2] : this.dataMartService && this.dataMartService[dataSourceName] ? this.dataMartService[dataSourceName] : [];
-      return (dataSource !== undefined && 
+      let _dataSourcesToMatch = this.dataMartService.sampleMatchLevel === SzCrossSourceSummaryCategoryTypeToMatchLevel.MATCHES ? [this.dataMartService.sampleDataSource1, this.dataMartService.sampleDataSource2] : this.dataMartService && this.dataMartService.sampleDataSource1 ? [this.dataMartService.sampleDataSource1] :  this.dataMartService && this.dataMartService.sampleDataSource2 ? [this.dataMartService.sampleDataSource2] : [];
+      let retVal = (dataSource !== undefined && 
         _dataSourcesToMatch
         .indexOf(dataSource) > -1) ? true : false;
+      console.log(`isDataSourceSelected("${dataSource}","${dataSourceName}"): [${_dataSourcesToMatch.join(',')}].indexOf("${dataSource} > -1 ?")`, retVal);
+      return retVal
     }
     /** used for detected whether or not a cell value has displayable data 
      * @internal
