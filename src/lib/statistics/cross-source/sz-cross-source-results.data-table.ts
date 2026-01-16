@@ -82,7 +82,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
      * Columns that cannot be hidden/collapsed. 
      * @internal
     */
-    private _alwaysVisibleColumns: string[] = ['entityId'];
+    private _alwaysVisibleColumns: string[] = ['ENTITY_ID'];
     
     /** 
      * Stores how many times a column has data available to be displayed. Used to automatically 
@@ -97,11 +97,11 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
       ['relatedEntityId', 3],
       ['DATA_SOURCE', 4],
       ['RECORD_ID', 5],
-      ['nameData', 6],
-      ['attributeData', 7],
-      ['identifierData', 8],
-      ['addressData', 9],
-      ['phoneData', 10],
+      ['ENTITY_NAME', 6],
+      ['ATTRIBUTE_DATA', 7],
+      ['IDENTIFIER_DATA', 8],
+      ['ADDRESS_DATA', 9],
+      ['PHONE_DATA', 10],
       ['relationshipData', 11],
       ['entityData', 12],
       ['otherData', 13]
@@ -116,11 +116,11 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
       ['relatedEntityId', 'Related Entity'],
       ['DATA_SOURCE', 'Data Source'],
       ['RECORD_ID', 'Record ID'],
-      ['nameData', 'Name Data'],
-      ['attributeData', 'Attribute Data'],
-      ['identifierData', 'Identifier Data'],
-      ['addressData', 'Address Data'],
-      ['phoneData', 'Phone Data'],
+      ['ENTITY_NAME', 'Name Data'],
+      ['ATTRIBUTE_DATA', 'Attribute Data'],
+      ['IDENTIFIER_DATA', 'Identifier Data'],
+      ['ADDRESS_DATA', 'Address Data'],
+      ['PHONE_DATA', 'Phone Data'],
       ['relationshipData', 'Relationship Data'],
       ['entityData', 'Entity Data'],
       ['otherData', 'Other Data']
@@ -155,11 +155,11 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
         'MATCH_KEY',
         'DATA_SOURCE',
         'RECORD_ID',
-        'nameData',
-        'attributeData',
-        'identifierData',
-        'addressData',
-        'phoneData',
+        'ENTITY_NAME',
+        'ATTRIBUTE_DATA',
+        'IDENTIFIER_DATA',
+        'ADDRESS_DATA',
+        'PHONE_DATA',
         'relationshipData',
         'entityData',
         'otherData'
@@ -171,11 +171,11 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
         'relatedEntityId',
         'DATA_SOURCE',
         'RECORD_ID',
-        'nameData',
-        'attributeData',
-        'identifierData',
-        'addressData',
-        'phoneData',
+        'ENTITY_NAME',
+        'ATTRIBUTE_DATA',
+        'IDENTIFIER_DATA',
+        'ADDRESS_DATA',
+        'PHONE_DATA',
         'relationshipData',
         'entityData',
         'otherData'
@@ -187,11 +187,11 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
         'relatedEntityId',
         'DATA_SOURCE',
         'RECORD_ID',
-        'nameData',
-        'attributeData',
-        'identifierData',
-        'addressData',
-        'phoneData',
+        'ENTITY_NAME',
+        'ATTRIBUTE_DATA',
+        'IDENTIFIER_DATA',
+        'ADDRESS_DATA',
+        'PHONE_DATA',
         'relationshipData',
         'entityData',
         'otherData'
@@ -222,13 +222,13 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
       'resolutionRuleCode',
       'MATCH_KEY',
       'relatedEntityId',
-      'dataSource',
+      'DATA_SOURCE',
       'RECORD_ID',
-      'nameData',
-      'attributeData',
-      'identifierData',
-      'addressData',
-      'phoneData',
+      'ENTITY_NAME',
+      'ATTRIBUTE_DATA',
+      'IDENTIFIER_DATA',
+      'ADDRESS_DATA',
+      'PHONE_DATA',
       'relationshipData',
       'entityData',
       'otherData'
@@ -336,10 +336,11 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
         return retVal;
       }
       return {
-        'nameData': dataFieldRenderer,
-        'identifierData': dataFieldRenderer,
-        'addressData': dataFieldRenderer,
-        'phoneData': dataFieldRenderer,
+        'NAME_DATA': dataFieldRenderer,
+        'IDENTIFIER_DATA': dataFieldRenderer,
+        'ATTRIBUTE_DATA': dataFieldRenderer,
+        'ADDRESS_DATA': dataFieldRenderer,
+        'PHONE_DATA': dataFieldRenderer,
         'relationshipData': dataFieldRenderer,
         'otherData': dataFieldRenderer,
       }
