@@ -46,6 +46,8 @@ import {
   SzDataTableRelatedEntity,
 } from '../../models/data-sampling';
 import { SzSdkEntityRecord } from '../../models/grpc/engine';
+import { getStringEntityFeatures } from '../../common/entity-utils';
+import { SzGrpcConfigManagerService } from '../../services/grpc/configManager.service';
 
 //import { SzSdkEntityResponse, SzSdkResolvedEntity, SzSdkRelatedEntity } from '../../models/grpc/engine'
 
@@ -449,6 +451,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
     constructor(
       public prefs: SzPrefsService,
       private cd: ChangeDetectorRef,
+      private configManager: SzGrpcConfigManagerService,
       private cssService: SzCSSClassService,
       private dataMartService: SzDataMartService,
       public dialog: MatDialog,
@@ -752,7 +755,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
       let retVal = (dataSource !== undefined && 
         _dataSourcesToMatch
         .indexOf(dataSource) > -1) ? true : false;
-      console.log(`isDataSourceSelected("${dataSource}","${dataSourceName}"): [${_dataSourcesToMatch.join(',')}].indexOf("${dataSource} > -1 ?")`, retVal);
+      //console.log(`isDataSourceSelected("${dataSource}","${dataSourceName}"): [${_dataSourcesToMatch.join(',')}].indexOf("${dataSource} > -1 ?")`, retVal);
       return retVal
     }
     /** used for detected whether or not a cell value has displayable data 
@@ -1110,6 +1113,15 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
               ENTITY_NAME: baseItem.ENTITY_NAME,
               DATA_TYPE: SzSampleSetTableRowType.ENTITY_RECORD
             }, rec);
+            if(rec.FEATURES && Object.keys(rec.FEATURES).length > 0) {
+              let _featuresAsStrings = getStringEntityFeatures(rec.FEATURES, true, this.configManager.fTypeToAttrClassMap);
+              if(_featuresAsStrings.has('ATTRIBUTE'))   retVal.ATTRIBUTE_DATA   = _featuresAsStrings.get('ATTRIBUTE');
+              if(_featuresAsStrings.has('ADDRESS'))     retVal.ADDRESS_DATA     = _featuresAsStrings.get('ADDRESS');
+              if(_featuresAsStrings.has('IDENTIFIER'))  retVal.IDENTIFIER_DATA  = _featuresAsStrings.get('IDENTIFIER');
+              if(_featuresAsStrings.has('NAME'))        retVal.NAME_DATA        = _featuresAsStrings.get('NAME');
+              if(_featuresAsStrings.has('PHONE'))       retVal.PHONE_DATA       = _featuresAsStrings.get('PHONE');
+              if(_featuresAsStrings.has('DOB'))         retVal.DOB_DATA         = _featuresAsStrings.get('DOB_DATA');
+            }
             return retVal;
           }) : undefined;
 
@@ -1143,6 +1155,16 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
               ENTITY_NAME: baseItem.ENTITY_NAME,
               dataType: SzSampleSetTableRowType.ENTITY_RECORD
             }, rec);
+            if(baseItem.FEATURES && Object.keys(baseItem.FEATURES).length > 0) {
+              let _featuresAsStrings = getStringEntityFeatures(baseItem.FEATURES, true, this.configManager.fTypeToAttrClassMap);
+              if(_featuresAsStrings.has('ATTRIBUTE'))   retVal.ATTRIBUTE_DATA   = _featuresAsStrings.get('ATTRIBUTE');
+              if(_featuresAsStrings.has('ADDRESS'))     retVal.ADDRESS_DATA     = _featuresAsStrings.get('ADDRESS');
+              if(_featuresAsStrings.has('IDENTIFIER'))  retVal.IDENTIFIER_DATA  = _featuresAsStrings.get('IDENTIFIER');
+              if(_featuresAsStrings.has('NAME'))        retVal.NAME_DATA        = _featuresAsStrings.get('NAME');
+              if(_featuresAsStrings.has('PHONE'))       retVal.PHONE_DATA       = _featuresAsStrings.get('PHONE');
+              if(_featuresAsStrings.has('DOB'))         retVal.DOB_DATA         = _featuresAsStrings.get('DOB_DATA');
+
+            }
             return retVal;
           }) : undefined;
 
