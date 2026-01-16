@@ -2,15 +2,24 @@ import { SzSdkEntityRecord, SzSdkEntityResponse, SzSdkRelatedEntity, SzSdkResolv
 import { SzBoundType } from '../models/statistics/szBoundType';
 import { SzRelationType } from '../models/statistics/szRelationType';
 
+//export interface SzSampleSetEntityFeatures {[key: string]: SzSdkEntityFeature[]}
+
+export interface SzSampleSetExtendedEntity extends SzSdkResolvedEntity {
+    ADDRESS_DATA?: string,
+    NAME_DATA?: string,
+    DOB_DATA?: string,
+    PHONE_DATA?: string
+}
+
 export interface SzSampleSetEntity {
-    entity?: SzSdkResolvedEntity;
+    entity?: SzSampleSetExtendedEntity;
     /**
      * The array of RelatedEntity instances describing the possible matches, discovered relationships, and disclosed relationships.
      */
     relatedEntities?: Array<SzSdkRelatedEntity>;
 }
 export interface SzSampleSetRelation {
-    entity?: SzSdkResolvedEntity;
+    entity?: SzSampleSetExtendedEntity;
     /**
      * The array of RelatedEntity instances describing the possible matches, discovered relationships, and disclosed relationships.
      */
@@ -133,7 +142,20 @@ export const SzSampleSetTableRowType = {
     RELATED_RECORD: 'RELATED_RECORD' as SzSampleSetTableRowType
 };
 
-export interface SzSampleSetEntityTableRow extends SzSdkResolvedEntity {
+interface SzSampleSetTableRowBase {
+    ATTRIBUTE_DATA?: string[],
+    ADDRESS_DATA?: string[],
+    DOB_DATA?: string[],
+    IDENTIFIER_DATA?: string[],
+    NAME_DATA?: string[],
+    PHONE_DATA?: string[],
+    /**
+     * the type of data construct this row represents
+     */
+    DATA_TYPE?: SzSampleSetTableRowType
+}
+
+export interface SzSampleSetEntityTableRow extends SzSdkResolvedEntity, SzSampleSetTableRowBase {
     /**
      * The data source code identifying the data source from  which the record was loaded.
      */
@@ -150,19 +172,8 @@ export interface SzSampleSetEntityTableRow extends SzSdkResolvedEntity {
      * The optioanl principle identifying the resolution rule that was used to merge the record into the entity to which it belonss.  This may be absent or `null` if this record belongs to a single-record entity or if it was the inital record of the first multi-record entity to which it belonged (even if it later re-resolved into a larger entity).
      */
     //principle?: string;
-    /**
-     * the type of data construct this row represents
-     */
-    DATA_TYPE?: SzSampleSetTableRowType
 }
-
-export interface SzSampleSetRelationTableRow extends SzSdkEntityRecord {
-    //export interface SzStatSampleEntityTableRow extends SzResolvedEntity, SzMatchedRecord {
-    /**
-     * the type of data construct this row represents
-     */
-    DATA_TYPE?: SzSampleSetTableRowType
-}
+export interface SzSampleSetRelationTableRow extends SzSdkEntityRecord, SzSampleSetTableRowBase {}
 
 export interface SzSampleSetEntityTableItem extends SzSampleSetEntity {
     //relatedEntities?: SzDataTableRelatedEntity[],
