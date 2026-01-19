@@ -280,17 +280,14 @@ export class SzCrossSourceStatistics implements OnInit, AfterViewInit, OnDestroy
 
     if(!evt.dataSource1 && evt.dataSource2) {
       // flip-flop if only one ds is defined
-      this.dataMartService.sampleDataSource1  = evt.dataSource2;
-      this.dataMartService.sampleDataSource2  = evt.dataSource2;
-      //console.log(`\tdatasource1 set to datasource2: ["${this.dataMartService.sampleDataSource1}","${this.dataMartService.sampleDataSource2}"]`);
+      this.dataMartService.setSampleDataSources(evt.dataSource2, evt.dataSource2);
+      console.log(`\tdatasource1 set to datasource2: ["${this.dataMartService.sampleDataSource1}","${this.dataMartService.sampleDataSource2}"]`);
     } else if((evt.dataSource1 && !evt.dataSource2) || ((evt.dataSource1 === evt.dataSource2) && evt.dataSource1 !== undefined)) {
-      this.dataMartService.sampleDataSource1  = evt.dataSource1;
-      this.dataMartService.sampleDataSource2  = evt.dataSource1;
-      //console.log(`\tdatasource2 set to datasource1: ["${this.dataMartService.sampleDataSource1}","${this.dataMartService.sampleDataSource2}" | "${evt.dataSource1}","${evt.dataSource2}"]`);
+      this.dataMartService.setSampleDataSources(evt.dataSource1, evt.dataSource1);
+      console.log(`\tdatasource2 set to datasource1: ["${this.dataMartService.sampleDataSource1}","${this.dataMartService.sampleDataSource2}" | "${evt.dataSource1}","${evt.dataSource2}"]`);
     } else {
-      this.dataMartService.sampleDataSource1  = evt.dataSource1;
-      this.dataMartService.sampleDataSource2  = evt.dataSource2;
-      //console.log(`\tset both datasources: ["${this.dataMartService.sampleDataSource1}","${this.dataMartService.sampleDataSource2}"]`);
+      this.dataMartService.setSampleDataSources(evt.dataSource1, evt.dataSource2);
+      console.log(`\tset both datasources: ["${this.dataMartService.sampleDataSource1}","${this.dataMartService.sampleDataSource2}"]`);
     }
   
     // simplify the event payload passed back
@@ -298,6 +295,7 @@ export class SzCrossSourceStatistics implements OnInit, AfterViewInit, OnDestroy
       matchLevel: evt.matchLevel,
       statType: evt.statType
     }
+
     if(this.dataMartService.sampleDataSource1)  _parametersEvt.dataSource1 = this.dataMartService.sampleDataSource1;
     if(this.dataMartService.sampleDataSource2)  _parametersEvt.dataSource2 = this.dataMartService.sampleDataSource2;
     //this.sourceStatisticClick.emit(evt);  // emit the raw event jic someone needs to use stopPropagation or access to the DOM node
@@ -350,7 +348,7 @@ export class SzCrossSourceStatistics implements OnInit, AfterViewInit, OnDestroy
     this.sourceStatisticClick.emit(evt);  // emit the raw event jic someone needs to use stopPropagation or access to the DOM node
 
     // get new sample set
-    //console.log(`\t\tgetting new sample set: `, _parametersEvt, evt);
+    console.log(`\t\tgetting new sample set: `, evt);
     this.getNewSampleSet(evt).subscribe((obs)=>{
       // initialized
       //console.log('initialized new sample set: ', obs, _parametersEvt);

@@ -979,9 +979,24 @@ export class SzDataMartService {
     }
         
         // ----------------------- sample set instance getters/setters -----------------------
+    private _dispatchSampleSetChangeEvents:boolean =  true;
+    /**
+     * Sets both sampleset datasources without a change on the first one 
+     * triggering a new sampleset load.
+     */
+    public setSampleDataSources(dataSource1:string, dataSource2: string) {
+        this._dispatchSampleSetChangeEvents = false;
+        this.sampleDataSource1 = dataSource1;
+        this._dispatchSampleSetChangeEvents = true;
+        this.sampleDataSource2 = dataSource2;
+        console.log(`SzDataMartService.setSampleDataSources("${dataSource1}","${dataSource2}")`,this.sampleDataSource1,this.sampleDataSource2);
+    }
+
     /** get the "from" datasource name assigned to the sample set instance */
     public get sampleDataSource1() {
         if(this._sampleSet) {
+            // if we have a sampleset with a selected datasource
+            // if not pull one out of the last time one was chosen
             return  this._sampleSet.dataSource1 ? this._sampleSet.dataSource1 : this.prefs.dataMart.sampleDataSource1;
         }
         return undefined;
@@ -990,13 +1005,26 @@ export class SzDataMartService {
     public set sampleDataSource1(value: string) {
         let _oType = this.prefs.dataMart.sampleDataSource1;
         this.prefs.dataMart.sampleDataSource1 = value;
-        let _evt = this.prefs.dataMart.sampleDataSource2 ? {dataSource2: this.prefs.dataMart.sampleDataSource2, dataSource1: value} : {dataSource2: value};
-        if(_oType !== value) this.onSampleDataSourceChange.next(_evt); // only emit on change
+        let _evt = this._sampleSet && this._sampleSet.dataSource2 ? {
+            dataSource1: value, 
+            dataSource2: this._sampleSet.dataSource2
+        } : {dataSource1: value};
+        if(this._sampleSet) {
+            this._sampleSet.dataSource1 = _evt.dataSource1;
+            this._sampleSet.dataSource2 = _evt.dataSource2;
+        }
+        if(_oType !== value && this._dispatchSampleSetChangeEvents){
+            this.onSampleDataSourceChange.next(_evt); // only emit on change
+        }
     }
     /** get the "to" datasource name assigned to the sample set instance */
     public get sampleDataSource2() {
         if(this._sampleSet) {
-            return  this._sampleSet.dataSource2 ? this._sampleSet.dataSource2 : this.prefs.dataMart.sampleDataSource1;
+            // if we dont have a second datasource the match is DS1vsDS1 to the data interface. (aka: not a mistake)
+            return this._sampleSet.dataSource2 ? 
+            this._sampleSet.dataSource2 : 
+            this._sampleSet.dataSource1;
+
         }
         return undefined;
     }
@@ -1004,8 +1032,17 @@ export class SzDataMartService {
     public set sampleDataSource2(value: string) {
         let _oType = this.prefs.dataMart.sampleDataSource2;
         this.prefs.dataMart.sampleDataSource2 = value;
-        let _evt = this.prefs.dataMart.sampleDataSource1 ? {dataSource1: this.prefs.dataMart.sampleDataSource1, dataSource2: value} : {dataSource2: value};
-        if(_oType !== value) this.onSampleDataSourceChange.next(_evt); // only emit on change
+        let _evt = this._sampleSet && this._sampleSet.dataSource1 ? {
+            dataSource1: this._sampleSet.dataSource1, 
+            dataSource2: value
+        } : {dataSource2: value};
+        if(this._sampleSet) {
+            this._sampleSet.dataSource1 = _evt.dataSource1;
+            this._sampleSet.dataSource2 = _evt.dataSource2;
+        }
+        if(_oType !== value && this._dispatchSampleSetChangeEvents){
+            this.onSampleDataSourceChange.next(_evt); // only emit on change
+        }
     }
     /** get the matchLevel assigned to the sample set instance */
     public get sampleMatchLevel() {
