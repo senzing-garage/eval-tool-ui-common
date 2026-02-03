@@ -49,8 +49,8 @@ export class SzGrpcEngineService {
     /**
      * data_as_json = '{"ADDR_LINE1":"123 Main Street, Las Vegas NV 89132","ADDR_TYPE":"MAILING","AMOUNT":"100","DATE":"1/2/18","DATE_OF_BIRTH":"12/11/1978","EMAIL_ADDRESS":"bsmith@work.com","PHONE_NUMBER":"702-919-1300","PHONE_TYPE":"HOME","PRIMARY_NAME_FIRST":"Robert","PRIMARY_NAME_LAST":"Smith","RECORD_TYPE":"PERSON","STATUS":"Active","DATA_SOURCE":"CUSTOMERS"}'
      */
-    public addRecord(dataSourceCode: string, recordId: string | number, recordDefinition: any) {
-        return this.szEnvironment.engine.addRecord(dataSourceCode, recordId, recordDefinition)
+    public addRecord(dataSourceCode: string, recordId: string | number, recordDefinition: any, flags: BigInt | number = SzEngineFlags.SZ_WITH_INFO) {
+        return this.szEnvironment.engine.addRecord(dataSourceCode, recordId, recordDefinition, flags)
     }
 
     public getActiveConfigId() {
