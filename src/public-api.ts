@@ -126,6 +126,7 @@ export * from './lib/configuration/sz-product-info/sz-product-info.component';
 export * from './lib/import/sz-import-files.component';
 export { SzSearchByIdGrpcComponent, SzSearchByIdFormParams } from './lib/search-grpc/sz-search/sz-search-by-id.component';
 export { SzSearchGrpcComponent } from './lib/search-grpc/sz-search/sz-search.component';
+export { SzSearchIdentifiersPickerDialogComponent } from './lib/search-grpc/sz-search/sz-search-identifiers-picker.component';
 export { SzSearchResultsGrpcComponent } from './lib/search-grpc/sz-search-results/sz-search-results.component';
 export { SzSearchResultCardGrpcComponent } from './lib/search-grpc/sz-search-result-card/sz-search-result-card.component';
 export { SzEntityDetailGrpcComponent } from './lib/entity-grpc/detail/sz-entity-detail.component';
