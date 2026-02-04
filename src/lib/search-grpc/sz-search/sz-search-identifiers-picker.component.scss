@@ -12,11 +12,11 @@
         display: none;
     }
 
-    /*.mat-mdc-dialog-actions {
+    .mat-mdc-dialog-actions {
         flex-direction: row;
-        justify-content: flex-end;
+        justify-content: flex-end !important;
         position: relative;
-    }*/
+    }
 
     button.mat-primary {
         background-color: colors.$blue;
