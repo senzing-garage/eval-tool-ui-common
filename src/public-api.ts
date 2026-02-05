@@ -120,6 +120,8 @@ export { SzHowNavComponent } from './lib/how-grpc/sz-how-nav.component';
 //export { SzHowVirtualEntityDialog } from './lib/how/sz-how-virtual-entity-dialog.component';
 /** --------------------------   Data Mart -------------------------- */
 export * from './lib/services/http/sz-datamart-environment';
+export { SzSummaryStats } from './lib/services/http/models/szSummaryStats';
+export { SzSourceSummary } from './lib/services/http/models/szSourceSummary';
 
 /** --------------------------   gRPC Web  -------------------------- */
 export * from './lib/configuration/sz-product-info/sz-product-info.component';
