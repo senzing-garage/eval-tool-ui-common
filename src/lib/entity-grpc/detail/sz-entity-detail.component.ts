@@ -35,7 +35,6 @@ import { SzSdkEntityRecord, SzSdkFindNetworkResponse } from '../../models/grpc/e
 import { SzRelatedEntityMatchLevel, SzResumeEntity, SzResumeRelatedEntity } from '../../models/SzResumeEntity';
 import { SzEntityDetailsSectionComponentGrpc } from './sz-entity-details-section/sz-entity-details-section.component';
 import { SzEntityDetailGraphComponent } from './sz-entity-detail-graph/sz-entity-detail-graph.component';
-import { V } from '@angular/cdk/scrolling-module.d-ud2XrbF8';
 
 /**
  * The Entity Detail Component.

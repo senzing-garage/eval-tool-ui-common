@@ -10,7 +10,6 @@ import {
     //SzVirtualEntity, SzVirtualEntityRecord, 
     //SzVirtualEntityResponse 
 } from '@senzing/rest-api-client-ng';
-import { SzConfigDataService } from '../services/sz-config-data.service';
 import { SzHowUIService } from '../services/sz-how-ui.service';
 import { 
   SzVirtualEntityRecordsClickEvent, 
@@ -346,8 +345,6 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
     }
 
     constructor(
-        //public entityDataService: SzEntityDataService,
-        public configDataService: SzConfigDataService,
         public dialog: MatDialog,
         private howUIService: SzHowUIService
     ){}

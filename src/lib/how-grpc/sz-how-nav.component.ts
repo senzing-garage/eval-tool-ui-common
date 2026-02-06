@@ -6,7 +6,6 @@ import {
     //SzResolutionStep, SzVirtualEntityRecord, 
     //SzFeatureScore 
 } from '@senzing/rest-api-client-ng';
-import { SzConfigDataService } from '../services/sz-config-data.service';
 import { SzResolutionStepDisplayType, SzResolvedVirtualEntity } from '../models/data-how';
 import { parseBool } from '../common/utils';
 import { filter, Subject, takeUntil } from 'rxjs';
@@ -707,8 +706,6 @@ export class SzHowNavComponent implements OnInit, OnDestroy {
     // ---------------------------------------- end filtered collection getters
 
     constructor(
-        //public entityDataService: SzEntityDataService,
-        public configDataService: SzConfigDataService,
         private howUIService: SzHowUIService
     ){}
 

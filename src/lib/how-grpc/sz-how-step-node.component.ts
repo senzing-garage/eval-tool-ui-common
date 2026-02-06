@@ -1,14 +1,9 @@
 import { Component, OnInit, Input, OnDestroy, HostBinding } from '@angular/core';
-import { 
-    EntityDataService as SzEntityDataService, 
-    //SzResolutionStep
-} from '@senzing/rest-api-client-ng';
-import { SzConfigDataService } from '../services/sz-config-data.service';
 import { SzResolutionStepListItemType, SzResolutionStepNode, SzResolvedVirtualEntity } from '../models/data-how';
 import { Subject } from 'rxjs';
 import { SzHowUIService } from '../services/sz-how-ui.service';
 import { CommonModule } from '@angular/common';
-import { SzSdkHowResolutionStep } from 'src/public-api';
+import { SzSdkHowResolutionStep } from '../models/grpc/engine';
 
 /**
  * Represents a step node in a How Report. Step Nodes wrap Step cards
@@ -146,8 +141,6 @@ export class SzHowStepNodeComponent implements OnInit, OnDestroy {
         return this._virtualEntitiesById;
     }
     constructor(
-        public entityDataService: SzEntityDataService,
-        public configDataService: SzConfigDataService,
         private howUIService: SzHowUIService
     ){}
 
