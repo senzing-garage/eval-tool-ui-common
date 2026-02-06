@@ -1,8 +1,14 @@
 import { Component, OnInit, Input, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { 
-    EntityDataService as SzEntityDataService, 
-    SzEntityIdentifier, SzFeatureMode, SzHowEntityResponse, SzHowEntityResult, SzRecordIdentifier, SzRecordIdentifiers, SzResolutionStep, SzResolvedEntity, SzVirtualEntity, SzVirtualEntityRecord, SzVirtualEntityResponse 
+    //EntityDataService as SzEntityDataService, 
+    SzEntityIdentifier, SzFeatureMode, 
+    //SzHowEntityResponse, 
+    //SzHowEntityResult,
+    SzRecordIdentifier, SzRecordIdentifiers, 
+    //SzResolutionStep, SzResolvedEntity, 
+    //SzVirtualEntity, SzVirtualEntityRecord, 
+    //SzVirtualEntityResponse 
 } from '@senzing/rest-api-client-ng';
 import { SzConfigDataService } from '../services/sz-config-data.service';
 import { SzHowUIService } from '../services/sz-how-ui.service';
@@ -18,6 +24,15 @@ import { SzResolutionStepListItemType, SzResolutionStepNode } from '../models/da
 import { CommonModule } from '@angular/common';
 import { SzHowNavComponent } from './sz-how-nav.component';
 import { SzHowStepNodeComponent } from './sz-how-step-node.component';
+import { 
+  SzSdkHowEntityResponse, 
+  SzSdkHowEntityResults, 
+  SzSdkHowResolutionStep, 
+  SzSdkResolvedEntity, 
+  SzSdkVirtualEntity, 
+  SzSdkVirtualEntityMemberRecord,
+  SzSdkVirtualEntityRecord
+} from '../models/grpc/engine';
 
 /**
  * Display the "How" information for entity
@@ -43,12 +58,12 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
     /** subscription to notify subscribers to unbind */
     public unsubscribe$ = new Subject<void>();
     /** the data retrieved from the 'finalStates' array of the how api request. passed to other components. */
-    public finalCardsData: SzVirtualEntity[];
+    public finalCardsData: SzSdkVirtualEntity[];
     /** 
      * @internal
      * the data retrieved from the how api request.
      */
-    private _data: SzHowEntityResult;
+    private _data: SzSdkHowEntityResults;
     /** 
      * @internal 
      * we get the expanded "virtual entities" for every step in the how request.
@@ -57,9 +72,9 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
     */
     private _virtualEntitiesById: Map<string, SzResolvedVirtualEntity>;
     /** @internal */
-    private _resolutionSteps: Array<SzResolutionStep>;
+    private _resolutionSteps: Array<SzSdkHowResolutionStep>;
     /** @internal */
-    private _resolutionStepsByVirtualId: {[key: string]: SzResolutionStep};
+    private _resolutionStepsByVirtualId: {[key: string]: SzSdkHowResolutionStep};
     /** @internal */
     private _stepNodeGroups: Map<string, SzResolutionStepNode>  = new Map<string, SzResolutionStepNode>();
     /** @internal */
@@ -90,7 +105,7 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
 
     // -------------------------------------------- observeables and emitters --------------------------------------------
     /** @internal */
-    private _dataChange: Subject<SzHowEntityResult>           = new Subject<SzHowEntityResult>();
+    private _dataChange: Subject<SzSdkHowEntityResults>           = new Subject<SzSdkHowEntityResults>();
     /** when the data has changed this event is emitted */
     public   dataChange                                       = this._dataChange.asObservable();
     /** @internal */
@@ -98,7 +113,7 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
     /** when the entity id passed to this component has changed this event is emitted */
     public   entityIdChange                                   = this._entityIdChange.asObservable();
     /** @internal */
-    private _finalEntitiesChange: Subject<SzVirtualEntity[]>  = new Subject<SzVirtualEntity[]>();
+    private _finalEntitiesChange: Subject<SzSdkVirtualEntity[]>  = new Subject<SzSdkVirtualEntity[]>();
     /** when the final entities are returned from the api request this event is emitted */
     public  finalEntitiesChange                               = this._finalEntitiesChange.asObservable();
     /** @internal */
@@ -110,7 +125,7 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
     /** when a user clicks the info link inside of a step card this event is emitted*/
     public  virtualEntityInfoLinkClick                        = this._virtualEntityInfoLinkClick.asObservable();
     /** when the data has changed this event is emitted */
-    @Output() public dataChanged                              = new EventEmitter<SzHowEntityResult>();
+    @Output() public dataChanged                              = new EventEmitter<SzSdkHowEntityResults>();
     /** when the entity id has changed and a data request response is pending this event is emitted */
     @Output() public loading: EventEmitter<boolean>           = new EventEmitter<boolean>();
     /** when the map of virtual entities found in the api response is returned from subsequent queries is returned this event is emitted */
@@ -177,27 +192,37 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
         // get entity data
         this._isLoading = true;
         this.loading.emit(true);
-        this.getData(this.entityId).subscribe((resp: SzHowEntityResponse) => {
+        this.getData(this.entityId).subscribe((resp: SzSdkHowEntityResponse) => {
             //console.log(`how response(${this.entityId}): ${resp}`, resp.data);
-            this._data                                    = resp && resp.data ? resp.data : undefined;
-            this._resolutionStepsByVirtualId              = resp && resp.data && resp.data.resolutionSteps ? this._data.resolutionSteps : undefined;
+            this._data                                    = resp && resp.HOW_RESULTS ? resp.HOW_RESULTS : undefined;
+            this._resolutionStepsByVirtualId              = resp && resp.HOW_RESULTS && resp.HOW_RESULTS.RESOLUTION_STEPS ? SzHowUIService.getStepsByVirtualIds(this._data.RESOLUTION_STEPS) : undefined;
             this._dataLoadedForId                         = this.entityId;
 
-            if(this._data.finalStates && this._data.finalStates.length > 0) {
+            if(this._data.FINAL_STATE && this._data.FINAL_STATE.VIRTUAL_ENTITIES.length > 0) {
                 // has at least one final states
                 // for each final state get the virual step
                 // and populate the components
-                let _finalStatesData = this._data.finalStates
+                let _finalStatesData = this._data.FINAL_STATE.VIRTUAL_ENTITIES
                 .filter((fStateObj) => {
-                    return this._data.resolutionSteps && this._data.resolutionSteps[ fStateObj.virtualEntityId ] ? true : false;
+                    return this._resolutionStepsByVirtualId && this._resolutionStepsByVirtualId[ fStateObj.VIRTUAL_ENTITY_ID ] ? true : false;
                 })
                 this.finalCardsData            = _finalStatesData;
                 //this.howUIService.finalStates  = _finalStatesData;
             }
-            if(this._data.resolutionSteps && Object.keys(this._data.resolutionSteps).length > 0) {
+            if(this._data.RESOLUTION_STEPS && this._data.RESOLUTION_STEPS.length > 0) {
                 // we have resolution steps
                 let _resSteps   = [];
-                let _stepCount  = Object.keys(this._data.resolutionSteps).length;
+                let _stepCount  = this._data.RESOLUTION_STEPS.length;
+                
+                this._data.RESOLUTION_STEPS.forEach((_step) => {
+                  let _stepType = SzHowUIService.getResolutionStepCardType(_step);
+                  if(_stepType !== SzResolutionStepDisplayType.CREATE || _stepCount <= this._expandCardsWhenLessThan) {
+                    //console.log(`#${this._data.resolutionSteps[rKey].stepNumber} type ${_stepType}`);
+                    this.howUIService.expandNode(_step.RESULT_VIRTUAL_ENTITY_ID, SzResolutionStepListItemType.STEP);
+                  }
+                  _resSteps.push( _step );
+                });
+                /*
                 for(let rKey in this._data.resolutionSteps) {
                   let _stepType = SzHowUIService.getResolutionStepCardType(this._data.resolutionSteps[rKey]);
                   if(_stepType !== SzResolutionStepDisplayType.CREATE || _stepCount <= this._expandCardsWhenLessThan) {
@@ -206,6 +231,7 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
                   }
                   _resSteps.push( this._data.resolutionSteps[rKey] );
                 }
+                */
                 this._resolutionSteps = _resSteps.reverse(); // we want the steps in reverse for display purposes
             }
             if(this._resolutionSteps){
@@ -213,8 +239,9 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
               //let _interimSteps                 = this.getInterimStepNodes(this._resolutionSteps);
               //console.log(`interim steps: `, _interimSteps);
             }
-            if(this._data && this._data.finalStates && this._data.resolutionSteps) {
-              this._stepNodes       = this.getStepNodesFromFinalStates(this._data.finalStates, this._data.resolutionSteps);
+            //if(this._data && this._data.finalStates && this._data.resolutionSteps) {
+            if(this._data && this._data.FINAL_STATE && this._data.FINAL_STATE.VIRTUAL_ENTITIES && this._data.RESOLUTION_STEPS) {
+              this._stepNodes       = this.getStepNodesFromFinalStates(this._data.FINAL_STATE.VIRTUAL_ENTITIES, this._data.RESOLUTION_STEPS);
               // get step nodes that are groups
               this._stepNodeGroups  = this.getGroupsFromStepNodes(this._stepNodes);
               //console.log(`step node groups: `, this._stepNodeGroups);
@@ -223,8 +250,8 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
               this.howUIService.stepNodes       = this._stepNodes;
             }
             // extend data with augmentation
-            if(this._data && this._data.resolutionSteps) {
-              this.getVirtualEntityDataForSteps(this._data.resolutionSteps, this._data.finalStates).pipe(
+            if(this._data && this._data.RESOLUTION_STEPS) {
+              this.getVirtualEntityDataForSteps(this._data.RESOLUTION_STEPS, this._data.FINAL_STATE.VIRTUAL_ENTITIES).pipe(
                 take(1),
                 takeUntil(this.unsubscribe$)
               ).subscribe((virtualEntitiesMap) => {
@@ -235,18 +262,18 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
             this._isLoading = false;
             this.loading.emit(false);
             this._finalEntitiesChange.next(this.finalCardsData);
-            this._dataChange.next(resp.data);
+            this._dataChange.next(resp.HOW_RESULTS);
         });
       }
     }
 
     // ------------------------------------------ utility methods and functions ------------------------------------------
     /** @internal */
-    private getGroupForMemberStep(step: SzResolutionStep, groups?: Map<string, SzResolutionStepNode>): SzResolutionStepNode {
+    private getGroupForMemberStep(step: SzSdkHowResolutionStep, groups?: Map<string, SzResolutionStepNode>): SzResolutionStepNode {
       let _retVal: SzResolutionStepNode;
       if(!groups) { groups = this.howUIService.stepNodeGroups; }
       if(groups && step) {
-        let _idToLookFor = step.resolvedVirtualEntityId;
+        let _idToLookFor = step.RESULT_VIRTUAL_ENTITY_ID;
         let _sk = false;
         groups.forEach((groupToSearch: SzResolutionStepNode, key: string) => {
           if(!_sk && groupToSearch.virtualEntityIds && groupToSearch.virtualEntityIds.indexOf(_idToLookFor) > -1 || groupToSearch.id === _idToLookFor) {
@@ -297,7 +324,7 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
       return retVal;
     }
     /** is a specific step a child of any other steps */
-    private isStepChildOfNode(step: SzResolutionStep, nodesWithChildren?: Map<string, SzResolutionStepNode>) {
+    private isStepChildOfNode(step: SzSdkHowResolutionStep, nodesWithChildren?: Map<string, SzResolutionStepNode>) {
       if(this.getGroupForMemberStep(step, nodesWithChildren) !== undefined) {
         return true;
       }
@@ -319,7 +346,7 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
     }
 
     constructor(
-        public entityDataService: SzEntityDataService,
+        //public entityDataService: SzEntityDataService,
         public configDataService: SzConfigDataService,
         public dialog: MatDialog,
         private howUIService: SzHowUIService
@@ -331,7 +358,7 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
       // publish how step data on retrieval
       this.dataChange.pipe(
         takeUntil(this.unsubscribe$)
-      ).subscribe((data: SzHowEntityResult) => {
+      ).subscribe((data: SzSdkHowEntityResults) => {
         this.dataChanged.emit(data);
       })
       // publish virtual entities data on retrieval
@@ -343,11 +370,11 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
       // expand final entities node(s) by default
       this.finalEntitiesChange.pipe(
         takeUntil(this.unsubscribe$)
-      ).subscribe((entities: SzVirtualEntity[]) => {
+      ).subscribe((entities: SzSdkVirtualEntity[]) => {
         if(entities && entities.forEach) {
           entities.forEach((vEnt) => {
-            this.howUIService.expandNode(vEnt.virtualEntityId, SzResolutionStepListItemType.FINAL);
-            this.howUIService.expandChildNodes(vEnt.virtualEntityId, SzResolutionStepListItemType.FINAL, [SzResolutionStepListItemType.STEP]);
+            this.howUIService.expandNode(vEnt.VIRTUAL_ENTITY_ID, SzResolutionStepListItemType.FINAL);
+            this.howUIService.expandChildNodes(vEnt.VIRTUAL_ENTITY_ID, SzResolutionStepListItemType.FINAL, [SzResolutionStepListItemType.STEP]);
           });
         }
       });
@@ -381,7 +408,7 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
     /**
      * @internal 
      * retrieve the how data for a entity */
-    private getData(entityId: SzEntityIdentifier): Observable<SzHowEntityResponse> {
+    private getData(entityId: SzEntityIdentifier): Observable<SzSdkHowEntityResponse> {
         return this.howUIService.getHowDataForEntity(
             this.entityId
         );
@@ -392,7 +419,7 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
      * This is primarily used for generating the default 'STACK' groups, but also include 'SzResolutionStepNode' objects 
      * that contain other groups or individual steps
      */
-    getGroupsFromStepNodes(_rSteps?: Array<SzResolutionStepNode | SzResolutionStep>): Map<string, SzResolutionStepNode> {
+    getGroupsFromStepNodes(_rSteps?: Array<SzResolutionStepNode | SzSdkHowResolutionStep>): Map<string, SzResolutionStepNode> {
       let retVal = new Map<string, SzResolutionStepNode>();
       if(!_rSteps) {
         _rSteps = this._stepNodes;
@@ -438,13 +465,23 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
     }*/
 
     /** @internal */
-    public getRecordsForNode(onlySingletons: boolean, step: SzResolutionStepNode): Array<SzVirtualEntityRecord> {
-      let retVal: SzVirtualEntityRecord[] = [];
-      if(step && step.inboundVirtualEntity && step.inboundVirtualEntity.records && step.inboundVirtualEntity.records.length > 0) {
+    public getRecordsForNode(onlySingletons: boolean, step: SzResolutionStepNode): Array<SzSdkVirtualEntityMemberRecord> {
+      //let retVal: SzVirtualEntityRecord[] = [];
+      let retVal: SzSdkVirtualEntityMemberRecord[] = [];
+
+      /*if(step && step.inboundVirtualEntity && step.inboundVirtualEntity.records && step.inboundVirtualEntity.records.length > 0) {
         if((onlySingletons && step.inboundVirtualEntity.singleton) || onlySingletons === undefined || onlySingletons === false){ retVal = retVal.concat(step.inboundVirtualEntity.records); }
       }
       if(step && step.candidateVirtualEntity && step.candidateVirtualEntity.records && step.candidateVirtualEntity.records.length > 0) {
         if((onlySingletons && step.candidateVirtualEntity.singleton) || onlySingletons === undefined || onlySingletons === false){ retVal = retVal.concat(step.candidateVirtualEntity.records); }
+      }*/
+      if(step && step.VIRTUAL_ENTITY_1 && step.VIRTUAL_ENTITY_1.MEMBER_RECORDS && step.VIRTUAL_ENTITY_1.MEMBER_RECORDS.length > 0) {
+        let _isSingleton = SzHowUIService.isVirtualEntitySingleton(step.VIRTUAL_ENTITY_1);
+        if((onlySingletons && _isSingleton) || onlySingletons === undefined || onlySingletons === false){ retVal = retVal.concat(step.VIRTUAL_ENTITY_1.MEMBER_RECORDS); }
+      }
+      if(step && step.VIRTUAL_ENTITY_2 && step.VIRTUAL_ENTITY_2.MEMBER_RECORDS && step.VIRTUAL_ENTITY_2.MEMBER_RECORDS.length > 0) {
+        let _isSingleton = SzHowUIService.isVirtualEntitySingleton(step.VIRTUAL_ENTITY_2);
+        if((onlySingletons && _isSingleton) || onlySingletons === undefined || onlySingletons === false){ retVal = retVal.concat(step.VIRTUAL_ENTITY_2.MEMBER_RECORDS); }
       }
       if(step && step.children && step.children.map) {
         retVal = retVal.concat(step.children.map(this.getRecordsForNode.bind(this, onlySingletons)));
@@ -463,34 +500,35 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
      * @param rSteps the object containing all steps returned from the api request.
      * @returns 
      */
-    private getStepNodesFromFinalStates(finalStates: SzVirtualEntity[], rSteps: {[key: string]: SzResolutionStep}) {
-      let stepsByVirtualId              = new Map<string, SzResolutionStep>();
-      for(let rKey in rSteps) {
-        stepsByVirtualId.set(rKey, rSteps[rKey]);
-      }
+    private getStepNodesFromFinalStates(finalStates: SzSdkVirtualEntity[], rSteps: SzSdkHowResolutionStep[]) {
+      let stepsByVirtualId              = new Map<string, SzSdkHowResolutionStep>();
+      rSteps.forEach((rStep) => {
+        stepsByVirtualId.set(rStep.RESULT_VIRTUAL_ENTITY_ID, rStep);
+      });
       let retVal: SzResolutionStepNode[] = finalStates.map((fVirt)=>{
-        let fStep = rSteps[fVirt.virtualEntityId] ? rSteps[fVirt.virtualEntityId] : fVirt;
+        let fStep = rSteps[fVirt.VIRTUAL_ENTITY_ID] ? rSteps[fVirt.VIRTUAL_ENTITY_ID] : fVirt;
         // initialize final step as a stepNode
         let finalStepAsStepNode: SzResolutionStepNode = Object.assign({
-          id: fVirt.virtualEntityId,
+          id: fVirt.VIRTUAL_ENTITY_ID,
           stepType: SzResolutionStepDisplayType.FINAL,
           itemType: SzResolutionStepListItemType.FINAL,
           children: []
         }, fStep);
 
         // if we can traverse then do it
-        if(rSteps[fVirt.virtualEntityId]) {
+        if(rSteps[fVirt.VIRTUAL_ENTITY_ID]) {
           // this will only ever return "1" top level item since that's all we're passing in
-          finalStepAsStepNode = this.getNestedStepNodesFromSteps([rSteps[fVirt.virtualEntityId]], stepsByVirtualId, false, true)[0];
+          finalStepAsStepNode = this.getNestedStepNodesFromSteps([rSteps[fVirt.VIRTUAL_ENTITY_ID]], stepsByVirtualId, false, true)[0];
         } else {
           // otherwise append final state as child of itself
           // since it is an expandable node
+          let _isVirtSingleton = SzHowUIService.isVirtualEntitySingleton(fVirt);
           let firstChild = (Object.assign({
-            id: fVirt.virtualEntityId,
-            stepType: fVirt.singleton ? SzResolutionStepDisplayType.SINGLETON: rSteps[fVirt.virtualEntityId] ? SzHowUIService.getResolutionStepCardType(rSteps[fVirt.virtualEntityId]) : SzResolutionStepListItemType.STEP,
-            itemType: fVirt.singleton ? SzResolutionStepListItemType.SINGLETON : SzResolutionStepListItemType.STEP,
+            id: fVirt.VIRTUAL_ENTITY_ID,
+            stepType: _isVirtSingleton ? SzResolutionStepDisplayType.SINGLETON: rSteps[fVirt.VIRTUAL_ENTITY_ID] ? SzHowUIService.getResolutionStepCardType(stepsByVirtualId.get(fVirt.VIRTUAL_ENTITY_ID)) : SzResolutionStepListItemType.STEP,
+            itemType: _isVirtSingleton ? SzResolutionStepListItemType.SINGLETON : SzResolutionStepListItemType.STEP,
           }, fStep) as SzResolutionStepNode);
-          finalStepAsStepNode.virtualEntityIds = [fVirt.virtualEntityId];
+          finalStepAsStepNode.virtualEntityIds = [fVirt.VIRTUAL_ENTITY_ID];
           finalStepAsStepNode.children.push(firstChild);
         }
         return finalStepAsStepNode;
@@ -507,13 +545,13 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
      * @param stepsByVirtualId map of ALL steps with their virtual id as the key
      * @returns 
      */
-    private getNestedStepNodesFromSteps(_rSteps: Array<SzResolutionStep>, stepsByVirtualId: Map<string, SzResolutionStep>, parentIsMerge?: boolean, parentIsFinal?: boolean): Array<SzResolutionStepNode> {
+    private getNestedStepNodesFromSteps(_rSteps: Array<SzSdkHowResolutionStep>, stepsByVirtualId: Map<string, SzSdkHowResolutionStep>, parentIsMerge?: boolean, parentIsFinal?: boolean): Array<SzResolutionStepNode> {
       let retVal:Array<SzResolutionStepNode> = [];
       if(!_rSteps) {
         _rSteps = this._resolutionSteps;
       }
       let sortByStepNumber = (a: SzResolutionStepNode, b: SzResolutionStepNode) => {
-        return (a.stepNumber > b.stepNumber) ? -1 : 1;
+        return (a.STEP > b.STEP) ? -1 : 1;
       }
       let collapseSteps = (virtualEntityIds: string[]) => {
         if(virtualEntityIds && virtualEntityIds.forEach) {
@@ -522,7 +560,7 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
           });
         }
       }
-      let createStacksForContiguousAddRecords = (_stepNodes: Array<SzResolutionStepNode | SzResolutionStep>): SzResolutionStepNode[] => {
+      let createStacksForContiguousAddRecords = (_stepNodes: Array<SzResolutionStepNode | SzSdkHowResolutionStep>): SzResolutionStepNode[] => {
         let itemsToRemove = [];
         //let addChildrenAtIndexPosition = -1;
         let stackToAddChildrenTo: SzResolutionStepNode;
@@ -541,11 +579,11 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
                 stackToAddChildrenTo.children = [sNode];
                 // clear out unused properties
                 stackToAddChildrenTo.stepType = undefined;
-                stackToAddChildrenTo.candidateVirtualEntity = undefined;
-                stackToAddChildrenTo.inboundVirtualEntity   = undefined;
+                //stackToAddChildrenTo.candidateVirtualEntity = undefined;
+                //stackToAddChildrenTo.inboundVirtualEntity   = undefined;
                 delete stackToAddChildrenTo.stepType;
-                delete stackToAddChildrenTo.candidateVirtualEntity;
-                delete stackToAddChildrenTo.inboundVirtualEntity;
+                //delete stackToAddChildrenTo.candidateVirtualEntity;
+                //delete stackToAddChildrenTo.inboundVirtualEntity;
                 // mark for deletion
                 //itemsToRemove.push(stepNode.id);
                 return stackToAddChildrenTo;
@@ -555,7 +593,7 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
               // append item to children
               stackToAddChildrenTo.children.push(sNode);
               // mark for deletion
-              let _idToDelete = (sNode as SzResolutionStepNode).id ? (sNode as SzResolutionStepNode).id : ((sNode as SzResolutionStep).resolvedVirtualEntityId);
+              let _idToDelete = (sNode as SzResolutionStepNode).id ? (sNode as SzResolutionStepNode).id : ((sNode as SzSdkHowResolutionStep).RESULT_VIRTUAL_ENTITY_ID);
               itemsToRemove.push(_idToDelete);
             }
           } else if(stackToAddChildrenTo) {
@@ -579,7 +617,7 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
         // check if we need to remove items that were moved to stack
         if(itemsToRemove && itemsToRemove.length > 0){
           _retVal = _retVal.filter((stepNode) => {
-            let _idOfStep = (stepNode as SzResolutionStepNode).id ? (stepNode as SzResolutionStepNode).id : ((stepNode as SzResolutionStep).resolvedVirtualEntityId);
+            let _idOfStep = (stepNode as SzResolutionStepNode).id ? (stepNode as SzResolutionStepNode).id : ((stepNode as SzSdkHowResolutionStep).RESULT_VIRTUAL_ENTITY_ID);
             return itemsToRemove.indexOf(_idOfStep) < 0 ;
           });
 
@@ -591,16 +629,23 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
         let stepsToTraverse = [];
         let stepType  = SzHowUIService.getResolutionStepCardType(step);
         let isMerge   = stepType === SzResolutionStepDisplayType.MERGE;
-        if(step && step.candidateVirtualEntity && !step.candidateVirtualEntity.singleton && stepsByVirtualId.has(step.candidateVirtualEntity.virtualEntityId)){
+      
+        if(step && step.VIRTUAL_ENTITY_1 && !SzHowUIService.isVirtualEntitySingleton(step.VIRTUAL_ENTITY_1) && stepsByVirtualId.has(step.VIRTUAL_ENTITY_1.VIRTUAL_ENTITY_ID)){
+          stepsToTraverse.push(stepsByVirtualId.get(step.VIRTUAL_ENTITY_1.VIRTUAL_ENTITY_ID));
+        }
+        if(step && step.VIRTUAL_ENTITY_2 && !SzHowUIService.isVirtualEntitySingleton(step.VIRTUAL_ENTITY_2) && stepsByVirtualId.has(step.VIRTUAL_ENTITY_2.VIRTUAL_ENTITY_ID)){
+          stepsToTraverse.push(stepsByVirtualId.get(step.VIRTUAL_ENTITY_2.VIRTUAL_ENTITY_ID));
+        }
+        /*if(step && step.candidateVirtualEntity && !step.candidateVirtualEntity.singleton && stepsByVirtualId.has(step.candidateVirtualEntity.virtualEntityId)){
           stepsToTraverse.push(stepsByVirtualId.get(step.candidateVirtualEntity.virtualEntityId));
         }
         if(step && step.inboundVirtualEntity && !step.inboundVirtualEntity.singleton && stepsByVirtualId.has(step.inboundVirtualEntity.virtualEntityId)){
           stepsToTraverse.push(stepsByVirtualId.get(step.inboundVirtualEntity.virtualEntityId));
-        }
+        }*/
         let isGroup = parentIsMerge ? true : false;
 
         let extendedNode: SzResolutionStepNode = Object.assign({
-          id: step.resolvedVirtualEntityId,
+          id: step.RESULT_VIRTUAL_ENTITY_ID,
           stepType: stepType,
           itemType: isGroup ? SzResolutionStepListItemType.GROUP : SzResolutionStepListItemType.STEP,
           isInterim: false
@@ -621,7 +666,7 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
             let stepChildren = this.getNestedStepNodesFromSteps(stepsToTraverse, stepsByVirtualId, isMerge);
             // for interim steps we need to add the step as a child of itself so it shows up INSIDE the group
             extendedNode.children   = [(Object.assign({
-              id: step.resolvedVirtualEntityId,
+              id: step.RESULT_VIRTUAL_ENTITY_ID,
               stepType: stepType,
               itemType: SzResolutionStepListItemType.STEP,
               isInterim: false
@@ -639,7 +684,7 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
               extendedNode.stepType   = SzResolutionStepDisplayType.FINAL;
               extendedNode.itemType   = SzResolutionStepListItemType.FINAL;
               extendedNode.children   = [(Object.assign({
-                id: step.resolvedVirtualEntityId,
+                id: step.RESULT_VIRTUAL_ENTITY_ID,
                 stepType: stepType,
                 itemType: SzResolutionStepListItemType.STEP,
                 isInterim: false
@@ -662,24 +707,24 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
           // then it's probably an interim with just one step(CREATE)
           // then add node as child of iteself
           extendedNode.children   = [(Object.assign({
-            id: step.resolvedVirtualEntityId,
+            id: step.RESULT_VIRTUAL_ENTITY_ID,
             stepType: stepType,
             itemType: SzResolutionStepListItemType.STEP,
             isInterim: false
           }, step) as SzResolutionStepNode)];
           retVal.push(extendedNode);
-          extendedNode.virtualEntityIds = [step.resolvedVirtualEntityId];
+          extendedNode.virtualEntityIds = [step.RESULT_VIRTUAL_ENTITY_ID];
         } else {
           if(parentIsFinal) { 
             // this is a final step node so append it to itself for display purposes
             let finalNode: SzResolutionStepNode = Object.assign({
-              id: step.resolvedVirtualEntityId,
+              id: step.RESULT_VIRTUAL_ENTITY_ID,
               stepType: SzResolutionStepDisplayType.FINAL,
               itemType: SzResolutionStepListItemType.FINAL,
               isInterim: false
             }, step);
             finalNode.children   = [(Object.assign({
-              id: step.resolvedVirtualEntityId,
+              id: step.RESULT_VIRTUAL_ENTITY_ID,
               stepType: stepType,
               itemType: SzResolutionStepListItemType.STEP,
               isInterim: false
@@ -710,13 +755,33 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
      * this data can then be used to populate any component or look up any components
      * displayed data at the source by its virtual entity id.
      */
-    private getVirtualEntityDataForSteps(resolutionSteps?: {[key: string]: SzResolutionStep}, finalVirtualEntities?: SzVirtualEntity[]): Observable<Map<string, SzResolvedVirtualEntity>> {
-      let _rParamsByVirtualEntityIds  = {};
+    private getVirtualEntityDataForSteps(resolutionSteps?: SzSdkHowResolutionStep[], finalVirtualEntities?: SzSdkVirtualEntity[]): Observable<Map<string, SzResolvedVirtualEntity>> {
+      let _rParamsByVirtualEntityIds: {[key: string]: Array<[string, string | number]>}  = {};
       let _responseSubject      = new Subject<Map<string, SzResolvedVirtualEntity>>();
       let _retObserveable       = _responseSubject.asObservable();
-      if(resolutionSteps){
+
+      let addParamsByVirtualEntityIdToMap = (virtualEntity: SzSdkVirtualEntity, mapToAddTo: {[key: string]: Array<[string, string | number]>}) => {
+        let _recordParamsForVirtualEntity: Array<[string, string | number]> = [];
+        virtualEntity.MEMBER_RECORDS.forEach((memberRecord) => {
+          _recordParamsForVirtualEntity = _recordParamsForVirtualEntity.concat(memberRecord.RECORDS.map((_record)=>{
+            return [_record.DATA_SOURCE, _record.RECORD_ID]
+          }));
+        });
+        mapToAddTo[ virtualEntity.VIRTUAL_ENTITY_ID ] = _recordParamsForVirtualEntity;
+        return mapToAddTo;
+      }
+
+      if(resolutionSteps && resolutionSteps.forEach){
+
+        resolutionSteps.forEach((_resolutionStep) => {
+          addParamsByVirtualEntityIdToMap(_resolutionStep.VIRTUAL_ENTITY_1, _rParamsByVirtualEntityIds);
+          addParamsByVirtualEntityIdToMap(_resolutionStep.VIRTUAL_ENTITY_2, _rParamsByVirtualEntityIds);
+        });
+        /*
         for(let rKey in resolutionSteps) {
-          _rParamsByVirtualEntityIds[ resolutionSteps[rKey].inboundVirtualEntity.virtualEntityId ] = resolutionSteps[rKey].inboundVirtualEntity.records.map((vRec: SzVirtualEntityRecord)=>{
+          //_rParamsByVirtualEntityIds[ _resolutionStep.VIRTUAL_ENTITY_1.VIRTUAL_ENTITY_ID ] = 
+
+          _resolutionStep.VIRTUAL_ENTITY_1.MEMBER_RECORDS.map((vRec: SzSdkVirtualEntityMemberRecord)=>{
             return {
                 src: vRec.dataSource,
                 id: vRec.recordId
@@ -729,15 +794,11 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
             } as SzRecordIdentifier
           });
         }
+        */
       }
       if(finalVirtualEntities) {
-        finalVirtualEntities.forEach((virtualEntity: SzVirtualEntity) => {
-          _rParamsByVirtualEntityIds[ virtualEntity.virtualEntityId ] = virtualEntity.records.map((vRec: SzVirtualEntityRecord)=>{
-            return {
-                src: vRec.dataSource,
-                id: vRec.recordId
-            } as SzRecordIdentifier
-          });
+        finalVirtualEntities.forEach((virtualEntity: SzSdkVirtualEntity) => {
+          addParamsByVirtualEntityIdToMap(virtualEntity, _rParamsByVirtualEntityIds);
         });
       }
       if(_rParamsByVirtualEntityIds && Object.keys(_rParamsByVirtualEntityIds).length > 0){
@@ -745,7 +806,15 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
         for(let virtualEntityId in _rParamsByVirtualEntityIds) {
           let szIdentifiersForVirtualEntity = _rParamsByVirtualEntityIds[virtualEntityId];
           //console.warn('rIds ??? ', szIdentifiersForVirtualEntity);
+          
           virtualRecordRequests.push(
+            SzHowUIService.getVirtualEntityByRecordIds(szIdentifiersForVirtualEntity)
+            .pipe(
+              takeUntil(this.unsubscribe$)
+            )
+          )
+          /*virtualRecordRequests.push(
+            
             this.entityDataService.getVirtualEntityByRecordIds(szIdentifiersForVirtualEntity, undefined, undefined, SzFeatureMode.ATTRIBUTED)
             .pipe(
               takeUntil(this.unsubscribe$),
@@ -755,16 +824,22 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
                 }, result.data.resolvedEntity);
               }))
             )
-          );
+
+          );*/
         }
-        let totalRequests = zip(...virtualRecordRequests).subscribe((_results: SzResolvedVirtualEntity[]) => {
+        let totalRequests = zip(...virtualRecordRequests).subscribe((_results: SzSdkResolvedEntity[]) => {
+          console.log(`getVirtualEntityDataForSteps: `, resolutionSteps, finalVirtualEntities);
+          console.log(`\tresponses: `, _results)
+        })
+
+        /*let totalRequests = zip(...virtualRecordRequests).subscribe((_results: SzResolvedVirtualEntity[]) => {
           let retVal  = new Map<string, SzResolvedVirtualEntity>();
           _results.forEach((virtualEntityResponse) => {
             retVal.set(virtualEntityResponse.virtualEntityId, virtualEntityResponse);
           });
           
           _responseSubject.next(retVal);
-        });
+        });*/
       }
       return _retObserveable;
     }

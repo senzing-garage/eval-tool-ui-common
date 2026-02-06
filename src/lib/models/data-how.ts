@@ -1,27 +1,33 @@
-import { SzResolutionStep, SzResolvedEntity, SzVirtualEntity, SzVirtualEntityRecord } from '@senzing/rest-api-client-ng';
+import { 
+    SzResolutionStep, 
+    //SzResolvedEntity, 
+    SzVirtualEntity, 
+    //SzVirtualEntityRecord 
+} from '@senzing/rest-api-client-ng';
 import { SzEntityMouseEvent } from './event-basic-event';
+import { SzSdkHowResolutionStep, SzSdkSearchResolvedEntity, SzSdkVirtualEntity, SzSdkVirtualEntityRecord } from './grpc/engine';
 /** when a user clicks a "more info" link on a step card this event 
  * extends a regular mouse click with how specific information.
 */
 export interface SzVirtualEntityRecordsClickEvent extends MouseEvent {
-    records?: Array<SzVirtualEntityRecord>,
+    records?: Array<SzSdkVirtualEntityRecord>,
     dataSourceName?: string
 }
 /** extends a resolved entity model with virtual entity properties to tie 
  * the two together.
  */
-export interface SzResolvedVirtualEntity extends SzResolvedEntity {
+export interface SzResolvedVirtualEntity extends SzSdkSearchResolvedEntity {
     virtualEntityId: string
 }
 /** used to categorize records in a virtual entity by their datasources */
 export interface SzVirtualEntityRecordsByDataSource {
-    [key: string]: Array<SzVirtualEntityRecord> 
+    [key: string]: Array<SzSdkVirtualEntityRecord> 
 }
 /** Common wrapper for extending data from a How step with UI specific features
  * and things like "children" for converting a flat dimensional step to a recursive 
  * heirarchal Tree of steps.
  */
-export interface SzResolutionStepNode extends SzResolutionStep, SzVirtualEntity {
+export interface SzResolutionStepNode extends SzSdkHowResolutionStep, SzSdkVirtualEntity {
     /** id of virtual entity or generated uuid */
     id: string,
     /** the ids of virtual entities found in children steps */
@@ -34,11 +40,11 @@ export interface SzResolutionStepNode extends SzResolutionStep, SzVirtualEntity 
     itemType?: SzResolutionStepListItemType,
     isInterim?: boolean,
     /** child steps that were used to make this step */
-    children?: Array<SzResolutionStepNode | SzResolutionStep>,
+    children?: Array<SzResolutionStepNode | SzSdkHowResolutionStep>,
     /** previous steps that were used to make this step */
-    ancestors?: Array<SzResolutionStepNode | SzResolutionStep>,
+    ancestors?: Array<SzResolutionStepNode | SzSdkHowResolutionStep>,
     /** child records pulled out of steps found in the `children` steps */
-    childRecords?: Array<SzVirtualEntityRecord>,
+    childRecords?: Array<SzSdkVirtualEntityRecord>,
     /** is this step a child of another step */
     isMemberOfGroup?: boolean,
     /** the id of the parent group */
@@ -46,7 +52,7 @@ export interface SzResolutionStepNode extends SzResolutionStep, SzVirtualEntity 
     /** the resolved virtual entity has much more information than a regular step 
      * and is more like an snapshot of an "entity" at a particular point in it's resolution
      */
-    resolvedVirtualEntity?: SzResolvedVirtualEntity
+    //resolvedVirtualEntity?: SzResolvedVirtualEntity
 }
 /** 
  * when a user clicks on a "how" button in the entity detail or in a search result 

@@ -35,6 +35,7 @@ import { SzSdkEntityRecord, SzSdkFindNetworkResponse } from '../../models/grpc/e
 import { SzRelatedEntityMatchLevel, SzResumeEntity, SzResumeRelatedEntity } from '../../models/SzResumeEntity';
 import { SzEntityDetailsSectionComponentGrpc } from './sz-entity-details-section/sz-entity-details-section.component';
 import { SzEntityDetailGraphComponent } from './sz-entity-detail-graph/sz-entity-detail-graph.component';
+import { V } from '@angular/cdk/scrolling-module.d-ud2XrbF8';
 
 /**
  * The Entity Detail Component.
@@ -1297,21 +1298,29 @@ export class SzEntityDetailGrpcComponent implements OnInit, OnDestroy, AfterView
     })
     if(this._entityId){
       // check to see if entity has how steps, if not disable how functions
-      this.howUIService.getHowDataForEntityViaGrpc(this._entityId).pipe(
+      this.howUIService.getHowDataForEntity(this._entityId).pipe(
         takeUntil(this.unsubscribe$),
         take(1)
       ).subscribe({
         next: (resp)=>{
-          let hasSteps = (resp && resp.data && resp.data.resolutionSteps && Object.keys(resp.data.resolutionSteps).length > 0);
-          let numberOfFinalStates = resp && resp.data && resp.data.finalStates && resp.data.finalStates.length ? resp.data.finalStates.length : 0
-          let isSingleton = (numberOfFinalStates === 1 && resp && resp.data && resp.data.finalStates && resp.data.finalStates[0]) ? resp.data.finalStates[0].singleton: false;
+          let result              = resp && resp.HOW_RESULTS ? resp.HOW_RESULTS : undefined;
+          let hasSteps            = result && result.RESOLUTION_STEPS && result.RESOLUTION_STEPS.length > 0;
+          let numberOfFinalStates = result && result.FINAL_STATE && result.FINAL_STATE.VIRTUAL_ENTITIES ? result.FINAL_STATE.VIRTUAL_ENTITIES.length : 0
+          let needsReEvaluation   = result && resp.HOW_RESULTS.FINAL_STATE && result.FINAL_STATE.NEED_REEVALUATION;
           
+          let isSingleton         = false;
+          if(numberOfFinalStates === 1) {
+            let finalStateHasSingleRecord = result.FINAL_STATE.VIRTUAL_ENTITIES.every((vEnt)=>{
+              return vEnt.MEMBER_RECORDS && vEnt.MEMBER_RECORDS.length === 1;
+            });
+            isSingleton = finalStateHasSingleRecord;
+          } 
+
           if(isSingleton) {
             // entity only has one record,
             // dont show re-eval
             _retObs.next([false, false]);
-          } else if (!hasSteps || numberOfFinalStates > 1){
-            // no resolution steps and more than one final state
+          } else if (needsReEvaluation){
             // needs re-evaluation
             _retObs.next([false, true]);
             //console.warn(`needs re-evaluation`);

@@ -12,6 +12,7 @@ import { SzPrefsService } from './sz-prefs.service';
 import { SzResolutionStepDisplayType, SzResolutionStepListItemType, SzResolutionStepNode } from '../models/data-how';
 import { SzGrpcEngineService } from './grpc/engine.service';
 import { SzGrpcConfigManagerService } from './grpc/configManager.service';
+import { SzSdkHowEntityResponse, SzSdkHowFeatureScore, SzSdkHowResolutionStep, SzSdkVirtualEntity, SzSdkVirtualEntityRecord } from '../models/grpc/engine';
 
 /**
  * Provides methods, eventing, and utilities used to display the 
@@ -217,7 +218,7 @@ export class SzHowUIService {
             return ((childNodeTypes && (_c as SzResolutionStepNode).itemType && childNodeTypes.includes((_c as SzResolutionStepNode).itemType)) || !childNodeTypes);
           }).forEach((_cn) => {
             // call expand for each child matching the type
-            this.expandNode(((_cn as SzResolutionStepNode).id ? (_cn as SzResolutionStepNode).id : _cn.resolvedVirtualEntityId), ((_cn as SzResolutionStepNode).itemType ? (_cn as SzResolutionStepNode).itemType : SzResolutionStepListItemType.STEP));
+            this.expandNode(((_cn as SzResolutionStepNode).id ? (_cn as SzResolutionStepNode).id : _cn.RESULT_VIRTUAL_ENTITY_ID), ((_cn as SzResolutionStepNode).itemType ? (_cn as SzResolutionStepNode).itemType : SzResolutionStepListItemType.STEP));
           });
         }
       });
@@ -271,7 +272,7 @@ export class SzHowUIService {
             // if so expand that one too
             if(_n.children && _n.children.length === 1) {                
               let childType = (_n.children[0] as SzResolutionStepNode).itemType ? (_n.children[0] as SzResolutionStepNode).itemType : SzResolutionStepListItemType.STEP;
-              let childId   = (_n.children[0] as SzResolutionStepNode).id ? (_n.children[0] as SzResolutionStepNode).id : _n.children[0].resolvedVirtualEntityId;
+              let childId   = (_n.children[0] as SzResolutionStepNode).id ? (_n.children[0] as SzResolutionStepNode).id : _n.children[0].RESULT_VIRTUAL_ENTITY_ID;
               this.expandNode(childId, childType);
             }
           }
@@ -343,9 +344,9 @@ export class SzHowUIService {
 
     if(!_stepNodes || (_stepNodes && _stepNodes.length <= 0)) { return undefined; }
     /** because "_stepNodes" is now fully nested we have to do a nested scan */
-    let _getStepNodeByIdRecursive = (stepNode: SzResolutionStepNode | SzResolutionStep) => {
-      let retVal: Array<SzResolutionStep | SzResolutionStepNode> = [];
-      let _id = stepNode && (stepNode as SzResolutionStepNode).id ? (stepNode as SzResolutionStepNode).id : (stepNode as SzResolutionStep).resolvedVirtualEntityId ;
+    let _getStepNodeByIdRecursive = (stepNode: SzResolutionStepNode | SzSdkHowResolutionStep) => {
+      let retVal: Array<SzSdkHowResolutionStep | SzResolutionStepNode> = [];
+      let _id = stepNode && (stepNode as SzResolutionStepNode).id ? (stepNode as SzResolutionStepNode).id : (stepNode as SzSdkHowResolutionStep).RESULT_VIRTUAL_ENTITY_ID ;
       if(_id === id) {
         // we found our huckleberry
         // we assign this to the "hoisted" retVal
@@ -388,8 +389,8 @@ export class SzHowUIService {
    * @param node current node who's children we should search through.
    * @returns array of step or step nodes
    */
-  private getChildrenContainingNode(id: string, node: SzResolutionStepNode): Array<SzResolutionStep | SzResolutionStepNode> {
-    let retVal: Array<SzResolutionStep | SzResolutionStepNode> = [];
+  private getChildrenContainingNode(id: string, node: SzResolutionStepNode): Array<SzSdkHowResolutionStep | SzResolutionStepNode> {
+    let retVal: Array<SzSdkHowResolutionStep | SzResolutionStepNode> = [];
 
     if(node && node.id === id){
       retVal.push((node as SzResolutionStepNode));
@@ -412,19 +413,7 @@ export class SzHowUIService {
    * entity came together.
    * @param entityId 
    */
-  public getHowDataForEntity(entityId: SzEntityIdentifier): Observable<SzHowEntityResponse> {
-    return this.engineDataService.howEntityByEntityId(
-        entityId as number
-    ).pipe(
-      tap((r) => {
-        // clear out any old data on response
-        this.clear();
-      })
-    )
-  }
-  
-  public getHowDataForEntityViaGrpc(entityId: SzEntityIdentifier): Observable<SzHowEntityResponse> {
-    
+  public getHowDataForEntity(entityId: SzEntityIdentifier): Observable<SzSdkHowEntityResponse> {
     return this.engineDataService.howEntityByEntityId(
         entityId as number
     ).pipe(
@@ -453,7 +442,7 @@ export class SzHowUIService {
       if(startingNode && startingNode.children && startingNode.children.some) {
         //has descendent
         let _dd = startingNode.children.some((_n) => {
-          return (_n as SzResolutionStepNode).id === childNodeId || _n.resolvedVirtualEntityId === childNodeId
+          return (_n as SzResolutionStepNode).id === childNodeId || _n.RESULT_VIRTUAL_ENTITY_ID === childNodeId
         });
         if(_dd) {
           retVal.push((startingNode as SzResolutionStepNode));
@@ -631,15 +620,15 @@ export class SzHowUIService {
         //console.log(`\t_parentGroup: `, _parentGroup);
         if(_stack && _parentGroup){
           // we can safely create new stacks, split by index
-          let itemsBeforeNode: (SzResolutionStepNode | SzResolutionStep)[]          = [];
-          let itemsAfterNode:  (SzResolutionStepNode | SzResolutionStep)[]          = [];
-          let itemsToRemoveFromStack:  (SzResolutionStepNode | SzResolutionStep)[]  = [];
+          let itemsBeforeNode: (SzResolutionStepNode | SzSdkHowResolutionStep)[]          = [];
+          let itemsAfterNode:  (SzResolutionStepNode | SzSdkHowResolutionStep)[]          = [];
+          let itemsToRemoveFromStack:  (SzResolutionStepNode | SzSdkHowResolutionStep)[]  = [];
           let _members              = Object.assign([], _stack.children);
           let _itemIndexInStack     = _members.findIndex((step) => {
-            return step.id ? step.id === vId : step.resolvedVirtualEntityId === vId ? true : false;
+            return step.id ? step.id === vId : step.RESULT_VIRTUAL_ENTITY_ID === vId ? true : false;
           });
           let _indexOfStackInParent = _parentGroup.children.findIndex((step) => {
-            return (step as SzResolutionStepNode).id ? (step as SzResolutionStepNode).id === _stack.id : step.resolvedVirtualEntityId === _stack.id ? true : false;
+            return (step as SzResolutionStepNode).id ? (step as SzResolutionStepNode).id === _stack.id : step.RESULT_VIRTUAL_ENTITY_ID === _stack.id ? true : false;
           });
           let itemToPin             = _members[_itemIndexInStack];
           if(_itemIndexInStack > -1) { 
@@ -652,7 +641,7 @@ export class SzHowUIService {
             // move current item to "after" the stack
             if(_indexOfStackInParent > -1) {
               itemToPin = Object.assign({
-                id: (itemToPin as SzResolutionStepNode).id ? (itemToPin as SzResolutionStepNode).id : itemToPin.resolvedVirtualEntityId,
+                id: (itemToPin as SzResolutionStepNode).id ? (itemToPin as SzResolutionStepNode).id : itemToPin.RESULT_VIRTUAL_ENTITY_ID,
                 itemType: (itemToPin as SzResolutionStepNode).itemType ? (itemToPin as SzResolutionStepNode).itemType : SzResolutionStepListItemType.STEP,
                 stepType: (itemToPin as SzResolutionStepNode).stepType ? (itemToPin as SzResolutionStepNode).stepType : SzHowUIService.getResolutionStepCardType(itemToPin)
               }, itemToPin);
@@ -667,7 +656,7 @@ export class SzHowUIService {
               // extend any items with the proper metadata
               itemsAfterNode = itemsAfterNode.map((_an) => {
                 return Object.assign({
-                  id: (_an as SzResolutionStepNode).id ? (_an as SzResolutionStepNode).id : _an.resolvedVirtualEntityId,
+                  id: (_an as SzResolutionStepNode).id ? (_an as SzResolutionStepNode).id : _an.RESULT_VIRTUAL_ENTITY_ID,
                   itemType: (_an as SzResolutionStepNode).itemType ? (_an as SzResolutionStepNode).itemType : SzResolutionStepListItemType.STEP,
                   stepType: (_an as SzResolutionStepNode).stepType ? (_an as SzResolutionStepNode).stepType : SzHowUIService.getResolutionStepCardType(itemToPin)
                 }, _an);
@@ -703,10 +692,10 @@ export class SzHowUIService {
             // remove any items from stack that have been moved
             if(itemsToRemoveFromStack && itemsToRemoveFromStack.length > 0) {
               let idsOfItemsToRemove = itemsToRemoveFromStack.map((_nr) => {
-                return (_nr as SzResolutionStepNode).id ? (_nr as SzResolutionStepNode).id : _nr.resolvedVirtualEntityId;
+                return (_nr as SzResolutionStepNode).id ? (_nr as SzResolutionStepNode).id : _nr.RESULT_VIRTUAL_ENTITY_ID;
               });
               _stack.children = _stack.children.filter((_nr) => {
-                return !idsOfItemsToRemove.includes(((_nr as SzResolutionStepNode).id ? (_nr as SzResolutionStepNode).id : _nr.resolvedVirtualEntityId));
+                return !idsOfItemsToRemove.includes(((_nr as SzResolutionStepNode).id ? (_nr as SzResolutionStepNode).id : _nr.RESULT_VIRTUAL_ENTITY_ID));
               });
               // if there is less than 2 items left in stack
               // convert from stack to single item
@@ -716,7 +705,7 @@ export class SzHowUIService {
                   ..._parentGroup.children.slice(0, _indexOfStackInParent),
                   ..._stack.children.map((_step) => {
                     return Object.assign({
-                      id: (_step as SzResolutionStepNode).id ? (_step as SzResolutionStepNode).id : _step.resolvedVirtualEntityId,
+                      id: (_step as SzResolutionStepNode).id ? (_step as SzResolutionStepNode).id : _step.RESULT_VIRTUAL_ENTITY_ID,
                       itemType: (_step as SzResolutionStepNode).itemType ? (_step as SzResolutionStepNode).itemType : SzResolutionStepListItemType.STEP,
                       stepType: (_step as SzResolutionStepNode).stepType ? (_step as SzResolutionStepNode).stepType : SzHowUIService.getResolutionStepCardType(_step)
                     }, _step);
@@ -776,10 +765,10 @@ export class SzHowUIService {
     let retVal = false;
     let parentNode = this.getParentContainingNode(vId);
     if(parentNode && parentNode.children) {
-      let itemsBeforeNode: (SzResolutionStepNode | SzResolutionStep)[]          = [];
-      let itemsAfterNode:  (SzResolutionStepNode | SzResolutionStep)[]          = [];
+      let itemsBeforeNode: (SzResolutionStepNode | SzSdkHowResolutionStep)[]          = [];
+      let itemsAfterNode:  (SzResolutionStepNode | SzSdkHowResolutionStep)[]          = [];
       let indexInParent = parentNode.children.findIndex((step) => {
-        return (step as SzResolutionStepNode).id ? (step as SzResolutionStepNode).id === vId : step.resolvedVirtualEntityId === vId ? true : false;
+        return (step as SzResolutionStepNode).id ? (step as SzResolutionStepNode).id === vId : step.RESULT_VIRTUAL_ENTITY_ID === vId ? true : false;
       });
       let itemNode = parentNode.children && parentNode.children.length >= indexInParent && parentNode.children[indexInParent] ? parentNode.children[indexInParent] : undefined;
       if(itemNode) {
@@ -852,10 +841,13 @@ export class SzHowUIService {
         console.log(`unPinStep: ${vId}`, parentNode, this._pinnedSteps);
       }
       if(parentNode && parentNode.children) {
-        let itemsBeforeNode: (SzResolutionStepNode | SzResolutionStep)[]          = [];
-        let itemsAfterNode:  (SzResolutionStepNode | SzResolutionStep)[]          = [];
+        //let itemsBeforeNode: (SzResolutionStepNode | SzResolutionStep)[]          = [];
+        //let itemsAfterNode:  (SzResolutionStepNode | SzResolutionStep)[]          = [];
+        let itemsBeforeNode: (SzResolutionStepNode | SzSdkHowResolutionStep)[]          = [];
+        let itemsAfterNode:  (SzResolutionStepNode | SzSdkHowResolutionStep)[]          = [];
+        
         let indexInParent = parentNode.children.findIndex((step) => {
-          return (step as SzResolutionStepNode).id ? (step as SzResolutionStepNode).id === vId : step.resolvedVirtualEntityId === vId ? true : false;
+          return (step as SzResolutionStepNode).id ? (step as SzResolutionStepNode).id === vId : step.RESULT_VIRTUAL_ENTITY_ID === vId ? true : false;
         });
         let itemNode = parentNode.children && parentNode.children.length >= indexInParent && parentNode.children[indexInParent] ? parentNode.children[indexInParent] : undefined;
         if(itemNode) {
@@ -1027,8 +1019,8 @@ export class SzHowUIService {
           if(itemsToRemoveFromParent && itemsToRemoveFromParent.length > 0) {
             let newChildren = parentNode.children.filter((_sn)=> {
               return !itemsToRemoveFromParent.some((itr) => {
-                let _mId =  itr.id ? itr.id : itr.resolvedVirtualEntityId;
-                return (_sn as SzResolutionStepNode).id ? (_sn as SzResolutionStepNode).id === _mId : _sn.resolvedVirtualEntityId === _mId;
+                let _mId =  itr.id ? itr.id : itr.RESULT_VIRTUAL_ENTITY_ID;
+                return (_sn as SzResolutionStepNode).id ? (_sn as SzResolutionStepNode).id === _mId : _sn.RESULT_VIRTUAL_ENTITY_ID === _mId;
               })
             });
             parentNode.children = newChildren
@@ -1068,11 +1060,67 @@ export class SzHowUIService {
    * entity came together.
    * @param entityId 
    */
-  public static getHowDataForEntity(entityId: SzEntityIdentifier): Observable<any> {
+  public static getHowDataForEntity(entityId: SzEntityIdentifier, flags?: BigInt | number): Observable<any> {
     return this._engineGrpcService.howEntityByEntityId(
-        entityId as number
+        entityId as number,
+        flags
     )
   }
+
+  public static getVirtualEntityByRecordIds(recordKeys: Array<[string, string | number]>, flags?: BigInt | number): Observable<any> {
+    return this._engineGrpcService.getVirtualEntityByRecordId(recordKeys, flags);
+  }
+
+  public static isAddRecordStep(step: SzSdkHowResolutionStep) {
+    return SzHowUIService.isMergeStep(step, true);
+  }
+
+  public static isVirtualEntityMergeStep(step: SzSdkHowResolutionStep) {
+    return SzHowUIService.isMergeStep(step, false);
+  }
+
+  public static isMergeStep(step: SzSdkHowResolutionStep, addRecordMerge = false) {
+    let isVirtualEntity1Singleton = SzHowUIService.isVirtualEntitySingleton(step.VIRTUAL_ENTITY_1); 
+    let isVirtualEntity2Singleton = SzHowUIService.isVirtualEntitySingleton(step.VIRTUAL_ENTITY_2);
+    if(!addRecordMerge) {
+      if(!(
+        isVirtualEntity1Singleton && 
+        isVirtualEntity2Singleton) &&
+        (isVirtualEntity1Singleton === false || isVirtualEntity2Singleton === false)
+      ) {
+        return true;
+      }
+      return false;
+    } else {
+      if(!(
+        isVirtualEntity1Singleton && 
+        isVirtualEntity2Singleton) &&
+        (isVirtualEntity1Singleton === true || isVirtualEntity2Singleton === true)
+      ) {
+        return true;
+      }
+      return false;
+    }
+    return false;
+  }
+  public static isCreateEntityStep(step: SzSdkHowResolutionStep) {
+    let isVirtualEntity1Singleton = SzHowUIService.isVirtualEntitySingleton(step.VIRTUAL_ENTITY_1); 
+    let isVirtualEntity2Singleton = SzHowUIService.isVirtualEntitySingleton(step.VIRTUAL_ENTITY_2);
+
+    if(isVirtualEntity1Singleton && isVirtualEntity2Singleton) {
+      return true;
+    }
+    return false
+  }
+
+  public static getFeatureScoreByType(featureKey: string, step: SzSdkHowResolutionStep)  {
+    let retVal: SzSdkHowFeatureScore[] = [];
+    if(step && step.FEATURE_SCORES && step.FEATURE_SCORES[ featureKey ]) {
+      return step.FEATURE_SCORES[ featureKey ];
+    }
+    return retVal;
+  }
+
   /**
    * Get the type of `CARD` that should be displayed. Possible results are: 
    * - `ADD` when a step added a singleton record to resolution
@@ -1082,20 +1130,20 @@ export class SzHowUIService {
    * - `MERGE` when two virtual entities are merged together to form a new virtual entity
    * @param step the resolution step 
    */
-  public static getResolutionStepCardType(step: SzResolutionStep, stepNumber?: number): SzResolutionStepDisplayType {
+  public static getResolutionStepCardType(step: SzSdkHowResolutionStep, stepNumber?: number): SzResolutionStepDisplayType {
     if(step && step !== undefined) {
       let _agg    = [];
       let _sngltn = [];
       //console.log(`#${stepNumber} getStepListItemType: `, step);
-      if(step.candidateVirtualEntity && step.candidateVirtualEntity.singleton) {
-        _sngltn.push(step.candidateVirtualEntity);
+      if(SzHowUIService.isVirtualEntitySingleton(step.VIRTUAL_ENTITY_1)) {
+        _sngltn.push(step.VIRTUAL_ENTITY_1);
       } else {
-        _agg.push(step.candidateVirtualEntity);
+        _agg.push(step.VIRTUAL_ENTITY_1);
       }
-      if(step.inboundVirtualEntity && step.inboundVirtualEntity.singleton) {
-        _sngltn.push(step.inboundVirtualEntity);
+      if(SzHowUIService.isVirtualEntitySingleton(step.VIRTUAL_ENTITY_2)) {
+        _sngltn.push(step.VIRTUAL_ENTITY_2);
       } else {
-        _agg.push(step.inboundVirtualEntity);
+        _agg.push(step.VIRTUAL_ENTITY_2);
       }
       if(_sngltn.length === 2) {
         // create virtual entity
@@ -1110,6 +1158,51 @@ export class SzHowUIService {
     }
     return undefined;
   }
+
+  public static getStepsByVirtualIds(steps: SzSdkHowResolutionStep[]): {[key: string]: SzSdkHowResolutionStep} {
+    let retVal = {};
+    if(steps && steps.length > 0 && steps.forEach) {
+      steps.forEach((step) => {
+        if(step.RESULT_VIRTUAL_ENTITY_ID) { 
+          retVal[ step.RESULT_VIRTUAL_ENTITY_ID ] = step;
+        }
+      });
+    }
+    return retVal;
+  }
+
+
+
+  public static isVirtualEntitySingleton(virtualEntity: SzSdkVirtualEntity): boolean {
+    let retVal = false;
+    if(virtualEntity && virtualEntity.MEMBER_RECORDS) {
+      if(virtualEntity.MEMBER_RECORDS.length === 1 && virtualEntity.MEMBER_RECORDS[0] && virtualEntity.MEMBER_RECORDS[0].RECORDS && virtualEntity.MEMBER_RECORDS[0].RECORDS.length === 1) {
+        // if there's only one record it's a singleton
+        retVal = true;
+        return retVal;
+      } else if(virtualEntity.MEMBER_RECORDS.length > 1) {
+        // check if ALL the records are identical
+        // map keys are "DATA_SOURCE/RECORD_ID" so if there's more than one unique 
+        // it's not a singleton
+        let DS_RECORD_MAP = new Map<string, SzSdkVirtualEntityRecord>();
+        virtualEntity.MEMBER_RECORDS.forEach((_MEMBER)=>{
+          _MEMBER.RECORDS.forEach((_VENT_RECORD) => {
+            let comboKey = _VENT_RECORD.DATA_SOURCE + _VENT_RECORD.RECORD_ID;
+            if(!DS_RECORD_MAP.has(comboKey)) {
+              DS_RECORD_MAP.set(comboKey, _VENT_RECORD);
+            }
+          });
+        });
+        if(DS_RECORD_MAP && DS_RECORD_MAP.size === 1) {
+          retVal = true;
+          return retVal;
+        }
+      }
+      //virtualEntity.MEMBER_RECORDS
+    }
+    return retVal;
+  }
+
   /**
    * Used to get the `itemType` of a node or step. Potential results are:
    * - `FINAL` a card representing a final result of previous steps that resulted in a entity.
@@ -1119,7 +1212,7 @@ export class SzHowUIService {
    * - `STEP` an individual card that has no child items.
    * @param item 
    */
-  public static getResolutionStepListItemType(item: SzResolutionStep | SzResolutionStepNode): SzResolutionStepListItemType {
+  public static getResolutionStepListItemType(item: SzSdkHowResolutionStep | SzResolutionStepNode): SzResolutionStepListItemType {
     if(item && item !== undefined) {
       let itemIsGroup   = (item as SzResolutionStepNode).virtualEntityIds && (item as SzResolutionStepNode).itemType ===  SzResolutionStepListItemType.GROUP ? true : false;
       let itemsIsStack  = (item as SzResolutionStepNode).virtualEntityIds && (item as SzResolutionStepNode).itemType ===  SzResolutionStepListItemType.STACK && !itemIsGroup ? true : false;
@@ -1149,7 +1242,7 @@ export class SzHowUIService {
 
     if(isNested) {
       // this is already a sub-child make sure id is in return value
-      retVal.push(step.id ? step.id : step.resolvedVirtualEntityId);
+      retVal.push(step.id ? step.id : step.RESULT_VIRTUAL_ENTITY_ID);
     }
     if(step && step.children && step.children.map) {
       retVal = retVal.concat(step.children.map(this.getVirtualEntityIdsForNode.bind(this, true)));
@@ -1167,7 +1260,7 @@ export class SzHowUIService {
     
     if(_rStep && _rStep.children) {
       _rStep.children.forEach((sNode, ind)=>{
-        let idToAdd = (sNode as SzResolutionStepNode).id ? (sNode as SzResolutionStepNode).id : (sNode as SzResolutionStep).resolvedVirtualEntityId;
+        let idToAdd = (sNode as SzResolutionStepNode).id ? (sNode as SzResolutionStepNode).id : (sNode as SzSdkHowResolutionStep).RESULT_VIRTUAL_ENTITY_ID;
         retVal.push(idToAdd);
 
         let childrenOfChildIds = this.getVirtualEntityIdsForNode((sNode as SzResolutionStepNode));
@@ -1190,7 +1283,7 @@ export class SzHowUIService {
     let retVal: string[] = [];
     if(isNested) {
       // this is already a sub-child make sure id is in return value
-      retVal.push(step.id ? step.id : step.resolvedVirtualEntityId);
+      retVal.push(step.id ? step.id : step.RESULT_VIRTUAL_ENTITY_ID);
     }
     if(step && step.children && step.children.map) {
       retVal = retVal.concat(
