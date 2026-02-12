@@ -3754,7 +3754,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
                 parseSzIdentifier(focalEnt) === parseSzIdentifier(relatedEntityId));
             }) ? true : false;
           }
-          let _relatedMatchCategory = SzRelationshipNetworkComponent.tokenizeMatchKey(relatedEntity.matchKey);
+          let _relatedMatchCategory = SzRelationshipNetworkComponent.tokenizeMatchKey(relatedEntity.MATCH_KEY);
           // match key tokens grouped by 'DERIVED' and 'DISCLOSED'
           let relatedMatchKeyCategories                 = _relatedMatchCategory;
           // flattened array of match key tokens
@@ -3798,7 +3798,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
               targetEntityId: relatedEntityId,
               touchesFocalEntity: isRelatedToFocalEntity,
               matchLevel: relatedEntity.matchLevel,
-              matchKey: relatedEntity.matchKey,
+              matchKey: relatedEntity.MATCH_KEY,
               matchKeyTokens: relatedMatchKeyCategories,
               matchKeyTokensFlat: _matchKeyTokensFlattened,
               relatedMatchKeyCategories: _relatedMatchCategory,
@@ -3814,7 +3814,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
               targetEntityId: relatedEntityId,
               touchesFocalEntity: isRelatedToFocalEntity,
               matchLevel: relatedEntity.matchLevel,
-              matchKey: relatedEntity.matchKey,
+              matchKey: relatedEntity.MATCH_KEY,
               matchKeyTokens: relatedMatchKeyCategories,
               matchKeyTokensFlat: _matchKeyTokensFlattened,
               relatedMatchKeyCategories: _relatedMatchCategory,
