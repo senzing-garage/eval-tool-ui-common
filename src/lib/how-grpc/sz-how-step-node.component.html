@@ -1,10 +1,9 @@
 <ul [class.tree]="isFinal" *ngIf="isFinal">
     <li class="top-level" *ngIf="isFinal">
-        final entity card
-        <!--<sz-how-final-entity-card
-        [attr.virtual-id]="data.resolvedVirtualEntityId"
-        [data]="data"
-        [virtualEntitiesById]="virtualEntitiesById"></sz-how-final-entity-card>-->
+        <sz-how-final-entity-card
+        [attr.virtual-id]="data.RESULT_VIRTUAL_ENTITY_ID"
+        [data]="dataAsNode"
+        [virtualEntitiesById]="virtualEntitiesById"></sz-how-final-entity-card>
     </li>
     <li class="top-level-children">
         <ul class="hide-on-group-collapsed" *ngIf="hasChildren && !isStack">

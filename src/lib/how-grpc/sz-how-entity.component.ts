@@ -27,8 +27,9 @@ import {
   SzSdkHowEntityResponse, 
   SzSdkHowEntityResults, 
   SzSdkHowResolutionStep, 
-  SzSdkResolvedEntity, 
-  SzSdkVirtualEntity, 
+  SzSdkEntityResponse,
+  SzSdkResolvedEntity,
+  SzSdkVirtualEntity,
   SzSdkVirtualEntityMemberRecord,
   SzSdkVirtualEntityRecord
 } from '../models/grpc/engine';
@@ -807,36 +808,22 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
           virtualRecordRequests.push(
             SzHowUIService.getVirtualEntityByRecordIds(szIdentifiersForVirtualEntity)
             .pipe(
-              takeUntil(this.unsubscribe$)
-            )
-          )
-          /*virtualRecordRequests.push(
-            
-            this.entityDataService.getVirtualEntityByRecordIds(szIdentifiersForVirtualEntity, undefined, undefined, SzFeatureMode.ATTRIBUTED)
-            .pipe(
               takeUntil(this.unsubscribe$),
-              map(((result: SzVirtualEntityResponse) => {
+              map((result: SzSdkEntityResponse) => {
                 return Object.assign({
                   virtualEntityId: virtualEntityId
-                }, result.data.resolvedEntity);
-              }))
+                }, result.RESOLVED_ENTITY) as SzResolvedVirtualEntity;
+              })
             )
-
-          );*/
+          )
         }
-        let totalRequests = zip(...virtualRecordRequests).subscribe((_results: SzSdkResolvedEntity[]) => {
-          console.log(`getVirtualEntityDataForSteps: `, resolutionSteps, finalVirtualEntities);
-          console.log(`\tresponses: `, _results)
-        })
-
-        /*let totalRequests = zip(...virtualRecordRequests).subscribe((_results: SzResolvedVirtualEntity[]) => {
+        let totalRequests = zip(...virtualRecordRequests).subscribe((_results: SzResolvedVirtualEntity[]) => {
           let retVal  = new Map<string, SzResolvedVirtualEntity>();
           _results.forEach((virtualEntityResponse) => {
             retVal.set(virtualEntityResponse.virtualEntityId, virtualEntityResponse);
           });
-          
           _responseSubject.next(retVal);
-        });*/
+        });
       }
       return _retObserveable;
     }
