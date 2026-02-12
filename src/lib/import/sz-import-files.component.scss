@@ -1,5 +1,5 @@
 @use '@angular/material' as mat;
-@import '../scss/import-datagrid.scss';
+@use '../scss/import-datagrid.scss' as *;
 
 :host-context {
   @include mat.theme((

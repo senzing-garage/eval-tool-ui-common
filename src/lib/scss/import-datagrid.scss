@@ -1,4 +1,4 @@
-@import '_datagrid.scss';
+@use 'datagrid' as *;
 
 :host-context .sz-import-files {
     border: 2px solid blue;
