@@ -112,9 +112,9 @@ export { SzWhyEntitiesDialog } from './lib/why/sz-why-entities.component';
 export { SzHowEntityGrpcComponent } from './lib/how-grpc/sz-how-entity.component';
 export { SzHowStepNodeComponent } from './lib/how-grpc/sz-how-step-node.component'
 export { SzHowFinalEntityCardComponent } from './lib/how-grpc/cards/sz-how-final-entity-card.component';
-//export { SzHowSingletonCardComponent } from './lib/how-grpc/cards/sz-how-singleton-card.component';
+export { SzHowSingletonCardComponent } from './lib/how-grpc/cards/sz-how-singleton-card.component';
 export { SzHowStepCardComponent } from './lib/how-grpc/cards/sz-how-step-card.component';
-//export { SzHowStepStackComponent } from './lib/how-grpc/sz-how-step-stack.component';
+export { SzHowStepStackComponent } from './lib/how-grpc/sz-how-step-stack.component';
 export { SzHowNavComponent } from './lib/how-grpc/sz-how-nav.component';
 //export { SzHowVirtualEntityCardComponent } from './lib/how/cards/sz-how-virtual-entity-card.component';
 //export { SzHowVirtualEntityDialog } from './lib/how/sz-how-virtual-entity-dialog.component';

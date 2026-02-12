@@ -5,7 +5,9 @@ import { SzHowUIService } from '../services/sz-how-ui.service';
 import { CommonModule } from '@angular/common';
 import { SzSdkHowResolutionStep } from '../models/grpc/engine';
 import { SzHowFinalEntityCardComponent } from './cards/sz-how-final-entity-card.component';
+import { SzHowSingletonCardComponent } from './cards/sz-how-singleton-card.component';
 import { SzHowStepCardComponent } from './cards/sz-how-step-card.component';
+import { SzHowStepStackComponent } from './sz-how-step-stack.component';
 
 /**
  * Represents a step node in a How Report. Step Nodes wrap Step cards
@@ -28,8 +30,10 @@ import { SzHowStepCardComponent } from './cards/sz-how-step-card.component';
     imports: [
         CommonModule,
         SzHowFinalEntityCardComponent,
+        SzHowSingletonCardComponent,
         SzHowStepCardComponent,
-        SzHowStepNodeComponent
+        SzHowStepNodeComponent,
+        SzHowStepStackComponent
     ]
 })
 export class SzHowStepNodeComponent implements OnInit, OnDestroy {
