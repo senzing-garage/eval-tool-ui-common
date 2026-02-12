@@ -54,6 +54,7 @@ export class SzCrossSourceStatistics implements OnInit, AfterViewInit, OnDestroy
   /** subscription to notify subscribers to unbind */
   public unsubscribe$ = new Subject<void>();
 
+  private _excludedDataSources: string[] = [];
   private _disableClickingOnZeroResults = true;
   private _isLoading = false;
   private _showTable    = false;
@@ -72,6 +73,12 @@ export class SzCrossSourceStatistics implements OnInit, AfterViewInit, OnDestroy
   /** if set to false no loading spinner for the table will be shown */
   @Input() set showTableLoadingSpinner(value: boolean | string) {
     this._showTableLoadingSpinner = parseBool(value);
+  }
+  @Input() set ignore(value: string[]) {
+    this._excludedDataSources = value || [];
+  }
+  public get excludedDataSources(): string[] {
+    return this._excludedDataSources;
   }
   /** whether or not to disable clicking on venn diagrams with "0" results */
   @Input() set disableClickingOnZeroResults(value: boolean | string) {

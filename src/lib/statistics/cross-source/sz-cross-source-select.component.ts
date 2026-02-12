@@ -41,6 +41,7 @@ export class SzCrossSourceSelectComponent implements OnInit, AfterViewInit, OnDe
   private _defaultFromDataSource: string | undefined;
   private _defaultToDataSource: string | undefined;
   private _dataSources : SzSdkDataSource[] = [];
+  private _hiddenDataSources: string[] = [];
   private _fromDataSources: {name: string, connectionCount: number}[] = [];
   private _toDataSources: {name: string, connectionCount: number}[]   = [];
   private dataSourceLookup : { [code: string]: string } = {};
@@ -56,6 +57,9 @@ export class SzCrossSourceSelectComponent implements OnInit, AfterViewInit, OnDe
   }
 
   public get dataSources() : SzSdkDataSource[] {
+    if (this._hiddenDataSources.length > 0) {
+      return this._dataSources.filter(ds => !this._hiddenDataSources.includes(ds.DSRC_CODE));
+    }
     return this._dataSources;
   }
 
@@ -88,6 +92,10 @@ export class SzCrossSourceSelectComponent implements OnInit, AfterViewInit, OnDe
   @Input("default-from-data-source")
   public set defaultFromDataSource(source: string) {
     this._defaultFromDataSource = source;
+  }
+
+  @Input() public set ignore(value: string[]) {
+    this._hiddenDataSources = value ? value.map(s => s.toUpperCase()) : [];
   }
 
   public get toDataSource(): string | null {
@@ -221,15 +229,18 @@ export class SzCrossSourceSelectComponent implements OnInit, AfterViewInit, OnDe
     }
   }
   private regenerateDataSourceLists(value: SzSdkDataSource[]) {
+    const filtered = this._hiddenDataSources.length > 0
+      ? value.filter(ds => !this._hiddenDataSources.includes(ds.DSRC_CODE))
+      : value;
     // regenerate toDataSources
-    this._toDataSources = value.map((ds: SzSdkDataSource) => {
+    this._toDataSources = filtered.map((ds: SzSdkDataSource) => {
       return {
         name: ds.DSRC_CODE,
         connectionCount: this.getDiscoveredConnectionCount(ds.DSRC_CODE, this.fromDataSource)
       }
     });
     // regenerate fromDataSources
-    this._fromDataSources = value.map((ds: SzSdkDataSource) => {
+    this._fromDataSources = filtered.map((ds: SzSdkDataSource) => {
       return {
         name: ds.DSRC_CODE,
         connectionCount: this.getDiscoveredConnectionCount(ds.DSRC_CODE, this.toDataSource)
