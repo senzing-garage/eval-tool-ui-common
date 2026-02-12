@@ -504,7 +504,8 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
         stepsByVirtualId.set(rStep.RESULT_VIRTUAL_ENTITY_ID, rStep);
       });
       let retVal: SzResolutionStepNode[] = finalStates.map((fVirt)=>{
-        let fStep = rSteps[fVirt.VIRTUAL_ENTITY_ID] ? rSteps[fVirt.VIRTUAL_ENTITY_ID] : fVirt;
+        let _matchingStep = stepsByVirtualId.get(fVirt.VIRTUAL_ENTITY_ID);
+        let fStep = _matchingStep ? _matchingStep : fVirt;
         // initialize final step as a stepNode
         let finalStepAsStepNode: SzResolutionStepNode = Object.assign({
           id: fVirt.VIRTUAL_ENTITY_ID,
@@ -514,16 +515,16 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
         }, fStep);
 
         // if we can traverse then do it
-        if(rSteps[fVirt.VIRTUAL_ENTITY_ID]) {
+        if(_matchingStep) {
           // this will only ever return "1" top level item since that's all we're passing in
-          finalStepAsStepNode = this.getNestedStepNodesFromSteps([rSteps[fVirt.VIRTUAL_ENTITY_ID]], stepsByVirtualId, false, true)[0];
+          finalStepAsStepNode = this.getNestedStepNodesFromSteps([_matchingStep], stepsByVirtualId, false, true)[0];
         } else {
           // otherwise append final state as child of itself
           // since it is an expandable node
           let _isVirtSingleton = SzHowUIService.isVirtualEntitySingleton(fVirt);
           let firstChild = (Object.assign({
             id: fVirt.VIRTUAL_ENTITY_ID,
-            stepType: _isVirtSingleton ? SzResolutionStepDisplayType.SINGLETON: rSteps[fVirt.VIRTUAL_ENTITY_ID] ? SzHowUIService.getResolutionStepCardType(stepsByVirtualId.get(fVirt.VIRTUAL_ENTITY_ID)) : SzResolutionStepListItemType.STEP,
+            stepType: _isVirtSingleton ? SzResolutionStepDisplayType.SINGLETON: _matchingStep ? SzHowUIService.getResolutionStepCardType(_matchingStep) : SzResolutionStepListItemType.STEP,
             itemType: _isVirtSingleton ? SzResolutionStepListItemType.SINGLETON : SzResolutionStepListItemType.STEP,
           }, fStep) as SzResolutionStepNode);
           finalStepAsStepNode.virtualEntityIds = [fVirt.VIRTUAL_ENTITY_ID];
