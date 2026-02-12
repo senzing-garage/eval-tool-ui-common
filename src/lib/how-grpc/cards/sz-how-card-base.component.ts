@@ -1,9 +1,11 @@
-import { Component, OnInit, Input, OnDestroy, Output, EventEmitter, HostBinding, inject } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy, Output, EventEmitter, ElementRef, HostBinding, inject } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { SzResolutionStepListItemType, SzResolutionStepDisplayType, SzResolutionStepNode, SzResolvedVirtualEntity } from '../../models/data-how';
 import { SzSdkHowFeatureScore, SzSdkHowResolutionStep, SzSdkSearchRecordSummary, SzSdkVirtualEntity, SzSdkVirtualEntityRecord } from '../../models/grpc/engine';
 import { Subject } from 'rxjs';
 import { SzHowUIService } from '../../services/sz-how-ui.service';
 import { SzPrefsService } from '../../services/sz-prefs.service';
+import { SzHowVirtualEntityDialog } from '../sz-how-virtual-entity-dialog.component';
 
 /** @internal extends a feature score with the feature type key */
 export interface SzHowFeatureScoreRow extends SzSdkHowFeatureScore {
@@ -35,6 +37,7 @@ export class SzHowStepCardBase implements OnInit, OnDestroy {
     protected _sourceAndRecordCount: {records: number, dataSources: number};
 
     protected prefs = inject(SzPrefsService, {optional: true});
+    protected dialog = inject(MatDialog);
 
     // ----------------------------------- css classes -----------------------------------
     @HostBinding('class.collapsed') get cssHiddenClass(): boolean {
@@ -131,8 +134,18 @@ export class SzHowStepCardBase implements OnInit, OnDestroy {
         this.howUIService.unPinStep(this.id);
     }
     public openVirtualEntityDialog(evt: any) {
-        // TODO: migrate SzHowVirtualEntityDialog to gRPC
-        console.log('openVirtualEntityDialog: ', evt, this.resolvedVirtualEntity, this._data);
+        let targetEle = new ElementRef(evt.target);
+        const dialogRef = this.dialog.open(SzHowVirtualEntityDialog, {
+            panelClass: 'how-virtual-entity-dialog-panel',
+            hasBackdrop: false,
+            data: {
+                target: targetEle,
+                virtualEntity: this.resolvedVirtualEntity,
+                stepData: this._data,
+                featureOrder: this.howUIService.orderedFeatures,
+                event: evt
+            }
+        });
     }
 
     // ------------------------------ getters and setters -----------------------------

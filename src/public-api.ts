@@ -116,8 +116,8 @@ export { SzHowSingletonCardComponent } from './lib/how-grpc/cards/sz-how-singlet
 export { SzHowStepCardComponent } from './lib/how-grpc/cards/sz-how-step-card.component';
 export { SzHowStepStackComponent } from './lib/how-grpc/sz-how-step-stack.component';
 export { SzHowNavComponent } from './lib/how-grpc/sz-how-nav.component';
-//export { SzHowVirtualEntityCardComponent } from './lib/how/cards/sz-how-virtual-entity-card.component';
-//export { SzHowVirtualEntityDialog } from './lib/how/sz-how-virtual-entity-dialog.component';
+export { SzHowVirtualEntityCardComponent } from './lib/how-grpc/cards/sz-how-virtual-entity-card.component';
+export { SzHowVirtualEntityDialog } from './lib/how-grpc/sz-how-virtual-entity-dialog.component';
 /** --------------------------   Data Mart -------------------------- */
 export * from './lib/services/http/sz-datamart-environment';
 export { SzSummaryStats } from './lib/services/http/models/szSummaryStats';
