@@ -41,7 +41,9 @@ sz-how-nav, .sz-how-nav {
         .mdc-checkbox__background {
             top: 0;
             left: 0;
-            background-color: #fff !important;
+        }
+        &:not(.mdc-checkbox--selected) .mdc-checkbox__background {
+            background-color: #fff;
         }
         .mat-mdc-checkbox-touch-target {
             width: 18px;
