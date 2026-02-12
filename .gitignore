@@ -20,6 +20,7 @@ sdk-components-grpc-web.iml
 
 # Testing
 /docs/coverage
+/test-results
 
 # IDE - VSCode
 .vscode/*
