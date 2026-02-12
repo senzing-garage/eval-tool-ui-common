@@ -87,3 +87,9 @@ sz-venn-diagram button.count-button {
         }
     }
 }
+/* styling for the venn diagram mat-menu-item pulldown overlays */
+.data-source-menu {
+    .connection-count {
+        float: right;
+    }
+}
