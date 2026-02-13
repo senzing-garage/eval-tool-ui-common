@@ -225,8 +225,8 @@ export class SzEntityDetailHeaderComponentGrpc implements OnInit, OnDestroy {
       if(iconType && iconType !== undefined){
         if (iconType === 'business') {
           iconClasses.push('company');
-        } else if (iconType === 'userFemale' || iconType === 'userMale') {
-          iconClasses.push( (gender == 'F' || iconType === 'userFemale' ? 'female' : 'male') );
+        } else if (iconType === 'person') {
+          iconClasses.push( gender == 'F' ? 'female' : 'male' );
           iconClasses.push('icon-flip');
         } else if (iconType === 'default') {
           iconClasses.push('default'); iconClasses.push('icon-flip');

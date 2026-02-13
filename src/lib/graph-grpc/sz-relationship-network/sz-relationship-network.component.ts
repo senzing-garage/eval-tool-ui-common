@@ -78,6 +78,43 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
         {'type': 'path',    attrs: {'d': 'M 23.829 1.105 L 23.664 12.779',  'style':'stroke-width: 2px;'}}
       ]
     },
+    person: {
+      transform: "translate(-24, -24)",
+      enclosure: {
+        'type': 'path',
+        attrs: {
+          'd': 'M 45.427 35.905 L 23.935 48.31 L 2.427 35.905 L 2.412 11.095 L 23.904 -1.31 L 45.412 11.095 Z',
+          'style':"stroke-width: 0;"
+        }
+      },
+      shapes: [
+        {
+          'type':'circle',
+          attrs: {
+            'style':"stroke-width: 2px;",
+            'class': 'sz-graph-node-icon-colored sz-graph-node-icon-fill',
+            'cx':"23.746",
+            'cy':"23.059",
+            'r':"16",
+          }
+        },
+        {
+          'type':'path',
+          attrs: {
+            'd': 'M391.8 374.1c-22.7-8.6-59.5-21.2-82.4-28-2.4-.7-2.7-.9-2.7-10.7 0-8.1 3.3-16.3 6.6-23.3 3.6-7.5 7.7-20.2 9.2-31.6 4.2-4.9 10-14.5 13.6-32.9 3.2-16.2 1.7-22.1-.4-27.6-.2-.6-.5-1.2-.6-1.7-.8-3.8.3-23.5 3.1-38.8 1.9-10.5-.5-32.8-14.9-51.3-9.1-11.7-26.6-26-58.5-28h-17.5c-31.4 2-48.8 16.3-58 28-14.5 18.5-16.9 40.8-15 51.3 2.8 15.3 3.9 35 3.1 38.8-.2.7-.4 1.2-.6 1.8-2.1 5.5-3.7 11.4-.4 27.6 3.7 18.4 9.4 28 13.6 32.9 1.5 11.4 5.7 24 9.2 31.6 2.6 5.5 3.8 13 3.8 23.6 0 9.9-.4 10-2.6 10.7-23.7 7-58.9 19.4-80 27.8Z',
+            'style':'fill: #6b6b6b; fill-opacity: 0.8; stroke: none;',
+            'transform': 'translate(2, 1.6) scale(0.085)'
+          }
+        },
+        {
+          'type': 'path',
+          attrs: {
+            'd': 'M 45.427 35.905 L 23.935 48.31 L 2.427 35.905 L 2.412 11.095 L 23.904 -1.31 L 45.412 11.095 Z',
+            'style':"fill: none; stroke-width: 4px; stroke-linecap: butt; stroke-linejoin: miter;"
+          }
+        }
+      ]
+    },
     business: {
       transform: "translate(-24, -24)",
       enclosure: {
@@ -2364,6 +2401,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
           // --- render person nodes
 
             let businessNodes = _newNodes.filter(d => d.iconType === "business");
+            let personNodes   = _newNodes.filter(d => d.iconType === "person");
             let genericNodes  = _newNodes.filter(d => d.iconType === "default")
             
             let _appendIconsForNodes = (_nodeList, _iconType) => {
@@ -2422,6 +2460,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
 
             // add icons for generic nodes
             _appendIconsForNodes(genericNodes, 'default');
+            _appendIconsForNodes(personNodes, 'person');
             _appendIconsForNodes(businessNodes, 'business');
           
           // --- render business nodes
@@ -3842,23 +3881,18 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
   }
 
   static getIconType(resolvedEntity: SzSdkResolvedEntity) {
-    //console.log(`getIconType(${resolvedEntity.entityId})`);
-    let retVal = 'default';
-    if(resolvedEntity.IS_BUSINESS) {
-      retVal = 'business';
+    if(resolvedEntity && resolvedEntity.FEATURES && resolvedEntity.FEATURES['RECORD_TYPE']) {
+      const recordTypes = resolvedEntity.FEATURES['RECORD_TYPE'];
+      if(recordTypes && recordTypes.length > 0) {
+        const firstType = recordTypes[0]?.FEAT_DESC || recordTypes[0]?.FEAT_DESC_VALUES?.[0]?.FEAT_DESC;
+        if(firstType === 'PERSON') {
+          return 'person';
+        } else if(firstType === 'ORGANIZATION') {
+          return 'business';
+        }
+      }
     }
-    if(resolvedEntity && resolvedEntity.RECORDS) {
-      resolvedEntity.RECORDS.slice(0, 9).forEach(element => {
-        /*if(element.NAMEORG || (element.FEATURES && element.FEATURES["ADDRESS"] && element.FEATURES["ADDRESS"].some((addr) => addr..indexOf('BUSINESS') > -1))) {
-          retVal = 'business';
-        }*//* else if(element.gender && (element.gender === 'FEMALE' || element.gender === 'F') ) {
-          retVal = 'userFemale';
-        } else if(element.gender && (element.gender === 'MALE' || element.gender === 'M') ) {
-          retVal = 'userMale';
-        }*/
-      });
-    }
-    return retVal;
+    return 'default';
   }
 
   /**
