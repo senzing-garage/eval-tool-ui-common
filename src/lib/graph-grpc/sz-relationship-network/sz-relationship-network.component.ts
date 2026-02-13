@@ -2401,7 +2401,6 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
           // --- render person nodes
 
             let businessNodes = _newNodes.filter(d => d.iconType === "business");
-            let personNodes   = _newNodes.filter(d => d.iconType === "person");
             let genericNodes  = _newNodes.filter(d => d.iconType === "default")
             
             let _appendIconsForNodes = (_nodeList, _iconType) => {
@@ -2460,7 +2459,6 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
 
             // add icons for generic nodes
             _appendIconsForNodes(genericNodes, 'default');
-            _appendIconsForNodes(personNodes, 'person');
             _appendIconsForNodes(businessNodes, 'business');
           
           // --- render business nodes
@@ -3885,9 +3883,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
       const recordTypes = resolvedEntity.FEATURES['RECORD_TYPE'];
       if(recordTypes && recordTypes.length > 0) {
         const firstType = recordTypes[0]?.FEAT_DESC || recordTypes[0]?.FEAT_DESC_VALUES?.[0]?.FEAT_DESC;
-        if(firstType === 'PERSON') {
-          return 'person';
-        } else if(firstType === 'ORGANIZATION') {
+        if(firstType === 'ORGANIZATION') {
           return 'business';
         }
       }
