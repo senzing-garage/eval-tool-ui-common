@@ -2005,7 +2005,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
         _nodes.on('mouseover.tooltip', function (event, d,j) {
           _tooltip.transition()
             .duration(300)
-            .style("opacity", .8);
+            .style("opacity", 1);
           _tooltip.html(SzRelationshipNetworkComponent.nodeTooltipText(d))
             .style("left", (event.pageX) + "px")
             .style("top", (event.pageY + 10) + "px");
@@ -2062,7 +2062,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
         _links.on('mouseover.tooltip', function (event, d) {
           _tooltip.transition()
             .duration(300)
-            .style("opacity", .8);
+            .style("opacity", 1);
           _tooltip.html(SzRelationshipNetworkComponent.linkTooltipText(d))
             .style("left", (event.pageX) + "px")
             .style("top", (event.pageY + 10) + "px");
@@ -2085,7 +2085,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
         .on('mouseover.tooltip', function (event, d) {
           _tooltip.transition()
             .duration(300)
-            .style("opacity", .8);
+            .style("opacity", 1);
           _tooltip.html(SzRelationshipNetworkComponent.linkTooltipText(d))
             .style("left", (event.pageX) + "px")
             .style("top", (event.pageY + 10) + "px");
@@ -3834,7 +3834,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
               sourceEntityId: entityId,
               targetEntityId: relatedEntityId,
               touchesFocalEntity: isRelatedToFocalEntity,
-              matchLevel: relatedEntity.matchLevel,
+              matchLevel: relatedEntity.MATCH_LEVEL_CODE,
               matchKey: relatedEntity.MATCH_KEY,
               matchKeyTokens: relatedMatchKeyCategories,
               matchKeyTokensFlat: _matchKeyTokensFlattened,
@@ -3850,7 +3850,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
               sourceEntityId: entityId,
               targetEntityId: relatedEntityId,
               touchesFocalEntity: isRelatedToFocalEntity,
-              matchLevel: relatedEntity.matchLevel,
+              matchLevel: relatedEntity.MATCH_LEVEL_CODE,
               matchKey: relatedEntity.MATCH_KEY,
               matchKeyTokens: relatedMatchKeyCategories,
               matchKeyTokensFlat: _matchKeyTokensFlattened,
