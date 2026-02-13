@@ -3950,7 +3950,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
   }
 
   /** get array of datasources present in network data */
-  public static getDataSourcesFromEntityNetworkData(data: SzNetorkGraphCompositeResponse): string[] {
+  public static getDataSourcesFromEntityNetworkData(data: any): string[] {
     const _datasources = [];
     if(data && data.NETWORK_RESPONSES && data.NETWORK_RESPONSES.map) {
       // flatten first
@@ -3971,11 +3971,21 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
           }
         });
       });
+    } else if(data && data.entities && data.entities.forEach) {
+      data.entities.forEach((ent: any) => {
+        if(ent.resolvedEntity && ent.resolvedEntity.RECORD_SUMMARY && ent.resolvedEntity.RECORD_SUMMARY.forEach) {
+          ent.resolvedEntity.RECORD_SUMMARY.forEach((rs: any) => {
+            if(rs.DATA_SOURCE && _datasources.indexOf(rs.DATA_SOURCE) === -1) {
+              _datasources.push(rs.DATA_SOURCE);
+            }
+          });
+        }
+      });
     }
     return _datasources;
   }
   /** get array of match keys present in network data */
-  public static getMatchKeysFromEntityNetworkData(data: SzNetorkGraphCompositeResponse): string[] {
+  public static getMatchKeysFromEntityNetworkData(data: any): string[] {
     let _matchkeys = [];
     if(data && data.NETWORK_RESPONSES && data.NETWORK_RESPONSES.forEach) {
       data.NETWORK_RESPONSES.forEach((networkResponse: SzSdkFindNetworkResponse)=>{
@@ -3994,6 +4004,16 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
           }
         }
       });
+    } else if(data && data.entities && data.entities.forEach) {
+      data.entities.forEach((ent: any) => {
+        if(ent.relatedEntities && ent.relatedEntities.forEach) {
+          ent.relatedEntities.forEach((relEnt: any) => {
+            if(relEnt.MATCH_KEY) {
+              _matchkeys.push(relEnt.MATCH_KEY);
+            }
+          });
+        }
+      });
     }
     // de-dupe match keys
     if(_matchkeys && _matchkeys.filter) {
@@ -4004,18 +4024,18 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
     return _matchkeys;
   }
   /** get array of match keys present in network data */
-  public static getEntityMatchKeysFromEntityNetworkData(data: SzNetorkGraphCompositeResponse, coreEntityIds?: SzEntityIdentifier[]): {entityId: string|number, value: string, isCoreRelationship: boolean}[] {
+  public static getEntityMatchKeysFromEntityNetworkData(data: any, coreEntityIds?: SzEntityIdentifier[]): {entityId: string|number, value: string, isCoreRelationship: boolean}[] {
     let _matchkeys = [];
     let _entitiesOnDeck   = [];
+    if(coreEntityIds) {
+      coreEntityIds = coreEntityIds.map(parseSzIdentifier);
+    }
     if(data && data.NETWORK_RESPONSES && data.NETWORK_RESPONSES.forEach) {
       data.NETWORK_RESPONSES.forEach((networkResponse: SzSdkFindNetworkResponse)=>{
       // first build a array of all entity Ids present
       _entitiesOnDeck     = networkResponse.ENTITIES.map((entity: SzFindNetworkEntity) => {
         return entity.RESOLVED_ENTITY;
       });
-      if(coreEntityIds) {
-        coreEntityIds = coreEntityIds.map(parseSzIdentifier);
-      }
       let _entityRelatedMatchKeys = networkResponse.ENTITIES.map( (entity: SzFindNetworkEntity) => {
         let retVal = [];
         if(entity && entity.RELATED_ENTITIES && entity.RELATED_ENTITIES.map) {
@@ -4040,6 +4060,24 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
         });
       }
       });
+    } else if(data && data.entities && data.entities.forEach) {
+      _entitiesOnDeck = data.entities.map((ent: any) => ent.resolvedEntity && ent.resolvedEntity.ENTITY_ID).filter(Boolean);
+      data.entities.forEach((ent: any) => {
+        if(ent.relatedEntities && ent.relatedEntities.forEach) {
+          let isCoreRelationship = coreEntityIds && coreEntityIds.indexOf && ent.resolvedEntity ? coreEntityIds.indexOf(ent.resolvedEntity.ENTITY_ID) > -1 : false;
+          ent.relatedEntities.forEach((relEnt: any) => {
+            if(relEnt.ENTITY_ID && _entitiesOnDeck.indexOf(relEnt.ENTITY_ID) > -1) {
+              _matchkeys.push({ entityId: relEnt.ENTITY_ID, value: relEnt.MATCH_KEY, isCoreRelationship: isCoreRelationship, coreEntities: coreEntityIds, relSource: ent.resolvedEntity.ENTITY_ID });
+            }
+          });
+        }
+      });
+      // de-dupe
+      if(_matchkeys && _matchkeys.filter) {
+        _matchkeys = _matchkeys.filter((value, index, self) => {
+          return self.indexOf(value) === index;
+        });
+      }
     }
     return _matchkeys;
   }
@@ -4175,7 +4213,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
    * "DISCLOSED" or "DERIVED" types. The members of the return value for "DERIVED" or "DISCLOSED" are
    * arrays of the entity ids found in the data that have that match key token present.
    */
-  public static getMatchKeyTokensFromEntityData(data: SzNetorkGraphCompositeResponse, focalEntityIds?: SzEntityIdentifier[]) {
+  public static getMatchKeyTokensFromEntityData(data: any, focalEntityIds?: SzEntityIdentifier[]) {
     let retValue: undefined | SzEntityNetworkMatchKeyTokens = {
       DISCLOSED: {},
       DERIVED: {}
