@@ -650,7 +650,7 @@ export class SzGraphComponentGrpc implements OnInit, OnDestroy {
    * from data.
   */
   public onGraphDataUpdated(data: any) {
-    if(data && data.entities) { 
+    if(data && data.entities) {
       this.filterShowDataSources  = SzRelationshipNetworkComponent.getDataSourcesFromEntityNetworkData(data);
       let _matchKeyTokens         = SzRelationshipNetworkComponent.getMatchKeyTokensFromEntityData(data, this.graphIds);
       let matchKeyTokens          = this.getMatchKeyTokenComposites( _matchKeyTokens );
