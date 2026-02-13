@@ -303,7 +303,7 @@ export class SzSearchService {
                 }
               }
               if(relatedEntitiesById.has(netEntity.RESOLVED_ENTITY.ENTITY_ID)) {
-                netEntity.RESOLVED_ENTITY = relatedEntitiesById.get(netEntity.RESOLVED_ENTITY.ENTITY_ID);
+                netEntity.RESOLVED_ENTITY = Object.assign(netEntity.RESOLVED_ENTITY, relatedEntitiesById.get(netEntity.RESOLVED_ENTITY.ENTITY_ID));
               }
 
               return netEntity;
