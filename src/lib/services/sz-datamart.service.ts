@@ -129,7 +129,7 @@ export class SzStatSampleSet {
             let _entities   = this._entityPages.get(this._currentPage).entities;
             if(_entities && _entities.map) {
                 return _entities.map((res: SzSampleSetEntity) => {
-                    return this._entities.has(res.entity.ENTITY_ID) ? this._entities.get(res.entity.ENTITY_ID) : {};
+                    return this._entities.has(res.entity.ENTITY_ID) ? { entity: this._entities.get(res.entity.ENTITY_ID) } : {};
                 });
             }
         }
