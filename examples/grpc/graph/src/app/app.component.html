@@ -1,0 +1,30 @@
+<h2 class="example-title">&#64;senzing/eval-tool-ui-common/graph example</h2>
+<div class="graph-container">
+  <div class="graph-canvas">
+    <sz-standalone-graph
+      #graphComponent
+      [graphIds]="graphIds"
+      [showPopOutIcon]="false"
+      [showMatchKeyControl]="false"
+      [showFiltersControl]="false"
+      [showLinkLabels]="showLinkLabels"
+      (entityClick)="onEntityClick($event)"
+      (entityDblClick)="onEntityDblClick($event)"
+      (contextMenuClick)="onContextMenuClick($event)"
+      (requestStarted)="onRequestStarted($event)"
+      (requestComplete)="onRequestComplete($event)"
+      (renderComplete)="onRenderComplete($event)"
+      (dataLoaded)="onDataLoaded($event)"
+      (dataSourcesChange)="onDataSourcesChange($event)"
+      (matchKeysChange)="onMatchKeysChange($event)"
+    ></sz-standalone-graph>
+  </div>
+  <div class="graph-filters" *ngIf="showFilters">
+    <sz-entity-detail-graph-filter
+      [showLinkLabels]="showLinkLabels"
+      [showDataSources]="showDataSourcesInFilter"
+      [showMatchKeys]="showMatchKeysInFilter"
+      (optionChanged)="onFilterOptionChange($event)"
+    ></sz-entity-detail-graph-filter>
+  </div>
+</div>
