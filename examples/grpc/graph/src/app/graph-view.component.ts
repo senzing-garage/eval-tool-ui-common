@@ -122,14 +122,11 @@ export class GraphViewComponent {
       console.warn('Graph network component not available for import');
       return;
     }
-    // restore prefs first so filters are applied during render
+    // restore prefs first so filters are applied
     if (data.graphPrefs) {
       this.prefs.graph.fromJSONObject(data.graphPrefs as any);
     }
-    // restore graph IDs to trigger a re-fetch, then apply node state
-    if (data.query && data.query.graphIds) {
-      this.graphIds = data.query.graphIds;
-    }
+    // apply positions, visibility, and viewport to the existing graph
     this.graphComponent.graphNetworkComponent.fromJSON(data);
   }
 }
