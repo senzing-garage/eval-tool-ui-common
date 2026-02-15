@@ -11,6 +11,7 @@ import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 import { SzDataSourceComposite } from '../models/data-sources';
 import { SzMatchKeyComposite, SzMatchKeyTokenComposite, SzMatchKeyTokenFilterScope } from '../models/graph';
+import { SzGraphExport } from '../models/SzNetworkGraph';
 import { sortDataSourcesByIndex, parseBool, sortMatchKeysByIndex, sortMatchKeyTokensByIndex } from '../common/utils';
 import { isBoolean } from '../common/utils';
 import { CommonModule } from '@angular/common';
@@ -257,7 +258,32 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
   @Input() linkColor: string;
   @Input() indirectLinkColor: string;
 
-  /** 
+  /** @internal */
+  private _showImportButton: boolean = true;
+  /** whether or not to show the import button */
+  @Input() public set showImportButton(value: boolean | string) {
+    this._showImportButton = parseBool(value);
+  }
+  public get showImportButton(): boolean {
+    return this._showImportButton;
+  }
+
+  /** @internal */
+  private _showExportButton: boolean = true;
+  /** whether or not to show the export button */
+  @Input() public set showExportButton(value: boolean | string) {
+    this._showExportButton = parseBool(value);
+  }
+  public get showExportButton(): boolean {
+    return this._showExportButton;
+  }
+
+  /** whether the import/export section should be visible at all */
+  public get showImportExportSection(): boolean {
+    return this._showImportButton || this._showExportButton;
+  }
+
+  /**
    * set the internal list of datasource colors from local storage or input value
    * and update any changed members also present in "_dataSources" with 
    * current properties
@@ -379,6 +405,10 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
   public prefsChange: EventEmitter<SzSdkPrefsModel> = new EventEmitter<SzSdkPrefsModel>();
   /** inheirited from "SzEntityDetailGraphControlComponent" code. wanted it to be interchangeable */
   @Output() public optionChanged = new EventEmitter<{name: string, value: any}>();
+  /** emitted when the user clicks the export button */
+  @Output() public exportGraph = new EventEmitter<void>();
+  /** emitted when the user picks a file via the import button */
+  @Output() public importGraph = new EventEmitter<SzGraphExport>();
 
   // ------------------------------ forms, form groups, and handlers ---------------------
   /** the form group for the filters by datasource list */
@@ -820,6 +850,35 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
     // now emit events
     this.optionChanged.emit({name: 'matchKeyTokenFilterScope', value: scope});
     this.matchKeyTokenSelectionScopeChanged.emit(scope);
+  }
+
+  /** triggers the exportGraph output so the parent can build and download the file */
+  onExportClick(): void {
+    this.exportGraph.emit();
+  }
+
+  /** opens the hidden file input to let the user pick a JSON file */
+  onImportClick(fileInput: HTMLInputElement): void {
+    fileInput.click();
+  }
+
+  /** reads the selected JSON file and emits importGraph with the parsed data */
+  onImportFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result as string) as SzGraphExport;
+        this.importGraph.emit(data);
+      } catch (err) {
+        console.error('SzGraphFilterComponent: failed to parse import file', err);
+      }
+      // reset so re-selecting the same file still triggers change
+      input.value = '';
+    };
+    reader.readAsText(file);
   }
 
   /**
