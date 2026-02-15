@@ -199,6 +199,20 @@
     */
   }
 
+  .import-export-actions {
+    display: flex;
+    gap: 8px;
+    padding: 0 1em;
+
+    button {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+  }
+
   mat-chip-listbox.match-keys {
     --mdc-chip-elevated-container-color: var(--sz-graph-filter-match-key-tags-selected-color);
     --mdc-chip-elevated-disabled-container-color: #eee;

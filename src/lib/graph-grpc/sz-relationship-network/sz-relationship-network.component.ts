@@ -24,7 +24,14 @@ import { SzGraphTooltipEntityModel, SzGraphTooltipLinkModel, SzGraphNodeFilterPa
 //import { SzSearchService } from '../../services/sz-search.service';
 import { SzGrpcEngineService } from '../../services/grpc/engine.service';
 import { SzFindNetworkEntity, SzSdkEntityFeatures, SzSdkEntityResponse, SzSdkFindNetworkResponse, SzSdkRelatedEntity, SzSdkResolvedEntity, SzSdkSearchMatchLevel } from '../../models/grpc/engine';
-import { SzNetorkGraphCompositeResponse, SzNetworkGraphInputs } from '../../models/SzNetworkGraph';
+import {
+  SzNetorkGraphCompositeResponse,
+  SzNetworkGraphInputs,
+  SzGraphExport,
+  SzGraphExportNode,
+  SzGraphExportLink,
+  SzGraphExportPrefs
+} from '../../models/SzNetworkGraph';
 
 /**
  * Provides a SVG of a relationship network diagram via D3.
@@ -4285,5 +4292,192 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
       return {entityId: matchKeyResult.entityId, disclosed: entityMatchKeys[0], derived: entityMatchKeys[1], isCoreRelationship: matchKeyResult.isCoreRelationship }
     });
     console.log('getMatchKeyTokensFromEntityPreflightData: ', relatedMatchKeys, categorizedMatchKeys);
+  }
+
+  // ---------------------------------------------------------------------------
+  //  Import / Export
+  // ---------------------------------------------------------------------------
+
+  /** Serialise the current graph state to a JSON-compatible object. */
+  public toJSON(): SzGraphExport {
+    // --- collect node data from D3 selection ---
+    const nodes: SzGraphExportNode[] = [];
+    if (this.node && this.node.each) {
+      this.node.each((d: any) => {
+        nodes.push({
+          entityId: d.entityId,
+          isPrimaryEntity: !!d.isPrimaryEntity,
+          isCoreNode: !!d.isCoreNode,
+          isQueriedNode: !!d.isQueriedNode,
+          position: { x: d.x ?? 0, y: d.y ?? 0 },
+          state: {
+            isHidden: !!d.isHidden,
+            hasCollapsedRelationships: !!d.hasCollapsedRelationships,
+            areAllRelatedEntitiesOnDeck: !!d.areAllRelatedEntitiesOnDeck,
+            numberRelated: d.numberRelated ?? 0,
+            numberRelatedOnDeck: d.numberRelatedOnDeck ?? 0,
+            numberRelatedHidden: d.numberRelatedHidden ?? 0
+          },
+          relatedEntities: d.relatedEntities ?? [],
+          iconType: d.iconType ?? 'default',
+          name: d.name ?? '',
+          orgName: d.orgName ?? '',
+          address: d.address ?? '',
+          phone: d.phone ?? '',
+          dataSources: d.dataSources ?? [],
+          recordSummaries: d.recordSummaries ?? {},
+          matchKeyTokens: {
+            coreRelationshipMatchKeyTokens: d.coreRelationshipMatchKeyTokens ?? [],
+            relationshipMatchKeyTokens: d.relationshipMatchKeyTokens ?? []
+          },
+          resolvedEntityData: d.resolvedEntityData ?? null,
+          relatedEntitiesData: d.relatedEntitiesData ?? null
+        });
+      });
+    }
+
+    // --- collect link data from D3 selection ---
+    const links: SzGraphExportLink[] = [];
+    if (this.link && this.link.each) {
+      this.link.each((d: any) => {
+        links.push({
+          id: d.id ?? d.index ?? 0,
+          sourceEntityId: d.sourceEntityId ?? (d.source && d.source.entityId) ?? 0,
+          targetEntityId: d.targetEntityId ?? (d.target && d.target.entityId) ?? 0,
+          matchLevel: d.matchLevel ?? '',
+          matchKey: d.matchKey ?? '',
+          isCoreLink: !!d.isCoreLink,
+          isHidden: !!d.isHidden
+        });
+      });
+    }
+
+    // --- read current viewport transform ---
+    let zoom = this._scaleRaw ?? 1;
+    let panX = 0;
+    let panY = 0;
+    if (this.svg) {
+      try {
+        const currentTransform = d3.zoomTransform(this.svg.node());
+        zoom = currentTransform.k;
+        panX = currentTransform.x;
+        panY = currentTransform.y;
+      } catch (_) { /* svg not initialised yet */ }
+    }
+
+    // --- query parameters ---
+    const query = {
+      graphIds: this._entityIds ? this._entityIds.map(id => parseInt(id, 10)) : [],
+      maxDegreesOfSeparation: this._maxDegrees ?? 1,
+      maxEntities: this._maxEntities ?? 40,
+      buildOut: this._buildOut ?? 1
+    };
+
+    return {
+      version: '1.0',
+      exportedAt: new Date().toISOString(),
+      query,
+      viewport: { zoom, panX, panY },
+      nodes,
+      links,
+      graphPrefs: {} as SzGraphExportPrefs  // caller should overlay prefs.graph.toJSONObject()
+    };
+  }
+
+  /** Restore graph state from a previously exported JSON object. */
+  public fromJSON(data: SzGraphExport): void {
+    if (!data || data.version === undefined) {
+      console.warn('SzRelationshipNetworkComponent.fromJSON: invalid export data');
+      return;
+    }
+
+    // --- restore entity ids from query ---
+    if (data.query && data.query.graphIds) {
+      this._entityIds = data.query.graphIds.map(id => id.toString());
+    }
+    if (data.query) {
+      this._maxDegrees = data.query.maxDegreesOfSeparation;
+      this._maxEntities = data.query.maxEntities;
+      this._buildOut = data.query.buildOut;
+    }
+
+    // --- wait for nodes and links to be rendered, then apply state ---
+    // use renderComplete to know when D3 elements are available
+    this.renderComplete.pipe(take(1)).subscribe(() => {
+      this._applyImportedState(data);
+    });
+  }
+
+  /** @internal Apply node positions, visibility, and viewport from import data. */
+  private _applyImportedState(data: SzGraphExport): void {
+    // build lookup maps
+    const nodeMap = new Map<string, SzGraphExportNode>();
+    for (const n of data.nodes) {
+      nodeMap.set(n.entityId.toString(), n);
+    }
+    const linkMap = new Map<string, SzGraphExportLink>();
+    for (const l of data.links) {
+      const key = [l.sourceEntityId, l.targetEntityId].sort().join('-');
+      linkMap.set(key, l);
+    }
+
+    // --- apply node state ---
+    if (this.node && this.node.each) {
+      this.node.each((d: any) => {
+        const exported = nodeMap.get(d.entityId?.toString());
+        if (!exported) return;
+
+        // restore position
+        d.x = exported.position.x;
+        d.y = exported.position.y;
+        d.fx = exported.position.x;
+        d.fy = exported.position.y;
+
+        // restore expand/collapse state
+        d.isHidden = exported.state.isHidden;
+        d.hasCollapsedRelationships = exported.state.hasCollapsedRelationships;
+        d.areAllRelatedEntitiesOnDeck = exported.state.areAllRelatedEntitiesOnDeck;
+        d.numberRelatedOnDeck = exported.state.numberRelatedOnDeck;
+        d.numberRelatedHidden = exported.state.numberRelatedHidden;
+      });
+    }
+
+    // --- apply link state ---
+    if (this.link && this.link.each) {
+      this.link.each((d: any) => {
+        const srcId = d.sourceEntityId ?? (d.source && d.source.entityId) ?? '';
+        const tgtId = d.targetEntityId ?? (d.target && d.target.entityId) ?? '';
+        const key = [srcId, tgtId].sort().join('-');
+        const exported = linkMap.get(key);
+        if (!exported) return;
+
+        d.isHidden = exported.isHidden;
+      });
+    }
+
+    // --- apply visibility classes ---
+    if (this.node) {
+      this.node.style('display', (d: any) => d.isHidden ? 'none' : null);
+    }
+    if (this.link) {
+      this.link.style('display', (d: any) => d.isHidden ? 'none' : null);
+    }
+    if (this.linkLabel) {
+      this.linkLabel.style('display', (d: any) => {
+        const srcId = d.sourceEntityId ?? (d.source && d.source.entityId) ?? '';
+        const tgtId = d.targetEntityId ?? (d.target && d.target.entityId) ?? '';
+        const key = [srcId, tgtId].sort().join('-');
+        const exported = linkMap.get(key);
+        return (exported && exported.isHidden) ? 'none' : null;
+      });
+    }
+
+    // --- restore viewport transform ---
+    if (data.viewport && this.svg && this._zoom) {
+      const t = d3.zoomIdentity
+        .translate(data.viewport.panX, data.viewport.panY)
+        .scale(data.viewport.zoom);
+      this.svg.call(this._zoom.transform, t);
+    }
   }
 }

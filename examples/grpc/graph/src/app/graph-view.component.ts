@@ -4,7 +4,8 @@ import { ActivatedRoute } from '@angular/router';
 import {
   SzStandaloneGraphComponent,
   SzEntityDetailGraphFilterComponent,
-  SzPrefsService
+  SzPrefsService,
+  SzGraphExport
 } from '@senzing/eval-tool-ui-common';
 
 @Component({
@@ -84,5 +85,47 @@ export class GraphViewComponent {
 
   public toggleFilters() {
     this.showFilters = !this.showFilters;
+  }
+
+  public onExportGraph(): void {
+    if (!this.graphComponent || !this.graphComponent.graphNetworkComponent) {
+      console.warn('Graph network component not available for export');
+      return;
+    }
+    const exportData = this.graphComponent.graphNetworkComponent.toJSON();
+    // overlay graph prefs
+    exportData.graphPrefs = this.prefs.graph.toJSONObject() as any;
+    // build filename from primary/focal entity names
+    const primaryNames = exportData.nodes
+      .filter(n => n.isPrimaryEntity || n.isQueriedNode)
+      .map(n => (n.name || '').replace(/[^a-zA-Z0-9_\- ]/g, '').trim().replace(/\s+/g, '_'))
+      .filter(n => n.length > 0);
+    const namePart = primaryNames.length > 0 ? primaryNames.join('-') : 'export';
+    const datePart = new Date().toISOString().slice(0, 10);
+    const filename = `sz-graph-${namePart}-${datePart}.json`.toLowerCase();
+    // trigger file download
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  public onImportGraph(data: SzGraphExport): void {
+    if (!this.graphComponent || !this.graphComponent.graphNetworkComponent) {
+      console.warn('Graph network component not available for import');
+      return;
+    }
+    // restore prefs first so filters are applied during render
+    if (data.graphPrefs) {
+      this.prefs.graph.fromJSONObject(data.graphPrefs as any);
+    }
+    // restore graph IDs to trigger a re-fetch, then apply node state
+    if (data.query && data.query.graphIds) {
+      this.graphIds = data.query.graphIds;
+    }
+    this.graphComponent.graphNetworkComponent.fromJSON(data);
   }
 }
