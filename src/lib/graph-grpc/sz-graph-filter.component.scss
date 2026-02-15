@@ -201,15 +201,16 @@
 
   .import-export-actions {
     display: flex;
-    gap: 8px;
-    padding: 0 1em;
+    justify-content: flex-end;
+    gap: 4px;
+    padding: 0 0.5em;
 
-    button {
-      flex: 1;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
+    ::ng-deep .mat-mdc-icon-button {
+      border-radius: 4px;
+
+      .mat-mdc-button-persistent-ripple {
+        border-radius: 4px;
+      }
     }
   }
 

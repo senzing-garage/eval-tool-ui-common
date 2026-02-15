@@ -4,6 +4,17 @@
 </ng-template>
 <!-- end   graph filtering tooltip template -->
 <div class="drawer-wrapper">
+  <ng-container *ngIf="showImportExportSection">
+    <div class="import-export-actions">
+      <input #importFileInput type="file" accept=".json" hidden (change)="onImportFileSelected($event)">
+      <button mat-icon-button *ngIf="showImportButton" (click)="onImportClick(importFileInput)" aria-label="Import graph" matTooltip="Import graph from file">
+        <mat-icon>file_upload</mat-icon>
+      </button>
+      <button mat-icon-button *ngIf="showExportButton" (click)="onExportClick()" aria-label="Export graph" matTooltip="Export graph to file">
+        <mat-icon>file_download</mat-icon>
+      </button>
+    </div>
+  </ng-container>
   <h3>{{ sectionTitles[0] }}</h3>
 
   <form [formGroup]="slidersForm">
@@ -257,17 +268,4 @@
     </form>-->
   </div>
 
-  <ng-container *ngIf="showImportExportSection">
-    <hr>
-    <h3>Import / Export</h3>
-    <div class="import-export-actions">
-      <input #importFileInput type="file" accept=".json" hidden (change)="onImportFileSelected($event)">
-      <button mat-stroked-button *ngIf="showImportButton" (click)="onImportClick(importFileInput)">
-        <mat-icon>file_upload</mat-icon> Import
-      </button>
-      <button mat-stroked-button *ngIf="showExportButton" (click)="onExportClick()">
-        <mat-icon>file_download</mat-icon> Export
-      </button>
-    </div>
-  </ng-container>
 </div>

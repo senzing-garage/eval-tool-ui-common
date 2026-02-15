@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { SzPrefsService } from '../../../services/sz-prefs.service';
 import { SzDataSourcesService } from '../../../services/sz-datasources.service';
@@ -41,7 +42,7 @@ import { SzGraphFilterComponent } from '../../../graph-grpc/sz-graph-filter.comp
     imports: [
       CommonModule, ReactiveFormsModule, FormsModule,
       MatSliderModule, MatCheckboxModule, MatInputModule, MatButtonModule,
-      MatChipsModule, MatBadgeModule, MatIconModule,
+      MatChipsModule, MatBadgeModule, MatIconModule, MatTooltipModule,
       DragDropModule,
     ]
 })

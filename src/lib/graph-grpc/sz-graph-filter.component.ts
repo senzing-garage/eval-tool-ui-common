@@ -22,6 +22,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatBadgeModule } from '@angular/material/badge';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { CdkAccordionModule } from '@angular/cdk/accordion';
 import { CdkMenuModule } from '@angular/cdk/menu';
 import { SzSdkDataSource } from '../models/grpc/config';
@@ -53,7 +54,7 @@ import { SzSdkDataSource } from '../models/grpc/config';
     imports: [
       CommonModule, ReactiveFormsModule, FormsModule,
       MatSliderModule, MatCheckboxModule, MatInputModule, MatButtonModule,
-      MatChipsModule, MatBadgeModule, MatIconModule,
+      MatChipsModule, MatBadgeModule, MatIconModule, MatTooltipModule,
       DragDropModule,
     ]
 })
