@@ -100,9 +100,13 @@ export class GraphViewComponent {
       .filter(n => n.isPrimaryEntity || n.isQueriedNode)
       .map(n => (n.name || '').replace(/[^a-zA-Z0-9_\- ]/g, '').trim().replace(/\s+/g, '_'))
       .filter(n => n.length > 0);
+    const prefix = 'sz-graph-';
+    const ext = '.json';
+    // 255 is the minimum max filename length across NTFS, APFS, and ext4
+    const maxLen = 255;
     const namePart = primaryNames.length > 0 ? primaryNames.join('-') : 'export';
-    const datePart = new Date().toISOString().slice(0, 10);
-    const filename = `sz-graph-${namePart}-${datePart}.json`.toLowerCase();
+    const truncated = namePart.slice(0, maxLen - prefix.length - ext.length);
+    const filename = `${prefix}${truncated}${ext}`.toLowerCase();
     // trigger file download
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
