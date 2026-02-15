@@ -1139,9 +1139,11 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
       .each((_d) => {
         _d.isHidden = false;
       });
+      // apply saved import positions to revealed nodes
+      this._applyImportedPositionsToNodes(relatedNodes);
       this._expandNode(d);
     }
-    // we only want links to just read off of 
+    // we only want links to just read off of
     // whatever the visibility is of the nodes (K.I.S.S.)
     let hiddenEntities   = [];
     this.node.each((_rn) => {
@@ -1435,6 +1437,11 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
   /** D3 selection for text labels on relationship lines */
   linkLabel: d3.Selection<SVGTextElement, any, any, any> | undefined;
   linkedByNodeIndexMap;
+
+  /** Saved node positions from an import, keyed by entityId string.
+   * Used to restore positions when nodes are revealed during expand/collapse.
+   * @internal */
+  private _importedNodePositions: Map<string, { x: number, y: number }> | undefined;
 
   /** D3 zoom plugin set in constructor
    * @internal*/
@@ -2726,6 +2733,8 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
 
           // set x/y positions of new nodes close to origin
           drawNodesInRings(newNodes, undefined, d.x, d.y)
+          // override with saved import positions if available
+          this._applyImportedPositionsToNodes(newNodes);
           // redraw any existing or new link relationships
           updateLinksForNodes(newNodes);
 
@@ -4384,32 +4393,55 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
     };
   }
 
-  /** Restore graph state from a previously exported JSON object. */
+  /** Restore graph state from a previously exported JSON object.
+   * Call this AFTER the graph has rendered (i.e. nodes/links exist in the DOM).
+   * This applies positions and visibility — it does NOT trigger a re-fetch.
+   */
   public fromJSON(data: SzGraphExport): void {
     if (!data || data.version === undefined) {
       console.warn('SzRelationshipNetworkComponent.fromJSON: invalid export data');
       return;
     }
 
-    // --- restore entity ids from query ---
-    if (data.query && data.query.graphIds) {
-      this._entityIds = data.query.graphIds.map(id => id.toString());
-    }
-    if (data.query) {
-      this._maxDegrees = data.query.maxDegreesOfSeparation;
-      this._maxEntities = data.query.maxEntities;
-      this._buildOut = data.query.buildOut;
-    }
-
-    // --- wait for nodes and links to be rendered, then apply state ---
-    // use renderComplete to know when D3 elements are available
-    this.renderComplete.pipe(take(1)).subscribe(() => {
+    // If nodes are already in the DOM, apply immediately
+    if (this.node && this.node.size() > 0) {
       this._applyImportedState(data);
+    } else {
+      // Otherwise wait for the next render cycle
+      this.renderComplete.pipe(take(1)).subscribe(() => {
+        this._applyImportedState(data);
+      });
+    }
+  }
+
+  /** @internal Apply saved import positions to a D3 node selection.
+   * Updates both the data (d.x, d.y) and the DOM (transform attribute).
+   */
+  private _applyImportedPositionsToNodes(nodes: d3.Selection<SVGElement, any, any, any>): void {
+    if (!this._importedNodePositions || !nodes) return;
+    const posMap = this._importedNodePositions;
+    nodes.each(function (d: any) {
+      const saved = posMap.get(d.entityId?.toString());
+      if (saved) {
+        d.x = saved.x;
+        d.y = saved.y;
+      }
     });
+    // update DOM
+    nodes
+      .attr('x', (d: any) => d.x)
+      .attr('y', (d: any) => d.y)
+      .attr('transform', (d: any) => `translate(${d.x},${d.y})`);
   }
 
   /** @internal Apply node positions, visibility, and viewport from import data. */
   private _applyImportedState(data: SzGraphExport): void {
+    // save all imported positions so expand/collapse can use them later
+    this._importedNodePositions = new Map<string, { x: number, y: number }>();
+    for (const n of data.nodes) {
+      this._importedNodePositions.set(n.entityId.toString(), { x: n.position.x, y: n.position.y });
+    }
+
     // build lookup maps
     const nodeMap = new Map<string, SzGraphExportNode>();
     for (const n of data.nodes) {
@@ -4421,17 +4453,15 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
       linkMap.set(key, l);
     }
 
-    // --- apply node state ---
-    if (this.node && this.node.each) {
-      this.node.each((d: any) => {
+    // --- apply node positions and state, then update DOM ---
+    if (this.node) {
+      this.node.each(function (d: any) {
         const exported = nodeMap.get(d.entityId?.toString());
         if (!exported) return;
 
-        // restore position
+        // restore position in data
         d.x = exported.position.x;
         d.y = exported.position.y;
-        d.fx = exported.position.x;
-        d.fy = exported.position.y;
 
         // restore expand/collapse state
         d.isHidden = exported.state.isHidden;
@@ -4440,28 +4470,33 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
         d.numberRelatedOnDeck = exported.state.numberRelatedOnDeck;
         d.numberRelatedHidden = exported.state.numberRelatedHidden;
       });
+
+      // update DOM transform to match new positions
+      this.node
+        .attr('x', (d: any) => d.x)
+        .attr('y', (d: any) => d.y)
+        .attr('transform', (d: any) => `translate(${d.x},${d.y})`)
+        .style('display', (d: any) => d.isHidden ? 'none' : null);
     }
 
     // --- apply link state ---
-    if (this.link && this.link.each) {
+    if (this.link) {
       this.link.each((d: any) => {
         const srcId = d.sourceEntityId ?? (d.source && d.source.entityId) ?? '';
         const tgtId = d.targetEntityId ?? (d.target && d.target.entityId) ?? '';
         const key = [srcId, tgtId].sort().join('-');
         const exported = linkMap.get(key);
         if (!exported) return;
-
         d.isHidden = exported.isHidden;
       });
+
+      // redraw link paths to follow new node positions and apply visibility
+      this.link
+        .attr('d', this.onLinkEntityPositionChange.bind(this))
+        .style('display', (d: any) => d.isHidden ? 'none' : null);
     }
 
-    // --- apply visibility classes ---
-    if (this.node) {
-      this.node.style('display', (d: any) => d.isHidden ? 'none' : null);
-    }
-    if (this.link) {
-      this.link.style('display', (d: any) => d.isHidden ? 'none' : null);
-    }
+    // --- update link labels ---
     if (this.linkLabel) {
       this.linkLabel.style('display', (d: any) => {
         const srcId = d.sourceEntityId ?? (d.source && d.source.entityId) ?? '';
