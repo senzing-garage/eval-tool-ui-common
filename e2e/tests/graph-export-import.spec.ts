@@ -2,141 +2,151 @@ import { test, expect } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
 
-test.describe('Graph Export/Import Position Validation', () => {
-  test('should restore node positions after import', async ({ page }) => {
+const FIXTURE_PATH = path.join(__dirname, '..', 'data', 'graph', 'test-import-positions.json');
+const TOLERANCE = 1.0; // 1px tolerance for floating point
+
+/** Selector that matches all entity node types (regular, core, queried) */
+const NODE_SELECTOR = 'sz-relationship-network svg g.sz-graph-node, sz-relationship-network svg g.sz-graph-core-node, sz-relationship-network svg g.sz-graph-queried-node';
+
+/** Read D3 node positions from the live graph DOM */
+function readNodePositions(page: any) {
+  return page.evaluate((selector: string) => {
+    const nodes = document.querySelectorAll(selector);
+    const positions: { entityId: string, x: number, y: number }[] = [];
+    const seen = new Set<string>();
+    nodes.forEach((node: any) => {
+      const d = (node as any).__data__;
+      if (d && !seen.has(String(d.entityId))) {
+        seen.add(String(d.entityId));
+        positions.push({ entityId: String(d.entityId), x: d.x ?? 0, y: d.y ?? 0 });
+      }
+    });
+    return positions;
+  }, NODE_SELECTOR);
+}
+
+/** Compare actual node positions against expected, log results, return mismatch count */
+function comparePositions(
+  actual: { entityId: string, x: number, y: number }[],
+  expectedMap: Map<string, { x: number, y: number }>,
+  label: string
+) {
+  let matchCount = 0;
+  let mismatchCount = 0;
+  let notInImport = 0;
+
+  console.log(`\n=== ${label} ===`);
+  for (const node of actual) {
+    const expected = expectedMap.get(node.entityId);
+    if (!expected) {
+      console.log(`  Entity ${node.entityId}: NOT in import data`);
+      notInImport++;
+      continue;
+    }
+    const dx = Math.abs(node.x - expected.x);
+    const dy = Math.abs(node.y - expected.y);
+    const match = dx <= TOLERANCE && dy <= TOLERANCE;
+    if (match) {
+      matchCount++;
+      console.log(`  Entity ${node.entityId}: MATCH (dx=${dx.toFixed(2)}, dy=${dy.toFixed(2)})`);
+    } else {
+      mismatchCount++;
+      console.log(`  Entity ${node.entityId}: MISMATCH expected=(${expected.x.toFixed(2)}, ${expected.y.toFixed(2)}) actual=(${node.x.toFixed(2)}, ${node.y.toFixed(2)}) delta=(${dx.toFixed(2)}, ${dy.toFixed(2)})`);
+    }
+  }
+  console.log(`  Result: ${matchCount} matched, ${mismatchCount} mismatched, ${notInImport} not in import data, out of ${actual.length} nodes\n`);
+  return mismatchCount;
+}
+
+/** Expand a node by calling expandNode() on the network component via Angular debug API */
+async function expandNode(page: any, entityId: number) {
+  await page.evaluate((id: number) => {
+    const el = document.querySelector('sz-relationship-network');
+    const comp = (window as any).ng?.getComponent(el);
+    if (comp && comp.expandNode) {
+      comp.expandNode(id);
+    }
+  }, entityId);
+}
+
+test.describe('Graph Import Position Validation', () => {
+  let importData: any;
+  let expectedMap: Map<string, { x: number, y: number }>;
+
+  test.beforeAll(() => {
+    importData = JSON.parse(fs.readFileSync(FIXTURE_PATH, 'utf-8'));
+    expectedMap = new Map(
+      importData.nodes.map((n: any) => [String(n.entityId), { x: n.position.x, y: n.position.y }])
+    );
+  });
+
+  test('should restore node positions from fixture JSON', async ({ page }) => {
     const consoleErrors: string[] = [];
     page.on('console', (msg) => {
-      if (msg.type() === 'error') {
-        consoleErrors.push(`[error] ${msg.text()}`);
-      }
+      if (msg.type() === 'error') consoleErrors.push(`[error] ${msg.text()}`);
     });
     page.on('pageerror', (err) => {
       consoleErrors.push(`[pageerror] ${err.message}`);
     });
 
     await page.goto('/', { waitUntil: 'networkidle', timeout: 30000 });
-    // wait for graph to render
     await page.waitForTimeout(8000);
 
-    // --- Step 1: Read initial D3 node positions ---
-    const initialPositions = await page.evaluate(() => {
-      const nodes = document.querySelectorAll('sz-relationship-network svg g.sz-graph-node');
-      const positions: { entityId: string, x: number, y: number }[] = [];
-      nodes.forEach((node: any) => {
-        const d = (node as any).__data__;
-        if (d) {
-          positions.push({ entityId: String(d.entityId), x: d.x ?? 0, y: d.y ?? 0 });
-        }
-      });
-      return positions;
-    });
-
-    console.log('\n=== INITIAL POSITIONS ===');
+    // --- Step 1: Verify graph rendered with initial nodes ---
+    const initialPositions = await readNodePositions(page);
+    console.log('\n=== INITIAL POSITIONS (before import) ===');
     for (const pos of initialPositions) {
       console.log(`  Entity ${pos.entityId}: x=${pos.x.toFixed(2)}, y=${pos.y.toFixed(2)}`);
     }
     expect(initialPositions.length).toBeGreaterThan(0);
 
-    // --- Step 2: Click export button and capture download ---
-    const [download] = await Promise.all([
-      page.waitForEvent('download'),
-      page.locator('sz-entity-detail-graph-filter button').filter({ hasText: 'Export' }).click()
-    ]);
-
-    const downloadPath = path.join(__dirname, '..', 'tmp', download.suggestedFilename());
-    await download.saveAs(downloadPath);
-    const exportJson = JSON.parse(fs.readFileSync(downloadPath, 'utf-8'));
-
-    console.log('\n=== EXPORTED FILE NODE POSITIONS ===');
-    for (const node of exportJson.nodes) {
-      console.log(`  Entity ${node.entityId} (${node.name}): x=${node.position.x.toFixed(2)}, y=${node.position.y.toFixed(2)}`);
-    }
-
-    // Verify exported positions are non-trivial (not all zero)
-    const nonZeroPositions = exportJson.nodes.filter(
-      (n: any) => Math.abs(n.position.x) > 0.01 || Math.abs(n.position.y) > 0.01
-    );
-    expect(nonZeroPositions.length).toBeGreaterThan(0);
-
-    // --- Step 3: Scramble positions in the export data to simulate user movement ---
-    const scrambledExport = JSON.parse(JSON.stringify(exportJson));
-    const offset = 200;
-    for (const node of scrambledExport.nodes) {
-      node.position.x += offset;
-      node.position.y += offset;
-    }
-    const scrambledPath = path.join(__dirname, '..', 'tmp', 'scrambled-import.json');
-    fs.mkdirSync(path.dirname(scrambledPath), { recursive: true });
-    fs.writeFileSync(scrambledPath, JSON.stringify(scrambledExport, null, 2));
-
-    console.log('\n=== SCRAMBLED POSITIONS (offset +200) ===');
-    for (const node of scrambledExport.nodes) {
-      console.log(`  Entity ${node.entityId} (${node.name}): x=${node.position.x.toFixed(2)}, y=${node.position.y.toFixed(2)}`);
-    }
-
-    // --- Step 4: Import the scrambled file ---
+    // --- Step 2: Import the fixture JSON ---
+    console.log('\n--- Importing fixture JSON ---');
     const fileInput = page.locator('sz-entity-detail-graph-filter input[type="file"]');
-    await fileInput.setInputFiles(scrambledPath);
-
-    // Wait for import to apply
+    await fileInput.setInputFiles(FIXTURE_PATH);
     await page.waitForTimeout(5000);
 
-    // --- Step 5: Read D3 node positions after import ---
-    const postImportPositions = await page.evaluate(() => {
-      const nodes = document.querySelectorAll('sz-relationship-network svg g.sz-graph-node');
-      const positions: { entityId: string, x: number, y: number }[] = [];
-      nodes.forEach((node: any) => {
-        const d = (node as any).__data__;
-        if (d) {
-          positions.push({ entityId: String(d.entityId), x: d.x ?? 0, y: d.y ?? 0 });
-        }
-      });
-      return positions;
-    });
-
-    console.log('\n=== POST-IMPORT POSITIONS ===');
+    // --- Step 3: Verify initial 4 node positions after import ---
+    const postImportPositions = await readNodePositions(page);
+    console.log('\n=== POST-IMPORT POSITIONS (4 initial nodes) ===');
     for (const pos of postImportPositions) {
       console.log(`  Entity ${pos.entityId}: x=${pos.x.toFixed(2)}, y=${pos.y.toFixed(2)}`);
     }
+    const mismatch1 = comparePositions(postImportPositions, expectedMap, 'INITIAL IMPORT COMPARISON');
+    expect(mismatch1).toBe(0);
 
-    // --- Step 6: Compare positions ---
-    const scrambledMap = new Map(
-      scrambledExport.nodes.map((n: any) => [String(n.entityId), n.position])
-    );
+    // --- Step 4: Expand entity 144 (Patricia Smith) → brings in 29, 30, 31 ---
+    console.log('\n--- Expanding entity 144 (Patricia Smith) ---');
+    await expandNode(page, 144);
+    await page.waitForTimeout(8000);
 
-    let matchCount = 0;
-    let mismatchCount = 0;
-    const tolerance = 1.0; // allow 1px tolerance for floating point
-
-    console.log('\n=== POSITION COMPARISON ===');
-    for (const actual of postImportPositions) {
-      const expected = scrambledMap.get(actual.entityId) as any;
-      if (!expected) {
-        console.log(`  Entity ${actual.entityId}: NOT in import data`);
-        continue;
-      }
-      const dx = Math.abs(actual.x - expected.x);
-      const dy = Math.abs(actual.y - expected.y);
-      const match = dx <= tolerance && dy <= tolerance;
-      if (match) {
-        matchCount++;
-        console.log(`  Entity ${actual.entityId}: MATCH (dx=${dx.toFixed(2)}, dy=${dy.toFixed(2)})`);
-      } else {
-        mismatchCount++;
-        console.log(`  Entity ${actual.entityId}: MISMATCH expected=(${expected.x.toFixed(2)}, ${expected.y.toFixed(2)}) actual=(${actual.x.toFixed(2)}, ${actual.y.toFixed(2)}) delta=(${dx.toFixed(2)}, ${dy.toFixed(2)})`);
-      }
+    const afterExpand1 = await readNodePositions(page);
+    console.log('\n=== AFTER EXPANDING ENTITY 144 ===');
+    for (const pos of afterExpand1) {
+      console.log(`  Entity ${pos.entityId}: x=${pos.x.toFixed(2)}, y=${pos.y.toFixed(2)}`);
     }
+    const mismatch2 = comparePositions(afterExpand1, expectedMap, 'AFTER EXPAND 144 COMPARISON');
+    expect(mismatch2).toBe(0);
 
-    console.log(`\n=== RESULT: ${matchCount} matched, ${mismatchCount} mismatched out of ${postImportPositions.length} nodes ===\n`);
+    // --- Step 5: Expand entity 29 (Patrick Smith) → brings in 27, 28, 154 ---
+    console.log('\n--- Expanding entity 29 (Patrick Smith) ---');
+    await expandNode(page, 29);
+    await page.waitForTimeout(8000);
 
-    // Log console errors
+    const afterExpand2 = await readNodePositions(page);
+    console.log('\n=== AFTER EXPANDING ENTITY 29 ===');
+    for (const pos of afterExpand2) {
+      console.log(`  Entity ${pos.entityId}: x=${pos.x.toFixed(2)}, y=${pos.y.toFixed(2)}`);
+    }
+    const mismatch3 = comparePositions(afterExpand2, expectedMap, 'FINAL COMPARISON (all 10 nodes)');
+
+    // --- Log errors ---
     if (consoleErrors.length > 0) {
       console.log('\n=== BROWSER CONSOLE ERRORS ===');
-      for (const err of consoleErrors) { console.log(err); }
+      for (const err of consoleErrors) console.log(err);
       console.log('=== END ===\n');
     }
 
-    // The test passes if positions match; this tells us if import is working
-    expect(mismatchCount).toBe(0);
+    expect(mismatch3).toBe(0);
   });
 });
