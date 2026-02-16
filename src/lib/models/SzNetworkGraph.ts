@@ -100,6 +100,19 @@ export interface SzGraphExportLink {
     isHidden: boolean;
 }
 
+/** Metadata returned when listing saved graph snapshots (no graph_data). */
+export interface SzSavedGraphExportMeta {
+    id: number;
+    name: string;
+    description: string;
+    created_at: string;
+    updated_at: string;
+    entity_ids: string;
+    node_count: number;
+    link_count: number;
+    version: string;
+}
+
 /** Serialised graph preferences – mirrors SzGraphPrefs.toJSONObject(). */
 export interface SzGraphExportPrefs {
     openInNewTab: boolean;

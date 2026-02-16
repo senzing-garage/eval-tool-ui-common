@@ -5,7 +5,8 @@ import {
   SzStandaloneGraphComponent,
   SzEntityDetailGraphFilterComponent,
   SzPrefsService,
-  SzGraphExport
+  SzGraphExport,
+  SzGraphStorageService
 } from '@senzing/eval-tool-ui-common';
 
 @Component({
@@ -27,7 +28,7 @@ export class GraphViewComponent {
 
   @ViewChild(SzStandaloneGraphComponent) graphComponent: SzStandaloneGraphComponent;
 
-  constructor(public prefs: SzPrefsService, private route: ActivatedRoute) {
+  constructor(public prefs: SzPrefsService, private route: ActivatedRoute, private graphStorageService: SzGraphStorageService) {
     this.route.params.subscribe(params => {
       if (params['entityId']) {
         const entityId = parseInt(params['entityId'], 10);
@@ -115,6 +116,33 @@ export class GraphViewComponent {
     a.download = filename;
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  public onSaveGraph(event: { name: string; description: string }): void {
+    if (!this.graphComponent || !this.graphComponent.graphNetworkComponent) {
+      console.warn('Graph network component not available for save');
+      return;
+    }
+    const exportData = this.graphComponent.graphNetworkComponent.toJSON();
+    exportData.graphPrefs = this.prefs.graph.toJSONObject() as any;
+    this.graphStorageService.save(event.name, event.description, exportData).subscribe({
+      next: (res) => console.log('Graph saved with id:', res.id),
+      error: (err) => console.error('Failed to save graph:', err)
+    });
+  }
+
+  public onLoadGraph(id: number): void {
+    this.graphStorageService.load(id).subscribe({
+      next: (data) => this.onImportGraph(data),
+      error: (err) => console.error('Failed to load graph:', err)
+    });
+  }
+
+  public onDeleteGraph(id: number): void {
+    this.graphStorageService.delete(id).subscribe({
+      next: () => console.log('Graph deleted:', id),
+      error: (err) => console.error('Failed to delete graph:', err)
+    });
   }
 
   public onImportGraph(data: SzGraphExport): void {

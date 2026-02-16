@@ -1,6 +1,6 @@
-import { Component, HostBinding, Input, OnInit, AfterViewInit, 
-  OnDestroy, Output, EventEmitter, ChangeDetectorRef, ViewChild, TemplateRef, 
-  ViewContainerRef } from '@angular/core';
+import { Component, HostBinding, Input, OnInit, AfterViewInit,
+  OnDestroy, Output, EventEmitter, ChangeDetectorRef, ViewChild, TemplateRef,
+  ViewContainerRef, inject } from '@angular/core';
 import { SzPrefsService, SzSdkPrefsModel } from '../services/sz-prefs.service';
 import { SzDataSourcesService } from '../services/sz-datasources.service';
 import { takeUntil } from 'rxjs/operators';
@@ -11,7 +11,8 @@ import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 import { SzDataSourceComposite } from '../models/data-sources';
 import { SzMatchKeyComposite, SzMatchKeyTokenComposite, SzMatchKeyTokenFilterScope } from '../models/graph';
-import { SzGraphExport } from '../models/SzNetworkGraph';
+import { SzGraphExport, SzSavedGraphExportMeta } from '../models/SzNetworkGraph';
+import { SzGraphStorageService } from '../services/sz-graph-storage.service';
 import { sortDataSourcesByIndex, parseBool, sortMatchKeysByIndex, sortMatchKeyTokensByIndex } from '../common/utils';
 import { isBoolean } from '../common/utils';
 import { CommonModule } from '@angular/common';
@@ -23,6 +24,9 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { CdkAccordionModule } from '@angular/cdk/accordion';
 import { CdkMenuModule } from '@angular/cdk/menu';
 import { SzSdkDataSource } from '../models/grpc/config';
@@ -55,12 +59,16 @@ import { SzSdkDataSource } from '../models/grpc/config';
       CommonModule, ReactiveFormsModule, FormsModule,
       MatSliderModule, MatCheckboxModule, MatInputModule, MatButtonModule,
       MatChipsModule, MatBadgeModule, MatIconModule, MatTooltipModule,
+      MatMenuModule, MatDividerModule, MatFormFieldModule,
       DragDropModule,
     ]
 })
 export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy {
+  /** @internal */
+  public graphStorage = inject(SzGraphStorageService);
+
   /**
-   * used for displaying tooltips above all other page content 
+   * used for displaying tooltips above all other page content
    * @internal */
   overlayRef: OverlayRef | undefined;
 
@@ -279,9 +287,33 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
     return this._showExportButton;
   }
 
+  /** @internal */
+  private _showSaveButton: boolean = true;
+  /** whether or not to show the save/load button */
+  @Input() public set showSaveButton(value: boolean | string) {
+    this._showSaveButton = parseBool(value);
+  }
+  public get showSaveButton(): boolean {
+    return this._showSaveButton;
+  }
+
+  /** emitted when user wants to save the current graph to the storage server */
+  @Output() public saveGraph = new EventEmitter<{ name: string; description: string }>();
+  /** emitted when user wants to load a saved graph from the storage server */
+  @Output() public loadGraph = new EventEmitter<number>();
+  /** emitted when user wants to delete a saved graph from the storage server */
+  @Output() public deleteGraph = new EventEmitter<number>();
+
+  /** saved graphs list from the storage service */
+  public savedGraphs: SzSavedGraphExportMeta[] = [];
+  /** name input for save form */
+  public saveGraphName: string = '';
+  /** description input for save form */
+  public saveGraphDescription: string = '';
+
   /** whether the import/export section should be visible at all */
   public get showImportExportSection(): boolean {
-    return this._showImportButton || this._showExportButton;
+    return this._showImportButton || this._showExportButton || this._showSaveButton;
   }
 
   /**
@@ -901,6 +933,16 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
       takeUntil(this.unsubscribe$)
     ).subscribe(this.onMatchKeyTokenSelectionScopeChanged.bind(this));
 
+    // subscribe to saved graphs list from storage service
+    this.graphStorage.savedGraphs$.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((graphs) => {
+      this.savedGraphs = graphs;
+      this.cd.detectChanges();
+    });
+    // initial fetch of saved graphs
+    this.graphStorage.refresh();
+
     // get datasources
     // then create filter and color control lists
     this.initializeDataSourceFormControls();
@@ -1014,6 +1056,25 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
     return true;
     return (this.showMatchKeyTokens && this.showMatchKeyTokens.length > 0) ? (this.showMatchKeyTokens.findIndex( (mkCat)=> { return mkCat.name === mkName; } ) > -1) : true;
   }
+  /** emits saveGraph with the current name/description, then resets the form */
+  onSaveGraphClick(): void {
+    if (!this.saveGraphName.trim()) return;
+    this.saveGraph.emit({ name: this.saveGraphName.trim(), description: this.saveGraphDescription.trim() });
+    this.saveGraphName = '';
+    this.saveGraphDescription = '';
+  }
+
+  /** emits loadGraph with the saved graph's id */
+  onLoadGraphClick(id: number): void {
+    this.loadGraph.emit(id);
+  }
+
+  /** emits deleteGraph with the saved graph's id */
+  onDeleteGraphClick(id: number, event: Event): void {
+    event.stopPropagation();
+    this.deleteGraph.emit(id);
+  }
+
   /** function for shortening the match key token badge counts notation */
   public getMKBadgeCount(count: number): string {
     let retVal = (count && count > 0) ? (count as unknown as string) : '0';

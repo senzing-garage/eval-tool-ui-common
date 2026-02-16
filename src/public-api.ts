@@ -24,6 +24,7 @@ export { SzPrefsService, SzSdkPrefsModel} from './lib/services/sz-prefs.service'
 export * from './lib/services/sz-search.service';  // updated to use rest
 export * from './lib/services/sz-ui.service';
 export * from './lib/services/sz-how-ui.service';
+export { SzGraphStorageService, SZ_GRAPH_STORAGE_URL } from './lib/services/sz-graph-storage.service';
 
 /** components */
   /** bulk data related */
@@ -85,7 +86,7 @@ export { SzSearchResultEntityData } from './lib/models/responces/search-results/
 export { AdminStreamConnProperties, AdminStreamAnalysisConfig, AdminStreamLoadConfig, AdminStreamUploadRates } from './lib/models/data-admin';
 export { SzDataSourceRecordAnalysis, SzDataSourceComposite } from './lib/models/data-sources';
 export { SzGraphTooltipEntityModel, SzGraphTooltipLinkModel, SzGraphNodeFilterPair, SzMatchKeyComposite, SzMatchKeyTokenComposite, SzEntityNetworkMatchKeyTokens, SzMatchKeyTokenFilterScope } from './lib/models/graph';
-export { SzNetworkGraphInputs } from './lib/models/SzNetworkGraph'
+export { SzNetworkGraphInputs, SzSavedGraphExportMeta } from './lib/models/SzNetworkGraph'
 export { SzDataSourceRecordsSelection, SzDataSourceRecordSelection, SzWhySelectionModeBehavior, SzWhySelectionMode } from './lib/models/data-source-record-selection';
 export {
   SzCrossSourceSummaryCategoryType,
