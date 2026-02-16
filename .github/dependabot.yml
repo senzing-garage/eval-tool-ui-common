@@ -1,21 +1,31 @@
-# Please see the documentation for all configuration options:
-# https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
-
+---
 version: 2
 updates:
   - package-ecosystem: "github-actions"
+    assignees:
+      - "kernelsam"
+    cooldown:
+      default-days: 21
+      exclude:
+        - "senzing-factory/*"
     directory: "/"
+    groups:
+      senzing-factory:
+        patterns:
+          - "senzing-factory/*"
     schedule:
       interval: "daily"
   - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "monthly"
     assignees:
       - "arawinters"
+    cooldown:
+      default-days: 21
+    directory: "/"
     allow:
       - dependency-type: "indirect"
       - dependency-type: "direct"
     ignore:
       - dependency-name: "*"
-        update-types: ["version-update:semver-major","version-update:semver-minor"]
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+    schedule:
+      interval: "monthly"
