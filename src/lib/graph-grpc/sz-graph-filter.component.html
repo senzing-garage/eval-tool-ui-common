@@ -13,25 +13,14 @@
       <button mat-icon-button *ngIf="showExportButton" (click)="onExportClick()" aria-label="Export graph" matTooltip="Export graph to file">
         <mat-icon>file_download</mat-icon>
       </button>
+      <button mat-icon-button *ngIf="showSaveButton" (click)="onSaveGraphClick()" aria-label="Save graph" matTooltip="Save graph">
+        <mat-icon>save</mat-icon>
+      </button>
       <button mat-icon-button *ngIf="showSaveButton" [matMenuTriggerFor]="savedGraphsMenu" aria-label="Saved graphs" matTooltip="Saved graphs">
         <mat-icon>bookmarks</mat-icon>
       </button>
     </div>
     <mat-menu #savedGraphsMenu="matMenu" class="saved-graphs-menu">
-      <div class="saved-graphs-save-form" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
-        <mat-form-field appearance="outline" class="saved-graphs-name-field">
-          <mat-label>Name</mat-label>
-          <input matInput [(ngModel)]="saveGraphName" placeholder="My graph snapshot">
-        </mat-form-field>
-        <mat-form-field appearance="outline" class="saved-graphs-desc-field">
-          <mat-label>Description</mat-label>
-          <input matInput [(ngModel)]="saveGraphDescription" placeholder="Optional description">
-        </mat-form-field>
-        <button mat-flat-button color="primary" [disabled]="!saveGraphName.trim()" (click)="onSaveGraphClick()">
-          Save Current
-        </button>
-      </div>
-      <mat-divider></mat-divider>
       <div *ngIf="savedGraphs.length === 0" class="saved-graphs-empty">
         <span>No saved graphs yet</span>
       </div>

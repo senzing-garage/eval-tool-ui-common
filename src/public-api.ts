@@ -52,6 +52,7 @@ export { SzGraphStorageService, SZ_GRAPH_STORAGE_URL } from './lib/services/sz-g
 export { SzRelationshipNetworkComponent } from './lib/graph-grpc/sz-relationship-network/sz-relationship-network.component';
 export * from './lib/graph-grpc/sz-graph-control.component';
 export * from './lib/graph-grpc/sz-graph-filter.component';
+export { SzSaveGraphDialog, SzSaveGraphDialogData, SzSaveGraphDialogResult } from './lib/graph-grpc/sz-save-graph-dialog.component';
 export { SzEntityDetailGraphComponent } from './lib/entity-grpc/detail/sz-entity-detail-graph/sz-entity-detail-graph.component';
 export { SzStandaloneGraphComponent } from './lib/entity-grpc/detail/sz-entity-detail-graph/sz-standalone-graph.component';
 export * from './lib/entity-grpc/detail/sz-entity-detail-graph/sz-entity-detail-graph-control.component';

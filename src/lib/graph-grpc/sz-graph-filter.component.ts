@@ -27,6 +27,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { SzSaveGraphDialog, SzSaveGraphDialogResult } from './sz-save-graph-dialog.component';
 import { CdkAccordionModule } from '@angular/cdk/accordion';
 import { CdkMenuModule } from '@angular/cdk/menu';
 import { SzSdkDataSource } from '../models/grpc/config';
@@ -59,13 +61,15 @@ import { SzSdkDataSource } from '../models/grpc/config';
       CommonModule, ReactiveFormsModule, FormsModule,
       MatSliderModule, MatCheckboxModule, MatInputModule, MatButtonModule,
       MatChipsModule, MatBadgeModule, MatIconModule, MatTooltipModule,
-      MatMenuModule, MatDividerModule, MatFormFieldModule,
+      MatMenuModule, MatDividerModule, MatFormFieldModule, MatDialogModule,
       DragDropModule,
     ]
 })
 export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy {
   /** @internal */
   public graphStorage = inject(SzGraphStorageService);
+  /** @internal */
+  private dialog = inject(MatDialog);
 
   /**
    * used for displaying tooltips above all other page content
@@ -306,10 +310,6 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
 
   /** saved graphs list from the storage service */
   public savedGraphs: SzSavedGraphExportMeta[] = [];
-  /** name input for save form */
-  public saveGraphName: string = '';
-  /** description input for save form */
-  public saveGraphDescription: string = '';
 
   /** whether the import/export section should be visible at all */
   public get showImportExportSection(): boolean {
@@ -1056,12 +1056,14 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
     return true;
     return (this.showMatchKeyTokens && this.showMatchKeyTokens.length > 0) ? (this.showMatchKeyTokens.findIndex( (mkCat)=> { return mkCat.name === mkName; } ) > -1) : true;
   }
-  /** emits saveGraph with the current name/description, then resets the form */
+  /** opens the save dialog and emits saveGraph with the result */
   onSaveGraphClick(): void {
-    if (!this.saveGraphName.trim()) return;
-    this.saveGraph.emit({ name: this.saveGraphName.trim(), description: this.saveGraphDescription.trim() });
-    this.saveGraphName = '';
-    this.saveGraphDescription = '';
+    const ref = this.dialog.open(SzSaveGraphDialog, { data: {} });
+    ref.afterClosed().subscribe((result: SzSaveGraphDialogResult | undefined) => {
+      if (result) {
+        this.saveGraph.emit({ name: result.name, description: result.description });
+      }
+    });
   }
 
   /** emits loadGraph with the saved graph's id */

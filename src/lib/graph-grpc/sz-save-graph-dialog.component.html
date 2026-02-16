@@ -1,0 +1,15 @@
+<h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle>Save Graph</h1>
+<div mat-dialog-content>
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Name</mat-label>
+    <input matInput [(ngModel)]="name" placeholder="My graph snapshot" cdkFocusInitial>
+  </mat-form-field>
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Description</mat-label>
+    <textarea matInput [(ngModel)]="description" placeholder="Optional description" rows="3"></textarea>
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-stroked-button mat-dialog-close color="primary" class="cancel">Cancel</button>
+  <button mat-stroked-button color="primary" class="ok" [disabled]="!name.trim()" (click)="onSave()">Save</button>
+</div>

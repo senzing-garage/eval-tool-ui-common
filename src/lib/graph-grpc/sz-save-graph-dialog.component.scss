@@ -1,0 +1,51 @@
+:host {
+    display: block;
+    position: relative;
+    height: 100%;
+
+    .mat-mdc-dialog-title {
+        background-color: #6d738c;
+        text-align: center;
+        padding: 6px;
+        color: #fff;
+        border-radius: 3px;
+        margin: 0px 0px;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+    .mat-mdc-dialog-content {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 480px;
+        margin: 0;
+        padding: 16px;
+    }
+    .mat-mdc-dialog-actions {
+        justify-content: flex-end;
+        padding: 10px 0;
+        margin-bottom: 0px;
+        width: 100%;
+        background-color: #fbfbfb;
+
+        button.ok, button.cancel {
+            min-width: 100px;
+            color: #6d738c;
+
+            &:hover {
+                color: #384786;
+            }
+        }
+        button:last-child {
+            margin-right: 20px;
+        }
+    }
+    .full-width {
+        width: 100%;
+    }
+}
+::ng-deep.mat-mdc-dialog-container {
+    resize: both;
+    overflow: auto;
+    background: #fff;
+}

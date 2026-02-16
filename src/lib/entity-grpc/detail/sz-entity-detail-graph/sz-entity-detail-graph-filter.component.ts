@@ -13,6 +13,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatDialogModule } from '@angular/material/dialog';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { SzPrefsService } from '../../../services/sz-prefs.service';
 import { SzDataSourcesService } from '../../../services/sz-datasources.service';
@@ -46,7 +47,7 @@ import { SzGraphFilterComponent } from '../../../graph-grpc/sz-graph-filter.comp
       CommonModule, ReactiveFormsModule, FormsModule,
       MatSliderModule, MatCheckboxModule, MatInputModule, MatButtonModule,
       MatChipsModule, MatBadgeModule, MatIconModule, MatTooltipModule,
-      MatMenuModule, MatDividerModule, MatFormFieldModule,
+      MatMenuModule, MatDividerModule, MatFormFieldModule, MatDialogModule,
       DragDropModule,
     ]
 })
