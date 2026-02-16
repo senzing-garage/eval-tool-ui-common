@@ -304,9 +304,9 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
   /** emitted when user wants to save the current graph to the storage server */
   @Output() public saveGraph = new EventEmitter<{ name: string; description: string }>();
   /** emitted when user wants to load a saved graph from the storage server */
-  @Output() public loadGraph = new EventEmitter<number>();
+  @Output() public loadGraph = new EventEmitter<string>();
   /** emitted when user wants to delete a saved graph from the storage server */
-  @Output() public deleteGraph = new EventEmitter<number>();
+  @Output() public deleteGraph = new EventEmitter<string>();
 
   /** saved graphs list from the storage service */
   public savedGraphs: SzSavedGraphExportMeta[] = [];
@@ -1067,12 +1067,12 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   /** emits loadGraph with the saved graph's id */
-  onLoadGraphClick(id: number): void {
+  onLoadGraphClick(id: string): void {
     this.loadGraph.emit(id);
   }
 
   /** emits deleteGraph with the saved graph's id */
-  onDeleteGraphClick(id: number, event: Event): void {
+  onDeleteGraphClick(id: string, event: Event): void {
     event.stopPropagation();
     this.deleteGraph.emit(id);
   }

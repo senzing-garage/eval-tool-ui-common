@@ -102,7 +102,7 @@ export interface SzGraphExportLink {
 
 /** Metadata returned when listing saved graph snapshots (no graph_data). */
 export interface SzSavedGraphExportMeta {
-    id: number;
+    id: string;
     name: string;
     description: string;
     created_at: string;

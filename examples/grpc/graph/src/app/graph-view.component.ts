@@ -131,14 +131,14 @@ export class GraphViewComponent {
     });
   }
 
-  public onLoadGraph(id: number): void {
+  public onLoadGraph(id: string): void {
     this.graphStorageService.load(id).subscribe({
       next: (data) => this.onImportGraph(data),
       error: (err) => console.error('Failed to load graph:', err)
     });
   }
 
-  public onDeleteGraph(id: number): void {
+  public onDeleteGraph(id: string): void {
     this.graphStorageService.delete(id).subscribe({
       next: () => console.log('Graph deleted:', id),
       error: (err) => console.error('Failed to delete graph:', err)

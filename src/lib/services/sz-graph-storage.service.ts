@@ -11,7 +11,7 @@ import { SzGraphEnvironment } from './sz-graph-environment';
  * the storage backend is unavailable.
  *
  * Provide a {@link SzGraphEnvironment} via the `'GRAPH_ENVIRONMENT'` injection
- * token to override the default base URL (`http://localhost:3000/api`).
+ * token to override the default base URL (`http://localhost:3000`).
  */
 @Injectable({ providedIn: 'root' })
 export class SzGraphStorageService {
@@ -37,7 +37,7 @@ export class SzGraphStorageService {
     @Optional() @Inject('GRAPH_ENVIRONMENT') graphEnv: SzGraphEnvironment | null
   ) {
     this.http = http;
-    this.baseUrl = graphEnv?.basePath ?? 'http://localhost:3000/api';
+    this.baseUrl = graphEnv?.basePath ?? 'http://localhost:3000';
     this.checkConnection();
   }
 
@@ -67,7 +67,7 @@ export class SzGraphStorageService {
    * Loads the full graph data for a saved graph.
    * @param id - the saved graph id
    */
-  load(id: number): Observable<SzGraphExport> {
+  load(id: string): Observable<SzGraphExport> {
     return this.http.get<SzGraphExport>(`${this.baseUrl}/graphs/${id}`);
   }
 
@@ -77,8 +77,8 @@ export class SzGraphStorageService {
    * @param description - optional description
    * @param data - the graph export payload
    */
-  save(name: string, description: string, data: SzGraphExport): Observable<{ id: number }> {
-    return this.http.post<{ id: number }>(`${this.baseUrl}/graphs`, { name, description, data }).pipe(
+  save(name: string, description: string, data: SzGraphExport): Observable<{ id: string }> {
+    return this.http.post<{ id: string }>(`${this.baseUrl}/graphs`, { name, description, data }).pipe(
       tap(() => this.refresh())
     );
   }
@@ -88,7 +88,7 @@ export class SzGraphStorageService {
    * @param id - the saved graph id
    * @param changes - fields to update (name, description, and/or data)
    */
-  update(id: number, changes: Partial<{ name: string; description: string; data: SzGraphExport }>): Observable<{ ok: boolean }> {
+  update(id: string, changes: Partial<{ name: string; description: string; data: SzGraphExport }>): Observable<{ ok: boolean }> {
     return this.http.put<{ ok: boolean }>(`${this.baseUrl}/graphs/${id}`, changes).pipe(
       tap(() => this.refresh())
     );
@@ -98,7 +98,7 @@ export class SzGraphStorageService {
    * Deletes a saved graph and refreshes the saved graphs list.
    * @param id - the saved graph id
    */
-  delete(id: number): Observable<{ ok: boolean }> {
+  delete(id: string): Observable<{ ok: boolean }> {
     return this.http.delete<{ ok: boolean }>(`${this.baseUrl}/graphs/${id}`).pipe(
       tap(() => this.refresh())
     );

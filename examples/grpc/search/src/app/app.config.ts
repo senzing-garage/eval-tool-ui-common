@@ -15,7 +15,7 @@ const restSdkEnv = new SzRestConfiguration({
   'withCredentials': true
 });
 const graphStorageEnv = new SzGraphEnvironment({
-  basePath: 'http://localhost:3000/api'
+  basePath: 'http://localhost:3000'
 });
 const datamartEnv = new SzDataMartEnvironment({
   basePath: 'http://localhost:8261/data-mart',
