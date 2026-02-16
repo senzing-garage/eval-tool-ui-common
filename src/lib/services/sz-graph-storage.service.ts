@@ -1,19 +1,23 @@
-import { Injectable, InjectionToken, inject } from '@angular/core';
+import { Injectable, Inject, Optional } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { SzGraphExport, SzSavedGraphExportMeta } from '../models/SzNetworkGraph';
-
-export const SZ_GRAPH_STORAGE_URL = new InjectionToken<string>('SZ_GRAPH_STORAGE_URL', {
-  providedIn: 'root',
-  factory: () => 'http://localhost:3000/api'
-});
+import { SzGraphEnvironment } from './sz-graph-environment';
 
 @Injectable({ providedIn: 'root' })
 export class SzGraphStorageService {
-  private http = inject(HttpClient);
-  private baseUrl = inject(SZ_GRAPH_STORAGE_URL);
+  private http: HttpClient;
+  private baseUrl: string;
 
   savedGraphs$ = new BehaviorSubject<SzSavedGraphExportMeta[]>([]);
+
+  constructor(
+    http: HttpClient,
+    @Optional() @Inject('GRAPH_ENVIRONMENT') graphEnv: SzGraphEnvironment | null
+  ) {
+    this.http = http;
+    this.baseUrl = graphEnv?.basePath ?? 'http://localhost:3000/api';
+  }
 
   list(): Observable<SzSavedGraphExportMeta[]> {
     return this.http.get<SzSavedGraphExportMeta[]>(`${this.baseUrl}/graphs`);

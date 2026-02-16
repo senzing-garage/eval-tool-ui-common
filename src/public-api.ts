@@ -24,7 +24,8 @@ export { SzPrefsService, SzSdkPrefsModel} from './lib/services/sz-prefs.service'
 export * from './lib/services/sz-search.service';  // updated to use rest
 export * from './lib/services/sz-ui.service';
 export * from './lib/services/sz-how-ui.service';
-export { SzGraphStorageService, SZ_GRAPH_STORAGE_URL } from './lib/services/sz-graph-storage.service';
+export { SzGraphStorageService } from './lib/services/sz-graph-storage.service';
+export { SzGraphEnvironment, SzGraphEnvironmentParameters } from './lib/services/sz-graph-environment';
 
 /** components */
   /** bulk data related */
