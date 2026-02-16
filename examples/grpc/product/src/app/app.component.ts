@@ -1,22 +1,11 @@
 import { Component } from '@angular/core';
-import { SzProductInfoComponent } from '@senzing/sz-sdk-components-grpc-web';
-import { SzGrpcWebEnvironment } from '@senzing/sz-sdk-typescript-grpc-web';
-
-const grpcSdkEnv = new SzGrpcWebEnvironment({
-    connectionString: `http://localhost:8260/grpc`
-});
+import { SzProductInfoComponent } from '@senzing/eval-tool-ui-common';
 
 @Component({
   selector: 'app-root',
   imports: [SzProductInfoComponent],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss',
-  /*providers: [
-    {
-      provide: 'GRPC_ENVIRONMENT',
-      useValue: grpcSdkEnv
-    }
-  ]*/
+  styleUrl: './app.component.scss'
 })
 export class AppComponent {
   title = 'product';
