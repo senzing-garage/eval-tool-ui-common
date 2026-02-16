@@ -298,7 +298,7 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
     this._showSaveButton = parseBool(value);
   }
   public get showSaveButton(): boolean {
-    return this._showSaveButton;
+    return this._showSaveButton && this.graphStorage.connectionValid;
   }
 
   /** emitted when user wants to save the current graph to the storage server */
@@ -934,7 +934,7 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
     ).subscribe(this.onMatchKeyTokenSelectionScopeChanged.bind(this));
 
     // subscribe to saved graphs list from storage service
-    this.graphStorage.savedGraphs$.pipe(
+    this.graphStorage.savedGraphsUpdated.pipe(
       takeUntil(this.unsubscribe$)
     ).subscribe((graphs) => {
       this.savedGraphs = graphs;

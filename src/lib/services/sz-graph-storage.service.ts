@@ -1,6 +1,6 @@
 import { Injectable, Inject, Optional } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable, tap, retry, timer } from 'rxjs';
 import { SzGraphExport, SzSavedGraphExportMeta } from '../models/SzNetworkGraph';
 import { SzGraphEnvironment } from './sz-graph-environment';
 
@@ -8,8 +8,14 @@ import { SzGraphEnvironment } from './sz-graph-environment';
 export class SzGraphStorageService {
   private http: HttpClient;
   private baseUrl: string;
+  private _serverInfo: Record<string, unknown> | null = null;
 
-  savedGraphs$ = new BehaviorSubject<SzSavedGraphExportMeta[]>([]);
+  private _savedGraphs$     = new BehaviorSubject<SzSavedGraphExportMeta[]>([]);
+  public savedGraphsUpdated = this._savedGraphs$.asObservable();
+
+  get connectionValid(): boolean {
+    return this._serverInfo !== null;
+  }
 
   constructor(
     http: HttpClient,
@@ -17,6 +23,19 @@ export class SzGraphStorageService {
   ) {
     this.http = http;
     this.baseUrl = graphEnv?.basePath ?? 'http://localhost:3000/api';
+    this.checkConnection();
+  }
+
+  checkConnection(): void {
+    let attempt = 0;
+    this.http.get<Record<string, unknown>>(`${this.baseUrl}/info`).pipe(
+      retry({
+        delay: () => {
+          attempt++;
+          return timer(attempt <= 6 ? 10_000 : 60_000);
+        }
+      })
+    ).subscribe((info) => this._serverInfo = info);
   }
 
   list(): Observable<SzSavedGraphExportMeta[]> {
@@ -47,7 +66,7 @@ export class SzGraphStorageService {
 
   refresh(): void {
     this.list().subscribe({
-      next: (graphs) => this.savedGraphs$.next(graphs),
+      next: (graphs) => this._savedGraphs$.next(graphs),
       error: (err) => console.warn('SzGraphStorageService: failed to refresh saved graphs', err)
     });
   }
