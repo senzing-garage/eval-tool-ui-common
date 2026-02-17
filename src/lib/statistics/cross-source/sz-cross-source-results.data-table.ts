@@ -1115,7 +1115,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
               DATA_TYPE: SzSampleSetTableRowType.ENTITY_RECORD
             }, rec) as SzSampleSetEntityTableRow;
             if(rec.FEATURES && Object.keys(rec.FEATURES).length > 0) {
-              let _featuresAsStrings = getStringRecordFeatures(rec.FEATURES, true, this.configManager.fTypeToAttrClassMap, true);
+              let _featuresAsStrings = getStringRecordFeatures(rec.FEATURES, true, this.configManager.fTypeToAttrClassMap, true, true);
               if(_featuresAsStrings.has('ATTRIBUTE'))   retVal.ATTRIBUTE_DATA   = _featuresAsStrings.get('ATTRIBUTE');
               if(_featuresAsStrings.has('ADDRESS'))     retVal.ADDRESS_DATA     = _featuresAsStrings.get('ADDRESS');
               if(_featuresAsStrings.has('IDENTIFIER'))  retVal.IDENTIFIER_DATA  = _featuresAsStrings.get('IDENTIFIER');
@@ -1157,7 +1157,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
               dataType: SzSampleSetTableRowType.ENTITY_RECORD
             }, rec) as SzSampleSetEntityTableRow;
             if(rec.FEATURES && Object.keys(rec.FEATURES).length > 0) {
-              let _featuresAsStrings = getStringRecordFeatures(rec.FEATURES, true, this.configManager.fTypeToAttrClassMap, true);
+              let _featuresAsStrings = getStringRecordFeatures(rec.FEATURES, true, this.configManager.fTypeToAttrClassMap, true, true);
               if(_featuresAsStrings.has('ATTRIBUTE'))   retVal.ATTRIBUTE_DATA   = _featuresAsStrings.get('ATTRIBUTE');
               if(_featuresAsStrings.has('ADDRESS'))     retVal.ADDRESS_DATA     = _featuresAsStrings.get('ADDRESS');
               if(_featuresAsStrings.has('IDENTIFIER'))  retVal.IDENTIFIER_DATA  = _featuresAsStrings.get('IDENTIFIER');
