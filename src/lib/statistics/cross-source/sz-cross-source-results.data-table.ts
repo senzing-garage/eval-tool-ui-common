@@ -92,7 +92,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
     /** display the columns in this order */
     override _colOrder: Map<string,number> = new Map([
       ['ENTITY_ID', 0],
-      ['resolutionRuleCode', 1],
+      ['ERRULE_CODE', 1],
       ['MATCH_KEY', 2],
       ['relatedEntityId', 3],
       ['DATA_SOURCE', 4],
@@ -111,7 +111,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
     */
     override _cols: Map<string,string> = new Map([
       ['ENTITY_ID', 'Entity ID'],
-      ['resolutionRuleCode', 'ER Code'],
+      ['ERRULE_CODE', 'ER Code'],
       ['MATCH_KEY', 'Match Key'],
       ['relatedEntityId', 'Related Entity'],
       ['DATA_SOURCE', 'Data Source'],
@@ -151,7 +151,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
     private _matchLevelToColumnsMap  = new Map<number, string[]>([
       [1,[
         'ENTITY_ID',
-        'resolutionRuleCode',
+        'ERRULE_CODE',
         'MATCH_KEY',
         'DATA_SOURCE',
         'RECORD_ID',
@@ -166,7 +166,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
       ]],
       [2,[
         'ENTITY_ID',
-        /*'resolutionRuleCode',*/
+        /*'ERRULE_CODE',*/
         'MATCH_KEY',
         'relatedEntityId',
         'DATA_SOURCE',
@@ -182,7 +182,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
       ]],
       [3,[
         'ENTITY_ID',
-        /*'resolutionRuleCode',*/
+        /*'ERRULE_CODE',*/
         'MATCH_KEY',
         'relatedEntityId',
         'DATA_SOURCE',
@@ -219,7 +219,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
     */
     override _selectableColumns: string[] = [
       'ENTITY_ID',
-      'resolutionRuleCode',
+      'ERRULE_CODE',
       'MATCH_KEY',
       'relatedEntityId',
       'DATA_SOURCE',
