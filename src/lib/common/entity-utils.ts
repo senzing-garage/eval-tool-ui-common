@@ -43,7 +43,7 @@ export function getStringEntityFeatures(features: {
     return retMap;
 }
 
-export function getStringRecordFeatures(features: SzSdkRecordFeatures, groupByAttributeClass = false, fTypeToAttrClassMap?: Map<string, SzAttrClass | SzAttrClass[]>, includeUsageType?: boolean): Map<string, string[]> {
+export function getStringRecordFeatures(features: SzSdkRecordFeatures, groupByAttributeClass = false, fTypeToAttrClassMap?: Map<string, SzAttrClass | SzAttrClass[]>, includeUsageType?: boolean, includeFeatureType?: boolean): Map<string, string[]> {
     let retMap = new Map<string, string[]>();
     for(let fTypeCode in features){
         let groupKey = (groupByAttributeClass && fTypeToAttrClassMap && fTypeToAttrClassMap.has(fTypeCode)) ? fTypeToAttrClassMap.get(fTypeCode) as SzAttrClass : fTypeCode;
@@ -55,6 +55,8 @@ export function getStringRecordFeatures(features: SzSdkRecordFeatures, groupByAt
             let _fVal = feat.FEAT_DESC;
             if(includeUsageType && feat.USAGE_TYPE) {
                 _fVal = `${feat.USAGE_TYPE}: ${feat.FEAT_DESC}`;
+            } else if(includeFeatureType) {
+                _fVal = `${fTypeCode}: ${feat.FEAT_DESC}`;
             }
             _values.push(_fVal);
         });
