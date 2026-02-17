@@ -17,6 +17,13 @@ export interface SzSdkEntityFeature {
     LABEL?: string
 }
 export interface SzSdkEntityFeatures {[key: string]: SzSdkEntityFeature[]}
+export interface SzSdkRecordFeature {
+    LIB_FEAT_ID: number,
+    FEAT_DESC: string,
+    USAGE_TYPE?: string,
+    ATTRIBUTES?: {[key: string]: string}
+}
+export interface SzSdkRecordFeatures {[key: string]: SzSdkRecordFeature[]}
 export interface SzSdkSearchRecordSummary {DATA_SOURCE: string, RECORD_COUNT: number}
 export interface SzSdkSearchResolvedEntity{
     ENTITY_ID: number,
@@ -57,7 +64,7 @@ export interface SzSdkEntityRecord extends SzSdkEntityBaseRecord {
     ERRULE_CODE?: string,
     FIRST_SEEN_DT?: string,
     LAST_SEEN_DT?: string,
-    FEATURES?: SzSdkEntityFeatures,
+    FEATURES?: SzSdkEntityFeatures | SzSdkRecordFeatures,
     NAMEORG?: string
 }
 

@@ -9,7 +9,7 @@ import { Subject, BehaviorSubject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { SzPrefsService } from '../../../services/sz-prefs.service';
 import { SzWhySelectionMode, SzWhySelectionAction, SzWhySelectionModeBehavior, SzWhySelectionActionBehavior } from '../../../models/data-source-record-selection';
-import { SzSdkEntityFeature, SzSdkEntityRecord, SzSdkSearchResolvedEntity, SzSdkSearchResult } from '../../../models/grpc/engine';
+import { SzSdkEntityFeature, SzSdkEntityFeatures, SzSdkEntityRecord, SzSdkSearchResolvedEntity, SzSdkSearchResult } from '../../../models/grpc/engine';
 import {  SzResumeRelatedEntity } from '../../../models/SzResumeEntity';
 import { getEntityFeaturesByType, getStringEntityFeatures } from '../../../common/entity-utils';
 import { SzGrpcConfigManagerService } from '../../../services/grpc/configManager.service';
@@ -126,7 +126,7 @@ export class SzEntityRecordCardContentComponentGrpc implements OnInit {
       }
       if(this.record){
         // record from resume
-        _features = this.record.FEATURES;
+        _features = this.record.FEATURES as SzSdkEntityFeatures;
       }
       if(_features) {
         let _featuresAsStrings = getStringEntityFeatures(_features, true, this.configManager.fTypeToAttrClassMap);
@@ -325,7 +325,7 @@ export class SzEntityRecordCardContentComponentGrpc implements OnInit {
     let featuresByType: Map<string, SzSdkEntityFeature[]>;
     
     if(entityOrRecord) {
-      let _features = ((entityOrRecord as SzSdkEntityRecord).RECORD_ID) ? (entityOrRecord as SzSdkEntityRecord).FEATURES : (entityOrRecord as SzResumeRelatedEntity).FEATURES;
+      let _features = ((entityOrRecord as SzSdkEntityRecord).RECORD_ID) ? (entityOrRecord as SzSdkEntityRecord).FEATURES as SzSdkEntityFeatures : (entityOrRecord as SzResumeRelatedEntity).FEATURES;
       featuresByType  = getEntityFeaturesByType(_features, featureToAttrMap);
       if(featuresByType) {
         // other data
@@ -365,7 +365,7 @@ export class SzEntityRecordCardContentComponentGrpc implements OnInit {
         let _features = this._relatedEntity.FEATURES;
         this._featuresByType = getEntityFeaturesByType(_features, _fTypeToAttrClassMap);
       } else if(this._record && this._record.FEATURES) {
-        let _features = this._record.FEATURES;
+        let _features = this._record.FEATURES as SzSdkEntityFeatures;
         this._featuresByType = getEntityFeaturesByType(_features, _fTypeToAttrClassMap);
 
       }
