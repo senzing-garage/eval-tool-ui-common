@@ -26,6 +26,7 @@ updates:
       - dependency-type: "direct"
     ignore:
       - dependency-name: "*"
-        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+        update-types:
+          ["version-update:semver-major", "version-update:semver-minor"]
     schedule:
       interval: "monthly"
