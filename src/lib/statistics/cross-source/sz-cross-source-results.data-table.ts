@@ -46,7 +46,7 @@ import {
   SzDataTableRelatedEntity,
 } from '../../models/data-sampling';
 import { SzSdkEntityRecord } from '../../models/grpc/engine';
-import { getStringEntityFeatures } from '../../common/entity-utils';
+import { getStringEntityFeatures, getStringRecordFeatures } from '../../common/entity-utils';
 import { SzGrpcConfigManagerService } from '../../services/grpc/configManager.service';
 
 //import { SzSdkEntityResponse, SzSdkResolvedEntity, SzSdkRelatedEntity } from '../../models/grpc/engine'
@@ -1109,13 +1109,13 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
           
           // add "rows: SzStatSampleEntityTableRow[]" // SzStatSampleEntityTableRow
           let _entRows = baseItem.RECORDS && baseItem.RECORDS.map ? baseItem.RECORDS.map((rec: SzSdkEntityRecord) => {
-            let retVal: SzSampleSetEntityTableRow      = Object.assign({
+            let retVal = Object.assign({
               ENTITY_ID: baseItem.ENTITY_ID,
               ENTITY_NAME: baseItem.ENTITY_NAME,
               DATA_TYPE: SzSampleSetTableRowType.ENTITY_RECORD
-            }, rec);
+            }, rec) as SzSampleSetEntityTableRow;
             if(rec.FEATURES && Object.keys(rec.FEATURES).length > 0) {
-              let _featuresAsStrings = getStringEntityFeatures(rec.FEATURES, true, this.configManager.fTypeToAttrClassMap, true);
+              let _featuresAsStrings = getStringRecordFeatures(rec.FEATURES, true, this.configManager.fTypeToAttrClassMap, true);
               if(_featuresAsStrings.has('ATTRIBUTE'))   retVal.ATTRIBUTE_DATA   = _featuresAsStrings.get('ATTRIBUTE');
               if(_featuresAsStrings.has('ADDRESS'))     retVal.ADDRESS_DATA     = _featuresAsStrings.get('ADDRESS');
               if(_featuresAsStrings.has('IDENTIFIER'))  retVal.IDENTIFIER_DATA  = _featuresAsStrings.get('IDENTIFIER');
@@ -1151,13 +1151,13 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
 
           // add "rows: SzStatSampleEntityTableRow[]" // SzStatSampleEntityTableRow
           let rows = baseItem.RECORDS && baseItem.RECORDS.map ? baseItem.RECORDS.map((rec: SzSdkEntityRecord) => {
-            let retVal: SzSampleSetEntityTableRow = Object.assign({
+            let retVal = Object.assign({
               ENTITY_ID: baseItem.ENTITY_ID,
               ENTITY_NAME: baseItem.ENTITY_NAME,
               dataType: SzSampleSetTableRowType.ENTITY_RECORD
-            }, rec);
-            if(baseItem.FEATURES && Object.keys(baseItem.FEATURES).length > 0) {
-              let _featuresAsStrings = getStringEntityFeatures(baseItem.FEATURES, true, this.configManager.fTypeToAttrClassMap, true);
+            }, rec) as SzSampleSetEntityTableRow;
+            if(rec.FEATURES && Object.keys(rec.FEATURES).length > 0) {
+              let _featuresAsStrings = getStringRecordFeatures(rec.FEATURES, true, this.configManager.fTypeToAttrClassMap, true);
               if(_featuresAsStrings.has('ATTRIBUTE'))   retVal.ATTRIBUTE_DATA   = _featuresAsStrings.get('ATTRIBUTE');
               if(_featuresAsStrings.has('ADDRESS'))     retVal.ADDRESS_DATA     = _featuresAsStrings.get('ADDRESS');
               if(_featuresAsStrings.has('IDENTIFIER'))  retVal.IDENTIFIER_DATA  = _featuresAsStrings.get('IDENTIFIER');

@@ -1,6 +1,6 @@
 import { SzResolvedEntity } from "@senzing/rest-api-client-ng";
 import { SzSdkConfigAttr } from "../models/grpc/config";
-import { SzSdkEntityFeature, SzSdkSearchResolvedEntity } from "../models/grpc/engine";
+import { SzSdkEntityFeature, SzSdkRecordFeature, SzSdkRecordFeatures, SzSdkSearchResolvedEntity } from "../models/grpc/engine";
 import { SzAttrClass, SzFeatureType } from "../models/grpc/SzFeatureTypes";
 import { SzGrpcConfigManagerService } from "../services/grpc/configManager.service";
 import { SzResumeEntity } from "../models/SzResumeEntity";
@@ -25,7 +25,9 @@ export function getStringEntityFeatures(features: {
         }*/
         let _values     = retMap.has(groupKey) ? retMap.get(groupKey) : [];
         let _featValues = features[fTypeCode];
+        if(!_featValues || !Array.isArray(_featValues)) continue;
         _featValues.forEach((feat)=> {
+            if(!feat.FEAT_DESC_VALUES) return;
             feat.FEAT_DESC_VALUES.forEach((featDesc)=>{
                 let _fVal = featDesc.FEAT_DESC;
                 if(includeUsageType && feat.USAGE_TYPE) {
@@ -41,6 +43,26 @@ export function getStringEntityFeatures(features: {
     return retMap;
 }
 
+export function getStringRecordFeatures(features: SzSdkRecordFeatures, groupByAttributeClass = false, fTypeToAttrClassMap?: Map<string, SzAttrClass | SzAttrClass[]>, includeUsageType?: boolean): Map<string, string[]> {
+    let retMap = new Map<string, string[]>();
+    for(let fTypeCode in features){
+        let groupKey = (groupByAttributeClass && fTypeToAttrClassMap && fTypeToAttrClassMap.has(fTypeCode)) ? fTypeToAttrClassMap.get(fTypeCode) as SzAttrClass : fTypeCode;
+        let _values     = retMap.has(groupKey) ? retMap.get(groupKey) : [];
+        let _featValues = features[fTypeCode];
+        if(!_featValues || !Array.isArray(_featValues)) continue;
+        _featValues.forEach((feat: SzSdkRecordFeature) => {
+            if(!feat.FEAT_DESC) return;
+            let _fVal = feat.FEAT_DESC;
+            if(includeUsageType && feat.USAGE_TYPE) {
+                _fVal = `${feat.USAGE_TYPE}: ${feat.FEAT_DESC}`;
+            }
+            _values.push(_fVal);
+        });
+        retMap.set(groupKey, _values);
+    }
+    return retMap;
+}
+
 export function getEntityFeaturesByType(features: {
     [key: string] : SzSdkEntityFeature[]
  }, fTypeToAttrClassMap: Map<SzFeatureType, SzAttrClass | SzAttrClass[]>): Map<SzFeatureType, SzSdkEntityFeature[]> {
@@ -50,6 +72,7 @@ export function getEntityFeaturesByType(features: {
          let groupKey = (fTypeToAttrClassMap && fTypeToAttrClassMap.has(_fTypeCodeAsType)) ? fTypeToAttrClassMap.get(_fTypeCodeAsType) as SzAttrClass : _fTypeCodeAsType;
          let _values     = retMap.has(groupKey) ? retMap.get(groupKey) : [];
          let _featValues = features[fTypeCode];
+         if(!_featValues || !Array.isArray(_featValues)) continue;
          _featValues.forEach((feat)=> {
             let _fVal = feat;
             if(!_fVal.LABEL) { _fVal.LABEL = fTypeCode; }
