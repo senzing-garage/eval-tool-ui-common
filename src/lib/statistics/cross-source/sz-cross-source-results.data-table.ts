@@ -97,7 +97,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
       ['relatedEntityId', 3],
       ['DATA_SOURCE', 4],
       ['RECORD_ID', 5],
-      ['ENTITY_NAME', 6],
+      ['NAME_DATA', 6],
       ['ATTRIBUTE_DATA', 7],
       ['IDENTIFIER_DATA', 8],
       ['ADDRESS_DATA', 9],
@@ -116,7 +116,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
       ['relatedEntityId', 'Related Entity'],
       ['DATA_SOURCE', 'Data Source'],
       ['RECORD_ID', 'Record ID'],
-      ['ENTITY_NAME', 'Name Data'],
+      ['NAME_DATA', 'Name Data'],
       ['ATTRIBUTE_DATA', 'Attribute Data'],
       ['IDENTIFIER_DATA', 'Identifier Data'],
       ['ADDRESS_DATA', 'Address Data'],
@@ -155,7 +155,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
         'MATCH_KEY',
         'DATA_SOURCE',
         'RECORD_ID',
-        'ENTITY_NAME',
+        'NAME_DATA',
         'ATTRIBUTE_DATA',
         'IDENTIFIER_DATA',
         'ADDRESS_DATA',
@@ -171,7 +171,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
         'relatedEntityId',
         'DATA_SOURCE',
         'RECORD_ID',
-        'ENTITY_NAME',
+        'NAME_DATA',
         'ATTRIBUTE_DATA',
         'IDENTIFIER_DATA',
         'ADDRESS_DATA',
@@ -187,7 +187,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
         'relatedEntityId',
         'DATA_SOURCE',
         'RECORD_ID',
-        'ENTITY_NAME',
+        'NAME_DATA',
         'ATTRIBUTE_DATA',
         'IDENTIFIER_DATA',
         'ADDRESS_DATA',
@@ -1115,7 +1115,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
               DATA_TYPE: SzSampleSetTableRowType.ENTITY_RECORD
             }, rec);
             if(rec.FEATURES && Object.keys(rec.FEATURES).length > 0) {
-              let _featuresAsStrings = getStringEntityFeatures(rec.FEATURES, true, this.configManager.fTypeToAttrClassMap);
+              let _featuresAsStrings = getStringEntityFeatures(rec.FEATURES, true, this.configManager.fTypeToAttrClassMap, true);
               if(_featuresAsStrings.has('ATTRIBUTE'))   retVal.ATTRIBUTE_DATA   = _featuresAsStrings.get('ATTRIBUTE');
               if(_featuresAsStrings.has('ADDRESS'))     retVal.ADDRESS_DATA     = _featuresAsStrings.get('ADDRESS');
               if(_featuresAsStrings.has('IDENTIFIER'))  retVal.IDENTIFIER_DATA  = _featuresAsStrings.get('IDENTIFIER');
@@ -1157,7 +1157,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
               dataType: SzSampleSetTableRowType.ENTITY_RECORD
             }, rec);
             if(baseItem.FEATURES && Object.keys(baseItem.FEATURES).length > 0) {
-              let _featuresAsStrings = getStringEntityFeatures(baseItem.FEATURES, true, this.configManager.fTypeToAttrClassMap);
+              let _featuresAsStrings = getStringEntityFeatures(baseItem.FEATURES, true, this.configManager.fTypeToAttrClassMap, true);
               if(_featuresAsStrings.has('ATTRIBUTE'))   retVal.ATTRIBUTE_DATA   = _featuresAsStrings.get('ATTRIBUTE');
               if(_featuresAsStrings.has('ADDRESS'))     retVal.ADDRESS_DATA     = _featuresAsStrings.get('ADDRESS');
               if(_featuresAsStrings.has('IDENTIFIER'))  retVal.IDENTIFIER_DATA  = _featuresAsStrings.get('IDENTIFIER');
