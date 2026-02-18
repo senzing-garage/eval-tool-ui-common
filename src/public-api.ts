@@ -108,6 +108,10 @@ export { SzWhyEntitiesComparisonComponent } from './lib/why/sz-why-entities.comp
 export { SzWhyEntityDialog } from './lib/why/sz-why-entity.component';
 export { SzWhyEntitiesDialog } from './lib/why/sz-why-entities.component';
 
+/** why gRPC */
+export { SzWhyRecordGrpcComponent, SzWhyRecordGrpcDialog } from './lib/why-grpc/sz-why-record-grpc.component';
+export { SzWhyEntitiesGrpcComponent, SzWhyEntitiesGrpcDialog } from './lib/why-grpc/sz-why-entities-grpc.component';
+
 /** how */
 export { SzHowEntityGrpcComponent } from './lib/how-grpc/sz-how-entity.component';
 export { SzHowStepNodeComponent } from './lib/how-grpc/sz-how-step-node.component'
@@ -138,7 +142,9 @@ export { SzEntityRecordViewerComponent } from './lib/record/sz-entity-record-vie
 export * from './lib/models/grpc/config';
 export * from './lib/models/grpc/engine';
 export * from './lib/models/grpc/product';
+export * from './lib/models/grpc/why';
 export * from './lib/models/grpc/SzFeatureTypes';
+export * from './lib/models/data-why-grpc';
 export * from './lib/models/SzNetworkGraph';
 export * from './lib/models/SzResumeEntity';
 // services

@@ -17,8 +17,8 @@ import {
 import { MatDialog } from '@angular/material/dialog';
 
 //import { SzEntityDetailGraphComponent } from './sz-entity-detail-graph/sz-entity-detail-graph.component';
-import { SzWhyEntityDialog } from '../../why/sz-why-entity.component';
-import { SzWhyEntitiesDialog } from '../../why/sz-why-entities.component';
+import { SzWhyRecordGrpcDialog } from '../../why-grpc/sz-why-record-grpc.component';
+import { SzWhyEntitiesGrpcDialog } from '../../why-grpc/sz-why-entities-grpc.component';
 
 import { SzPrefsService } from '../../services/sz-prefs.service';
 import { parseBool } from '../../common/utils';
@@ -1001,12 +1001,8 @@ export class SzEntityDetailGrpcComponent implements OnInit, OnDestroy, AfterView
       _data.entityName = this.entity.BEST_NAME ? this.entity.BEST_NAME : this.entity.ENTITY_NAME;
     }
     if(this._openWhyComparisonModalOnClick){
-      this.dialog.open(SzWhyEntityDialog, {
-        panelClass: 'why-entity-dialog-panel',
-        minWidth: 800,
-        height: 'var(--sz-why-dialog-default-height)',
-        data: _data
-      });
+      // whyEntityByEntityID was removed from gRPC SDK; single-entity why is not available
+      console.warn('Single-entity why is not available in gRPC mode. Use record-level why instead.');
     }
   }
   /**
@@ -1032,16 +1028,20 @@ export class SzEntityDetailGrpcComponent implements OnInit, OnDestroy, AfterView
   public onCompareRecordsForWhy(records: SzRecordId[]) {
     //console.log('SzEntityDetailComponent.onCompareRecordsForWhy: ', records);
     this.recordsWhyButtonClick.emit(records);
-    if(this._openWhyComparisonModalOnClick) {
-      this.dialog.open(SzWhyEntityDialog, {
+    if(this._openWhyComparisonModalOnClick && records && records.length > 0) {
+      // records may be SzSdkEntityRecord (gRPC) with DATA_SOURCE/RECORD_ID properties
+      let rec = records[0] as any;
+      let dataSource = rec.DATA_SOURCE || rec.src;
+      let recordId = rec.RECORD_ID || rec.id;
+      this.dialog.open(SzWhyRecordGrpcDialog, {
         panelClass: 'why-entity-dialog-panel',
         minWidth: 800,
         height: 'var(--sz-why-dialog-default-height)',
         data: {
-          entityId: this.entity.ENTITY_ID,
+          DATA_SOURCE: dataSource,
+          RECORD_ID: recordId,
           showOkButton: false,
-          okButtonText: 'Close',
-          records: records
+          okButtonText: 'Close'
         }
       });
     }
@@ -1052,10 +1052,10 @@ export class SzEntityDetailGrpcComponent implements OnInit, OnDestroy, AfterView
     if(entityIds && entityIds.length > 0 && entityIds.push){
       entityIds.push(this.entity.ENTITY_ID);
     }
-    
+
     this.relatedEntitiesWhyNotButtonClick.emit(entityIds);
     if(this._openWhyComparisonModalOnClick) {
-      this.dialog.open(SzWhyEntitiesDialog, {
+      this.dialog.open(SzWhyEntitiesGrpcDialog, {
         panelClass: 'why-entities-dialog-panel',
         minWidth: 800,
         height: 'var(--sz-why-dialog-default-height)',
@@ -1262,7 +1262,7 @@ export class SzEntityDetailGrpcComponent implements OnInit, OnDestroy, AfterView
   public openWhyReportForGraphRelationship(event: any) {
     if(event && event.sourceEntityId && event.targetEntityId) {
       this.closeGraphContextMenu();
-      this.dialog.open(SzWhyEntitiesDialog, {
+      this.dialog.open(SzWhyEntitiesGrpcDialog, {
         panelClass: 'why-entities-dialog-panel',
         minWidth: 800,
         height: 'var(--sz-why-dialog-default-height)',

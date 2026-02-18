@@ -5,6 +5,7 @@ import { SzProductLicenseResponse, SzProductVersionResponse } from '../../models
 import { SzGrpcConfig } from './config.service';
 import { isNotNull } from '../../common/utils';
 import { SzSdkEntityResponse, SzSdkFindNetworkResponse } from '../../models/grpc/engine';
+import { SzSdkWhyEntitiesResponse, SzSdkWhyRecordInEntityResponse } from '../../models/grpc/why';
 import { SzNetorkGraphCompositeResponse } from '../../models/SzNetworkGraph';
 
 @Injectable({
@@ -223,6 +224,34 @@ export class SzGrpcEngineService {
         this.szEnvironment?.engine?.reevaluateRecord(dataSourceCode, recordId, flags).then((resp) => {
           retVal.next(JSON.parse(resp as string));
         })
+      }
+      return retVal.asObservable();
+    }
+
+    public whyEntities(entityId1: number, entityId2: number, flags: BigInt | number = SzEngineFlags.SZ_WHY_ENTITIES_DEFAULT_FLAGS): Observable<SzSdkWhyEntitiesResponse | SzError> {
+      let retVal = new Subject<SzSdkWhyEntitiesResponse | SzError>();
+      console.log(`why entities from grpc...`);
+      if(this.szEnvironment && this.szEnvironment.engine) {
+        this.szEnvironment?.engine?.whyEntities(entityId1, entityId2, flags).then((resp) => {
+          retVal.next(JSON.parse(resp as string));
+        }).catch((err) => {
+          console.error(`whyEntities: Exception: ` + err.message);
+          retVal.error(err);
+        });
+      }
+      return retVal.asObservable();
+    }
+
+    public whyRecordInEntity(dataSourceCode: string, recordId: string, flags: BigInt | number = SzEngineFlags.SZ_WHY_RECORDS_DEFAULT_FLAGS): Observable<SzSdkWhyRecordInEntityResponse | SzError> {
+      let retVal = new Subject<SzSdkWhyRecordInEntityResponse | SzError>();
+      console.log(`why record in entity from grpc...`);
+      if(this.szEnvironment && this.szEnvironment.engine) {
+        this.szEnvironment?.engine?.whyRecordInEntity(dataSourceCode, recordId, flags).then((resp) => {
+          retVal.next(JSON.parse(resp as string));
+        }).catch((err) => {
+          console.error(`whyRecordInEntity: Exception: ` + err.message);
+          retVal.error(err);
+        });
       }
       return retVal.asObservable();
     }
