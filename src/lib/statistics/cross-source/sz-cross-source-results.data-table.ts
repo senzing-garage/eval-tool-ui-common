@@ -103,8 +103,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
       ['ADDRESS_DATA', 9],
       ['PHONE_DATA', 10],
       ['RELATIONSHIP_DATA', 11],
-      ['ENTITY_DATA', 12],
-      ['OTHER_DATA', 13]
+      ['OTHER_DATA', 12]
     ]);
     /** Maps the internal field name of a column to the human readable title
      * @internal
@@ -122,7 +121,6 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
       ['ADDRESS_DATA', 'Address Data'],
       ['PHONE_DATA', 'Phone Data'],
       ['RELATIONSHIP_DATA', 'Relationship Data'],
-      ['ENTITY_DATA', 'Entity Data'],
       ['OTHER_DATA', 'Other Data']
     ]);
     /** when the column picker pulldown is visible this is `true`
@@ -161,7 +159,6 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
         'ADDRESS_DATA',
         'PHONE_DATA',
         'RELATIONSHIP_DATA',
-        'ENTITY_DATA',
         'OTHER_DATA'
       ]],
       [2,[
@@ -177,7 +174,6 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
         'ADDRESS_DATA',
         'PHONE_DATA',
         'RELATIONSHIP_DATA',
-        'ENTITY_DATA',
         'OTHER_DATA'
       ]],
       [3,[
@@ -193,7 +189,6 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
         'ADDRESS_DATA',
         'PHONE_DATA',
         'RELATIONSHIP_DATA',
-        'ENTITY_DATA',
         'OTHER_DATA'
       ]]
     ]);
@@ -230,7 +225,6 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
       'ADDRESS_DATA',
       'PHONE_DATA',
       'RELATIONSHIP_DATA',
-      'ENTITY_DATA',
       'OTHER_DATA'
     ];
     /** this is the columns that CAN be shown and is generated from the data
@@ -342,7 +336,6 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
         'ADDRESS_DATA': dataFieldRenderer,
         'PHONE_DATA': dataFieldRenderer,
         'RELATIONSHIP_DATA': dataFieldRenderer,
-        'ENTITY_DATA': dataFieldRenderer,
         'OTHER_DATA': dataFieldRenderer,
       }
     }
@@ -1124,7 +1117,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
               if(_featuresAsStrings.has('PHONE'))          retVal.PHONE_DATA          = _featuresAsStrings.get('PHONE');
               if(_featuresAsStrings.has('DOB'))            retVal.DOB_DATA            = _featuresAsStrings.get('DOB_DATA');
               if(_featuresAsStrings.has('RELATIONSHIP'))   retVal.RELATIONSHIP_DATA   = _featuresAsStrings.get('RELATIONSHIP');
-              if(_featuresAsStrings.has('ENTITY'))         retVal.ENTITY_DATA         = _featuresAsStrings.get('ENTITY');
+
               if(_featuresAsStrings.has('OTHER'))          retVal.OTHER_DATA          = _featuresAsStrings.get('OTHER');
             }
             // Add unmapped passthrough fields from JSON_DATA
@@ -1175,7 +1168,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
               if(_featuresAsStrings.has('PHONE'))          retVal.PHONE_DATA          = _featuresAsStrings.get('PHONE');
               if(_featuresAsStrings.has('DOB'))            retVal.DOB_DATA            = _featuresAsStrings.get('DOB_DATA');
               if(_featuresAsStrings.has('RELATIONSHIP'))   retVal.RELATIONSHIP_DATA   = _featuresAsStrings.get('RELATIONSHIP');
-              if(_featuresAsStrings.has('ENTITY'))         retVal.ENTITY_DATA         = _featuresAsStrings.get('ENTITY');
+
               if(_featuresAsStrings.has('OTHER'))          retVal.OTHER_DATA          = _featuresAsStrings.get('OTHER');
             }
             // Add unmapped passthrough fields from JSON_DATA
