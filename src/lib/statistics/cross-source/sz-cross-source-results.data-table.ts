@@ -102,9 +102,9 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
       ['IDENTIFIER_DATA', 8],
       ['ADDRESS_DATA', 9],
       ['PHONE_DATA', 10],
-      ['relationshipData', 11],
-      ['entityData', 12],
-      ['otherData', 13]
+      ['RELATIONSHIP_DATA', 11],
+      ['ENTITY_DATA', 12],
+      ['OTHER_DATA', 13]
     ]);
     /** Maps the internal field name of a column to the human readable title
      * @internal
@@ -121,9 +121,9 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
       ['IDENTIFIER_DATA', 'Identifier Data'],
       ['ADDRESS_DATA', 'Address Data'],
       ['PHONE_DATA', 'Phone Data'],
-      ['relationshipData', 'Relationship Data'],
-      ['entityData', 'Entity Data'],
-      ['otherData', 'Other Data']
+      ['RELATIONSHIP_DATA', 'Relationship Data'],
+      ['ENTITY_DATA', 'Entity Data'],
+      ['OTHER_DATA', 'Other Data']
     ]);
     /** when the column picker pulldown is visible this is `true`
      * @internal
@@ -160,9 +160,9 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
         'IDENTIFIER_DATA',
         'ADDRESS_DATA',
         'PHONE_DATA',
-        'relationshipData',
-        'entityData',
-        'otherData'
+        'RELATIONSHIP_DATA',
+        'ENTITY_DATA',
+        'OTHER_DATA'
       ]],
       [2,[
         'ENTITY_ID',
@@ -176,9 +176,9 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
         'IDENTIFIER_DATA',
         'ADDRESS_DATA',
         'PHONE_DATA',
-        'relationshipData',
-        'entityData',
-        'otherData'
+        'RELATIONSHIP_DATA',
+        'ENTITY_DATA',
+        'OTHER_DATA'
       ]],
       [3,[
         'ENTITY_ID',
@@ -192,9 +192,9 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
         'IDENTIFIER_DATA',
         'ADDRESS_DATA',
         'PHONE_DATA',
-        'relationshipData',
-        'entityData',
-        'otherData'
+        'RELATIONSHIP_DATA',
+        'ENTITY_DATA',
+        'OTHER_DATA'
       ]]
     ]);
     /** used for positioning the prefs menu */
@@ -229,9 +229,9 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
       'IDENTIFIER_DATA',
       'ADDRESS_DATA',
       'PHONE_DATA',
-      'relationshipData',
-      'entityData',
-      'otherData'
+      'RELATIONSHIP_DATA',
+      'ENTITY_DATA',
+      'OTHER_DATA'
     ];
     /** this is the columns that CAN be shown and is generated from the data
      * so that if the columns are not present in the data AND in the "_selectableColumns"
@@ -341,8 +341,9 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
         'ATTRIBUTE_DATA': dataFieldRenderer,
         'ADDRESS_DATA': dataFieldRenderer,
         'PHONE_DATA': dataFieldRenderer,
-        'relationshipData': dataFieldRenderer,
-        'otherData': dataFieldRenderer,
+        'RELATIONSHIP_DATA': dataFieldRenderer,
+        'ENTITY_DATA': dataFieldRenderer,
+        'OTHER_DATA': dataFieldRenderer,
       }
     }
     /** get counts of how many rows have values for a particular column */
@@ -1116,12 +1117,15 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
             }, rec) as SzSampleSetEntityTableRow;
             if(rec.FEATURES && Object.keys(rec.FEATURES).length > 0) {
               let _featuresAsStrings = getStringRecordFeatures(rec.FEATURES, true, this.configManager.fTypeToAttrClassMap, true, true);
-              if(_featuresAsStrings.has('ATTRIBUTE'))   retVal.ATTRIBUTE_DATA   = _featuresAsStrings.get('ATTRIBUTE');
-              if(_featuresAsStrings.has('ADDRESS'))     retVal.ADDRESS_DATA     = _featuresAsStrings.get('ADDRESS');
-              if(_featuresAsStrings.has('IDENTIFIER'))  retVal.IDENTIFIER_DATA  = _featuresAsStrings.get('IDENTIFIER');
-              if(_featuresAsStrings.has('NAME'))        retVal.NAME_DATA        = _featuresAsStrings.get('NAME');
-              if(_featuresAsStrings.has('PHONE'))       retVal.PHONE_DATA       = _featuresAsStrings.get('PHONE');
-              if(_featuresAsStrings.has('DOB'))         retVal.DOB_DATA         = _featuresAsStrings.get('DOB_DATA');
+              if(_featuresAsStrings.has('ATTRIBUTE'))      retVal.ATTRIBUTE_DATA      = _featuresAsStrings.get('ATTRIBUTE');
+              if(_featuresAsStrings.has('ADDRESS'))        retVal.ADDRESS_DATA        = _featuresAsStrings.get('ADDRESS');
+              if(_featuresAsStrings.has('IDENTIFIER'))     retVal.IDENTIFIER_DATA     = _featuresAsStrings.get('IDENTIFIER');
+              if(_featuresAsStrings.has('NAME'))           retVal.NAME_DATA           = _featuresAsStrings.get('NAME');
+              if(_featuresAsStrings.has('PHONE'))          retVal.PHONE_DATA          = _featuresAsStrings.get('PHONE');
+              if(_featuresAsStrings.has('DOB'))            retVal.DOB_DATA            = _featuresAsStrings.get('DOB_DATA');
+              if(_featuresAsStrings.has('RELATIONSHIP'))   retVal.RELATIONSHIP_DATA   = _featuresAsStrings.get('RELATIONSHIP');
+              if(_featuresAsStrings.has('ENTITY'))         retVal.ENTITY_DATA         = _featuresAsStrings.get('ENTITY');
+              if(_featuresAsStrings.has('OTHER'))          retVal.OTHER_DATA          = _featuresAsStrings.get('OTHER');
             }
             return retVal;
           }) : undefined;
@@ -1158,13 +1162,15 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
             }, rec) as SzSampleSetEntityTableRow;
             if(rec.FEATURES && Object.keys(rec.FEATURES).length > 0) {
               let _featuresAsStrings = getStringRecordFeatures(rec.FEATURES, true, this.configManager.fTypeToAttrClassMap, true, true);
-              if(_featuresAsStrings.has('ATTRIBUTE'))   retVal.ATTRIBUTE_DATA   = _featuresAsStrings.get('ATTRIBUTE');
-              if(_featuresAsStrings.has('ADDRESS'))     retVal.ADDRESS_DATA     = _featuresAsStrings.get('ADDRESS');
-              if(_featuresAsStrings.has('IDENTIFIER'))  retVal.IDENTIFIER_DATA  = _featuresAsStrings.get('IDENTIFIER');
-              if(_featuresAsStrings.has('NAME'))        retVal.NAME_DATA        = _featuresAsStrings.get('NAME');
-              if(_featuresAsStrings.has('PHONE'))       retVal.PHONE_DATA       = _featuresAsStrings.get('PHONE');
-              if(_featuresAsStrings.has('DOB'))         retVal.DOB_DATA         = _featuresAsStrings.get('DOB_DATA');
-
+              if(_featuresAsStrings.has('ATTRIBUTE'))      retVal.ATTRIBUTE_DATA      = _featuresAsStrings.get('ATTRIBUTE');
+              if(_featuresAsStrings.has('ADDRESS'))        retVal.ADDRESS_DATA        = _featuresAsStrings.get('ADDRESS');
+              if(_featuresAsStrings.has('IDENTIFIER'))     retVal.IDENTIFIER_DATA     = _featuresAsStrings.get('IDENTIFIER');
+              if(_featuresAsStrings.has('NAME'))           retVal.NAME_DATA           = _featuresAsStrings.get('NAME');
+              if(_featuresAsStrings.has('PHONE'))          retVal.PHONE_DATA          = _featuresAsStrings.get('PHONE');
+              if(_featuresAsStrings.has('DOB'))            retVal.DOB_DATA            = _featuresAsStrings.get('DOB_DATA');
+              if(_featuresAsStrings.has('RELATIONSHIP'))   retVal.RELATIONSHIP_DATA   = _featuresAsStrings.get('RELATIONSHIP');
+              if(_featuresAsStrings.has('ENTITY'))         retVal.ENTITY_DATA         = _featuresAsStrings.get('ENTITY');
+              if(_featuresAsStrings.has('OTHER'))          retVal.OTHER_DATA          = _featuresAsStrings.get('OTHER');
             }
             return retVal;
           }) : undefined;
