@@ -9,7 +9,7 @@ import { SzPrefsService } from '../../../services/sz-prefs.service';
 import { CommonModule } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { SzResumeEntity } from '../../../models/SzResumeEntity';
-import { getStringEntityFeatures } from '../../../common/entity-utils';
+import { getStringEntityFeatures, getUnmappedJsonDataFields } from '../../../common/entity-utils';
 import { SzGrpcConfigManagerService } from '../../../services/grpc/configManager.service';
 import { SzSdkEntityRecord } from '../../../models/grpc/engine';
 
@@ -125,13 +125,10 @@ export class SzEntityDetailHeaderContentComponentGrpc implements OnDestroy, OnIn
 
   // ----------------- start total getters -------------------
   get columnOneTotal(): number {
-    if (this.entityFeatures.has('OTHER')) {
-      return this.entityFeatures.get('OTHER').length;
-    }
-    return 0;
+    return this.otherData.length;
   }
   get showColumnOne(): boolean {
-    return this.hasRecordId || (this.entity && this.entityFeatures.has('OTHER') && this.entityFeatures.get('OTHER').length > 0) && this.showOtherData;
+    return this.hasRecordId || (this.entity && this.otherData.length > 0) && this.showOtherData;
   }
   get columnTwoTotal(): number {
     return (this.nameData.concat(this.attributeData).length);
@@ -202,15 +199,25 @@ export class SzEntityDetailHeaderContentComponentGrpc implements OnDestroy, OnIn
   }
 
   get otherData(): string[] {
-    if (this.entityFeatures) {
-      if (this.entityFeatures.has('OTHER')) {
-        return this.entityFeatures.get('OTHER');
-      } else {
-        return [];
-      }
-    } else {
-      return [];
+    let result: string[] = [];
+    // Include any entity-level OTHER features
+    if (this.entityFeatures && this.entityFeatures.has('OTHER')) {
+      result = [...this.entityFeatures.get('OTHER')];
     }
+    // Extract unmapped passthrough fields from all records' JSON_DATA
+    if (this.entity?.RECORDS) {
+      const seen = new Set<string>(result);
+      for (const rec of this.entity.RECORDS) {
+        for (const field of getUnmappedJsonDataFields(rec)) {
+          const formatted = `${field.key}: ${field.value}`;
+          if (!seen.has(formatted)) {
+            seen.add(formatted);
+            result.push(formatted);
+          }
+        }
+      }
+    }
+    return result;
   }
   
   get identifierData(): string[] {

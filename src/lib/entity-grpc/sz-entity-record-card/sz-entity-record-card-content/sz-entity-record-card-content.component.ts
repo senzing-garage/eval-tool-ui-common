@@ -11,7 +11,7 @@ import { SzPrefsService } from '../../../services/sz-prefs.service';
 import { SzWhySelectionMode, SzWhySelectionAction, SzWhySelectionModeBehavior, SzWhySelectionActionBehavior } from '../../../models/data-source-record-selection';
 import { SzSdkEntityFeature, SzSdkEntityFeatures, SzSdkEntityRecord, SzSdkSearchResolvedEntity, SzSdkSearchResult } from '../../../models/grpc/engine';
 import {  SzResumeRelatedEntity } from '../../../models/SzResumeEntity';
-import { getEntityFeaturesByType, getStringEntityFeatures } from '../../../common/entity-utils';
+import { getEntityFeaturesByType, getStringEntityFeatures, getUnmappedJsonDataFields } from '../../../common/entity-utils';
 import { SzGrpcConfigManagerService } from '../../../services/grpc/configManager.service';
 import { SzAttrClass, SzFeatureType } from '../../../models/grpc/SzFeatureTypes';
 
@@ -328,8 +328,11 @@ export class SzEntityRecordCardContentComponentGrpc implements OnInit {
       let _features = ((entityOrRecord as SzSdkEntityRecord).RECORD_ID) ? (entityOrRecord as SzSdkEntityRecord).FEATURES as SzSdkEntityFeatures : (entityOrRecord as SzResumeRelatedEntity).FEATURES;
       featuresByType  = getEntityFeaturesByType(_features, featureToAttrMap);
       if(featuresByType) {
-        // other data
+        // other data (features classified as OTHER or unmapped JSON_DATA fields)
         if(featuresByType && featuresByType.has('OTHER') &&  featuresByType.get('OTHER').length > 0) {
+          retVal[0] = true;
+        }
+        if(!retVal[0] && (entityOrRecord as SzSdkEntityRecord).JSON_DATA) {
           retVal[0] = true;
         }
         // name and attr data
@@ -388,7 +391,14 @@ export class SzEntityRecordCardContentComponentGrpc implements OnInit {
 
   get otherData(): SzSdkEntityFeature[] | undefined {
     let _features = this.featuresByType;
-    return _features.has(SzFeatureType.OTHER) ? _features.get(SzFeatureType.OTHER) : undefined;
+    let result: SzSdkEntityFeature[] = _features && _features.has(SzFeatureType.OTHER) ? [..._features.get(SzFeatureType.OTHER)] : [];
+    // Extract unmapped passthrough fields from record's JSON_DATA
+    if (this._record) {
+      for (const field of getUnmappedJsonDataFields(this._record)) {
+        result.push({ FEAT_DESC: field.value, LABEL: field.key, LIB_FEAT_ID: 0, FEAT_DESC_VALUES: [] });
+      }
+    }
+    return result.length > 0 ? result : undefined;
   }
 
   get nameData(): SzSdkEntityFeature[] | undefined  {

@@ -1,6 +1,6 @@
 import { SzResolvedEntity } from "@senzing/rest-api-client-ng";
 import { SzSdkConfigAttr } from "../models/grpc/config";
-import { SzSdkEntityFeature, SzSdkRecordFeature, SzSdkRecordFeatures, SzSdkSearchResolvedEntity } from "../models/grpc/engine";
+import { SzSdkEntityFeature, SzSdkEntityRecord, SzSdkRecordFeature, SzSdkRecordFeatures, SzSdkSearchResolvedEntity } from "../models/grpc/engine";
 import { SzAttrClass, SzFeatureType } from "../models/grpc/SzFeatureTypes";
 import { SzGrpcConfigManagerService } from "../services/grpc/configManager.service";
 import { SzResumeEntity } from "../models/SzResumeEntity";
@@ -86,6 +86,39 @@ export function getEntityFeaturesByType(features: {
  }
 
 
+
+/**
+ * Extracts unmapped passthrough fields from a record's JSON_DATA by subtracting
+ * all keys that are mapped to Senzing features (via ATTRIBUTES), structural keys
+ * (DATA_SOURCE, RECORD_ID), and usage-type keys (e.g. ADDR_TYPE).
+ * Returns an array of {key, value} pairs.
+ */
+export function getUnmappedJsonDataFields(record: SzSdkEntityRecord): {key: string, value: string}[] {
+    if (!record?.JSON_DATA || !record?.FEATURES) return [];
+    const mappedKeys = new Set<string>(['DATA_SOURCE', 'RECORD_ID']);
+    const usageTypeValues = new Set<string>();
+    for (const fTypeCode in record.FEATURES) {
+        const featArray = (record.FEATURES as any)[fTypeCode];
+        if (!Array.isArray(featArray)) continue;
+        for (const feat of featArray as SzSdkRecordFeature[]) {
+            if (feat.ATTRIBUTES) {
+                for (const attrKey of Object.keys(feat.ATTRIBUTES)) {
+                    mappedKeys.add(attrKey);
+                }
+            }
+            if (feat.USAGE_TYPE) {
+                usageTypeValues.add(feat.USAGE_TYPE);
+            }
+        }
+    }
+    const result: {key: string, value: string}[] = [];
+    for (const [key, value] of Object.entries(record.JSON_DATA)) {
+        if (mappedKeys.has(key)) continue;
+        if (key.endsWith('_TYPE') && usageTypeValues.has(value as string)) continue;
+        result.push({ key, value: String(value) });
+    }
+    return result;
+}
 
 export function bestEntityName(entity: SzResumeEntity | SzSdkSearchResolvedEntity): string {
     let retVal = undefined;

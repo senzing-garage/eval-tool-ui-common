@@ -65,6 +65,7 @@ export interface SzSdkEntityRecord extends SzSdkEntityBaseRecord {
     FIRST_SEEN_DT?: string,
     LAST_SEEN_DT?: string,
     FEATURES?: SzSdkEntityFeatures | SzSdkRecordFeatures,
+    JSON_DATA?: {[key: string]: any},
     NAMEORG?: string
 }
 
