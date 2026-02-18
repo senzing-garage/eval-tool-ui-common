@@ -474,7 +474,8 @@ export class SzStatSampleSet {
         SzEngineFlags.SZ_ENTITY_INCLUDE_RELATED_ENTITY_NAME |
         SzEngineFlags.SZ_ENTITY_INCLUDE_ALL_RELATIONS |
         SzEngineFlags.SZ_ENTITY_INCLUDE_DISCLOSED_RELATIONS |
-        SzEngineFlags.SZ_ENTITY_INCLUDE_RECORD_FEATURE_DETAILS;
+        SzEngineFlags.SZ_ENTITY_INCLUDE_RECORD_FEATURE_DETAILS |
+        SzEngineFlags.SZ_ENTITY_INCLUDE_RECORD_JSON_DATA;
 
         this.engineService.getEntitiesByEntityId(entityIds, flags).pipe(
             map((responses: SzSdkEntityResponse[])=> {
