@@ -46,7 +46,7 @@ import {
   SzDataTableRelatedEntity,
 } from '../../models/data-sampling';
 import { SzSdkEntityRecord } from '../../models/grpc/engine';
-import { getStringEntityFeatures, getStringRecordFeatures } from '../../common/entity-utils';
+import { getStringEntityFeatures, getStringRecordFeatures, getUnmappedJsonDataFields } from '../../common/entity-utils';
 import { SzGrpcConfigManagerService } from '../../services/grpc/configManager.service';
 
 //import { SzSdkEntityResponse, SzSdkResolvedEntity, SzSdkRelatedEntity } from '../../models/grpc/engine'
@@ -1127,6 +1127,12 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
               if(_featuresAsStrings.has('ENTITY'))         retVal.ENTITY_DATA         = _featuresAsStrings.get('ENTITY');
               if(_featuresAsStrings.has('OTHER'))          retVal.OTHER_DATA          = _featuresAsStrings.get('OTHER');
             }
+            // Add unmapped passthrough fields from JSON_DATA
+            const _unmapped = getUnmappedJsonDataFields(rec);
+            if (_unmapped.length > 0) {
+              const existing = retVal.OTHER_DATA || [];
+              retVal.OTHER_DATA = existing.concat(_unmapped.map(f => `${f.key}: ${f.value}`));
+            }
             return retVal;
           }) : undefined;
 
@@ -1171,6 +1177,12 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
               if(_featuresAsStrings.has('RELATIONSHIP'))   retVal.RELATIONSHIP_DATA   = _featuresAsStrings.get('RELATIONSHIP');
               if(_featuresAsStrings.has('ENTITY'))         retVal.ENTITY_DATA         = _featuresAsStrings.get('ENTITY');
               if(_featuresAsStrings.has('OTHER'))          retVal.OTHER_DATA          = _featuresAsStrings.get('OTHER');
+            }
+            // Add unmapped passthrough fields from JSON_DATA
+            const _unmapped = getUnmappedJsonDataFields(rec);
+            if (_unmapped.length > 0) {
+              const existing = retVal.OTHER_DATA || [];
+              retVal.OTHER_DATA = existing.concat(_unmapped.map(f => `${f.key}: ${f.value}`));
             }
             return retVal;
           }) : undefined;
