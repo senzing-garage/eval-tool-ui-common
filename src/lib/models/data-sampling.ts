@@ -146,7 +146,6 @@ interface SzSampleSetTableRowBase {
     ATTRIBUTE_DATA?: string[],
     ADDRESS_DATA?: string[],
     DOB_DATA?: string[],
-    ENTITY_DATA?: string[],
     IDENTIFIER_DATA?: string[],
     NAME_DATA?: string[],
     OTHER_DATA?: string[],
