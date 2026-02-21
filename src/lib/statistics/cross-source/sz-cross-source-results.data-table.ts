@@ -981,7 +981,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
      */
     override onCellClick(cellName: string, data: any, event?: MouseEvent, element?: HTMLElement) {
       console.log(`on${cellName}Click: `, event, data);
-      if((cellName === 'relatedEntityId' || cellName === 'entityId') && data) {
+      if((cellName === 'relatedEntityId' || cellName === 'ENTITY_ID') && data) {
         this._onEntityIdClick.next(data as number);
       }
       this.cellClick.emit({key: cellName, value: data});

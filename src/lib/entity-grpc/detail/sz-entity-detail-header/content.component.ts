@@ -11,7 +11,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { SzResumeEntity } from '../../../models/SzResumeEntity';
 import { getStringEntityFeatures, getUnmappedJsonDataFields } from '../../../common/entity-utils';
 import { SzGrpcConfigManagerService } from '../../../services/grpc/configManager.service';
-import { SzSdkEntityRecord } from '../../../models/grpc/engine';
+import { SzSdkEntityFeature, SzSdkEntityRecord } from '../../../models/grpc/engine';
 
 /**
  * @internal
@@ -70,7 +70,15 @@ export class SzEntityDetailHeaderContentComponentGrpc implements OnDestroy, OnIn
   public get entityFeatures(): Map<string, string[]> {
     if(!this._entityFeatures && this.entity) {
       let _features = this.entity.FEATURES;
-      let _featuresAsStrings = getStringEntityFeatures(_features, true, this.configManager.fTypeToAttrClassMap, true, true);
+      // Only use the first FEAT_DESC_VALUES entry per feature for the header summary
+      let _trimmed: { [key: string]: SzSdkEntityFeature[] } = {};
+      for (let fTypeCode in _features) {
+        _trimmed[fTypeCode] = _features[fTypeCode].map(feat => ({
+          ...feat,
+          FEAT_DESC_VALUES: feat.FEAT_DESC_VALUES?.length > 0 ? [feat.FEAT_DESC_VALUES[0]] : feat.FEAT_DESC_VALUES
+        }));
+      }
+      let _featuresAsStrings = getStringEntityFeatures(_trimmed, true, this.configManager.fTypeToAttrClassMap, true, true);
       this._entityFeatures = _featuresAsStrings;
     }
     return this._entityFeatures;

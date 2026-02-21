@@ -1101,8 +1101,8 @@ export class SzEntityDetailGrpcComponent implements OnInit, OnDestroy, AfterView
   private findNetworkByEntityId(entityId: number) {
     const flags = SzEngineFlags.SZ_FIND_NETWORK_DEFAULT_FLAGS |
     SzEngineFlags.SZ_FIND_NETWORK_INCLUDE_MATCHING_INFO | 
-    SzEngineFlags.SZ_ENTITY_INCLUDE_ALL_RELATIONS | 
-    SzEngineFlags.SZ_ENTITY_INCLUDE_ALL_FEATURES |
+    SzEngineFlags.SZ_ENTITY_INCLUDE_ALL_RELATIONS |
+    SzEngineFlags.SZ_ENTITY_INCLUDE_REPRESENTATIVE_FEATURES |
     SzEngineFlags.SZ_ENTITY_INCLUDE_RECORD_DATA | 
     SzEngineFlags.SZ_ENTITY_INCLUDE_RELATED_MATCHING_INFO |
     //SzEngineFlags.SZ_INCLUDE_MATCH_KEY_DETAILS |
