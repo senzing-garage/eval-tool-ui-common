@@ -2,7 +2,7 @@
 <!-- Start Context Menus -->
 <ng-template #sz_dt_header_context_menu let-col>
     <div class="sz-dt-header-context-menu" cdkMenu>
-        <button class="header-context-menu-item" *ngIf="col.key === 'matchKey'" cdkMenuItem (click)="openFilterDialog()">Filter By Match Key</button>
+        <button class="header-context-menu-item" *ngIf="col.key === 'MATCH_KEY'" cdkMenuItem (click)="openFilterDialog()">Filter By Match Key</button>
         <button class="header-context-menu-item" cdkMenuItem *ngIf="!isColumnHidden(col.key)" (click)="selectColumn(col.key, false)">Hide Column</button>
         <button class="header-context-menu-item" cdkMenuItem *ngIf="isColumnHidden(col.key)" (click)="selectColumn(col.key, true)">Show Column</button>
         <button class="header-context-menu-item" cdkMenuItem
@@ -33,7 +33,7 @@
 <ng-template #sz_dt_cell_context_menu let-data>
     <div class="sz-dt-header-context-menu" cdkMenu>
 
-        <button class="header-context-menu-item" *ngIf="data.col.key === 'matchKey'" cdkMenuItem (click)="openFilterDialog()">Filter By Match Key</button>
+        <button class="header-context-menu-item" *ngIf="data.col.key === 'MATCH_KEY'" cdkMenuItem (click)="openFilterDialog()">Filter By Match Key</button>
         <!--<button class="header-context-menu-item" *ngIf="data.col.key === 'ENTITY_ID'" cdkMenuItem (click)="copyCellValue(data.entityData && data.entityData['entityId'] ? data.entityData['entityId'] : data.rowData['entityId'], data)">Copy Entity ID</button>
         <button class="header-context-menu-item" *ngIf="data.col.key === 'ENTITY_ID'" cdkMenuItem (click)="openEntityById(data.entityData && data.entityData['entityId'] ? data.entityData['entityId'] : data.rowData['entityId'])">Open Entity in new tab</button>-->
         <button class="header-context-menu-item" *ngIf="data.col.key === 'ENTITY_ID' || data.col.key === 'relatedEntityId'" cdkMenuItem 
@@ -41,7 +41,7 @@
         [cdkMenuTriggerData]="{$implicit: data}">Entity</button>
         <!--<button class="header-context-menu-item" *ngIf="data.col.key === 'relatedEntityId'" cdkMenuItem (click)="copyCellValue(data.rowData['relatedEntityId'])">Copy Related Entity ID</button>
         <button class="header-context-menu-item" *ngIf="data.col.key === 'relatedEntityId'" cdkMenuItem (click)="openEntityById(data.rowData['relatedEntityId'])">Open Entity in new tab</button>-->
-        <div class="separator" *ngIf="data.col.key === 'ENTITY_ID' || data.col.key === 'relatedEntityId' || data.col.key === 'matchKey'"></div>
+        <div class="separator" *ngIf="data.col.key === 'ENTITY_ID' || data.col.key === 'relatedEntityId' || data.col.key === 'MATCH_KEY'"></div>
         <!--<button class="header-context-menu-item" *ngIf="data.col.key !== 'ENTITY_ID'" cdkMenuItem (click)="copyCellContent(data.cell, data.cellData)">Copy Cell As JSON</button>
         <button class="header-context-menu-item" cdkMenuItem (click)="copyRowContent(data.row, data.rowData)">Copy Row As JSON</button>-->
         <button class="header-context-menu-item" cdkMenuItem
@@ -191,7 +191,7 @@ sz-tooltip="Tooltip text">Get Grid Column Sizes</button>-->
                 <div *ngIf="getRowCountForField(col.key) > 0" class="handle-resize"
                 (mousedown)="onResizeMouseDown(col.key, $event)"
                 (mouseup)="onResizeMouseUp(col.key, $event)"></div>
-                <span *ngIf="col.key === 'matchKey'" class="icon-filter descending mdi--filter" (click)="openFilterDialog()"></span>
+                <span *ngIf="col.key === 'MATCH_KEY'" class="icon-filter descending mdi--filter" (click)="openFilterDialog()"></span>
             </th>
             <!--<div class="leftdragbar" onmousedown="startColResize(col.key)" onmouseup="endColResize(col.key)"></div>-->
         <!--</ng-container>-->
@@ -345,8 +345,8 @@ sz-tooltip="Tooltip text">Get Grid Column Sizes</button>-->
                         [cdkContextMenuTriggerData]="{$implicit: {cell: cellRef, row: rowRef, col: col, cellData: rowY[col.key], rowData: rowY, entityData: row, relatedEntity: row.relatedEntity}}"
                         (click)="onCellClick(col.key, (col.key === 'relatedEntityId'? row.relatedEntity[col.key] : rowY[col.key]), $event, cellRef)"
                     >
-                        <div class="cell-content"
-                            *ngIf="col.key === 'matchKey'"
+                        <div class="cell-content" 
+                            *ngIf="col.key === 'MATCH_KEY'"
                             [innerHTML]="cellValue(row.relatedEntity.relatedMatchKey, col.key)" [attr.cell-key]="col.key"></div>
                         <div class="cell-content entity-id-link"
                             *ngIf="col.key === 'ENTITY_ID' || (col.key === 'relatedEntityId')"
@@ -354,7 +354,7 @@ sz-tooltip="Tooltip text">Get Grid Column Sizes</button>-->
                             [matTooltipPosition]="col.key === 'ENTITY_ID' ? 'right':'above'"
                             [innerHTML]="cellValue(row.relatedEntity[col.key], col.key)" [attr.cell-key]="col.key"></div>
                         <div class="cell-content" 
-                            *ngIf="col.key !== 'ENTITY_ID' && col.key !== 'relatedEntityId' && col.key !== 'matchKey'"
+                            *ngIf="col.key !== 'ENTITY_ID' && col.key !== 'relatedEntityId' && col.key !== 'MATCH_KEY'"
                             [innerHTML]="cellValue(rowY[col.key], col.key)" [attr.cell-key]="col.key"></div>
                         <!--<div class="cell-content" [innerHTML]="cellValue(rowY[col.key], col.key)" [attr.cell-key]="col.key"></div>-->
                         <div *ngIf="col.key === 'ENTITY_ID' && (getTotalRowCount(row) - getRowCountInSelectedDataSources(row)) > 0">
