@@ -345,7 +345,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
     }
     override cellClass(fieldName: string, prefix?: string, suffix?: string) {
         let fieldNameAsKebab = fieldName && fieldName.toUpperCase && fieldName.toUpperCase() === fieldName ? fieldName : camelToKebabCase(fieldName);
-        fieldNameAsKebab = underscoresToDashes(fieldNameAsKebab);
+        fieldNameAsKebab = underscoresToDashes(fieldNameAsKebab.toLocaleLowerCase());
         return (prefix !== undefined ? prefix+ '-' : '')+ fieldNameAsKebab + (suffix !== undefined ? '-' + suffix : '')
     }
     /** Sets the inline style tag for the entire data table. Mainly used for setting 
@@ -646,7 +646,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
         let _dataSourcesToMatch = this.dataMartService.sampleMatchLevel === SzCrossSourceSummaryCategoryTypeToMatchLevel.MATCHES ? [this.dataMartService.sampleDataSource1, this.dataMartService.sampleDataSource2] : [this.dataMartService.sampleDataSource1];
         let rowsInSelectedDataSources = item.rows.filter((row) => {
           if(!dataType || (dataType && dataType.includes(row.DATA_TYPE))) {
-            return (row.DATA_TYPE !== undefined && _dataSourcesToMatch.indexOf(row.DATA_TYPE) > -1) ? 1 : 0;
+            return (row.DATA_SOURCE !== undefined && _dataSourcesToMatch.indexOf(row.DATA_SOURCE) > -1) ? 1 : 0;
           }
           return false;
         });
@@ -663,7 +663,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
           //retVal    += item.relatedEntity.rows.length;
           let rowsInSelectedDataSources = item.relatedEntity.rows.filter((row) => {
             if(!dataType || (dataType && dataType.includes(row.DATA_TYPE))) {
-              return (row.DATA_TYPE !== undefined && _dataSourcesToMatch.indexOf(row.DATA_TYPE) > -1) ? 1 : 0;
+              return (row.DATA_SOURCE !== undefined && _dataSourcesToMatch.indexOf(row.DATA_SOURCE) > -1) ? 1 : 0;
             }
             return false;
           });
@@ -869,10 +869,10 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
       let retVal = '';
       retVal += '--column-count: '+ this.getColCount() +';';
       if(item) {
-        retVal += ' --entity-row-count: '+ this.getTotalRowCount(item, [SzSampleSetTableRowType.ENTITY_RECORD]) +';';  
-        retVal += ' --selected-datasources-entity-row-count: '+ this.getRowCountInSelectedDataSources(item, [SzSampleSetTableRowType.ENTITY_RECORD]) +';';  
+        retVal += ' --entity-row-count: '+ this.getTotalRowCount(item, [SzSampleSetTableRowType.ENTITY_RECORD]) +';';
+        retVal += ' --selected-datasources-entity-row-count: '+ this.getRowCountInSelectedDataSources(item, [SzSampleSetTableRowType.ENTITY_RECORD]) +';';
         retVal += ' --related-row-count: '+ this.getTotalRowCount(item, [SzSampleSetTableRowType.RELATED_RECORD]) +';';
-        retVal += ' --selected-datasources-related-row-count: '+ this.getRowCountInSelectedDataSources(item, [SzSampleSetTableRowType.RELATED_RECORD]) +';';  
+        retVal += ' --selected-datasources-related-row-count: '+ this.getRowCountInSelectedDataSources(item, [SzSampleSetTableRowType.RELATED_RECORD]) +';';
       }
       return retVal;
     }
@@ -1130,7 +1130,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
           }) : undefined;
 
           let _relRows = relItem.RECORDS && relItem.RECORDS.map ? relItem.RECORDS.map((rec: SzSdkEntityRecord) => {
-            let retVal: SzSampleSetRelationTableRow      = Object.assign({dataType: SzSampleSetTableRowType.RELATED_RECORD}, rec);
+            let retVal: SzSampleSetRelationTableRow      = Object.assign({DATA_TYPE: SzSampleSetTableRowType.RELATED_RECORD}, rec);
             return retVal;
           }) : undefined;
 
@@ -1157,7 +1157,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
             let retVal = Object.assign({
               ENTITY_ID: baseItem.ENTITY_ID,
               ENTITY_NAME: baseItem.ENTITY_NAME,
-              dataType: SzSampleSetTableRowType.ENTITY_RECORD
+              DATA_TYPE: SzSampleSetTableRowType.ENTITY_RECORD
             }, rec) as SzSampleSetEntityTableRow;
             if(rec.FEATURES && Object.keys(rec.FEATURES).length > 0) {
               let _featuresAsStrings = getStringRecordFeatures(rec.FEATURES, true, this.configManager.fTypeToAttrClassMap, true, true);
