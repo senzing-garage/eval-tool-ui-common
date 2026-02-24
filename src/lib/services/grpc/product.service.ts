@@ -38,7 +38,7 @@ export class SzGrpcProductService {
    */
   getVersion() {
     let retVal = new Subject<SzProductVersionResponse>();
-    console.log(`getting version from grpc...`);
+    console.log(`getting version from grpc (${this.VERSION() !== undefined ? 'refresh' : 'initial request'})...`);
     if(this.szEnvironment && this.szEnvironment.product) {
       this.szEnvironment?.product?.getVersion().then((resp: SzProductVersionResponse) => {
         if(resp) {
@@ -69,7 +69,7 @@ export class SzGrpcProductService {
    */
   getLicense() {
     let retVal = new Subject<SzProductLicenseResponse>();
-    console.log(`getting license from grpc...`);
+    console.log(`getting license from grpc (${Object.keys(this.LICENSE()).length > 0 ? 'refresh' : 'initial request'})...`);
     if(this.szEnvironment && this.szEnvironment.product) {
       this.szEnvironment?.product?.getLicense().then((resp) => {
         let _LICENSE: SzProductLicenseResponse = {};
