@@ -1,6 +1,6 @@
-import { Component, OnInit, Input, Output, EventEmitter, Inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subject, filter, takeUntil } from 'rxjs';
+import { Subject, interval, filter, take, takeUntil } from 'rxjs';
 //import { SzLoadedStats } from '@senzing/rest-api-client-ng';
 
 import { parseBool, parseNumber } from '../../common/utils';
@@ -40,7 +40,7 @@ import { MatButtonModule } from '@angular/material/button';
       { provide: SzGrpcProductService, useClass: SzGrpcProductService }
     ]
 })
-export class SzLicenseInfoComponent implements OnInit {
+export class SzLicenseInfoComponent implements OnInit, OnDestroy {
   /** subscription to notify subscribers to unbind */
   public unsubscribe$ = new Subject<void>();
   /** this brings in the enum to local scope for html template access */
@@ -169,12 +169,18 @@ export class SzLicenseInfoComponent implements OnInit {
 
   //@Input() format = 'small';
   constructor(
-    private dmService: SzDataMartService, 
+    private dmService: SzDataMartService,
     private productService: SzGrpcProductService
   ) {}
 
+  ngOnDestroy() {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+  }
+
   ngOnInit() {
     this.dmService.onCountStats.pipe(
+      takeUntil(this.unsubscribe$),
       filter( (val) => val !== undefined)
     ).subscribe( (resp: SzLoadedStats) => {
       this._countStats = resp;
@@ -200,6 +206,13 @@ export class SzLicenseInfoComponent implements OnInit {
       let temp = this.dmService.loadedStatistics;
       console.log(`default count stats: `, temp);
     }
+
+    // periodically refresh record counts (data mart may still be processing)
+    interval(20000).pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe(() => {
+      this.dmService.getLoadedStatistics().pipe(take(1)).subscribe();
+    });
   }
 
   public handleUpgradeButtonClicked(event: Event) {
