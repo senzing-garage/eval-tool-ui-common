@@ -1,7 +1,7 @@
 import { Component, Input, Output, OnInit, OnDestroy, EventEmitter, ChangeDetectorRef, HostBinding } from '@angular/core';
 import { SzPrefsService } from '../../services/sz-prefs.service';
 import { map, take, takeUntil } from 'rxjs/operators';
-import { Observable, Subject } from 'rxjs';
+import { interval, Observable, Subject } from 'rxjs';
 import * as d3 from 'd3-selection';
 import * as d3Shape from 'd3-shape';
 
@@ -149,6 +149,10 @@ export class SzRecordStatsDonutChart implements OnInit, OnDestroy {
 
   @HostBinding("class.show-hidden") get classMatches() {
     return this._showHiddenDataSources;
+  }
+
+  @HostBinding("attr.aria-totalrecords") get attrTotalRecords() {
+    return this._totalRecordCount;
   }
 
   /** -------------------------------------- getters and setters -------------------------------------- */
@@ -331,6 +335,20 @@ export class SzRecordStatsDonutChart implements OnInit, OnDestroy {
         console.error(`huh? `, err);
         this.exception.next(err);
       }
+    });
+
+    // periodically refresh record counts (data mart may still be processing)
+    interval(20000).pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe(() => {
+      this.getDataSources().pipe(take(1)).subscribe((dataSources) => {
+        this._dataSources = dataSources;
+        this.getDataSourceRecordCounts().pipe(take(1)).subscribe(() => {
+          if (this._dataSourceCounts && this._dataSources) {
+            this.dataChanged.next(this._dataSourceCounts);
+          }
+        });
+      });
     });
   }
 
