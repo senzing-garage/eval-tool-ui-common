@@ -3,7 +3,6 @@ import { Subject, BehaviorSubject, merge, timer } from 'rxjs';
 import { takeUntil, debounce } from 'rxjs/operators';
 import { SzDataSourceComposite } from '../models/data-sources';
 import { SzSearchHistoryFolio, SzSearchHistoryFolioItem, SzSearchParamsFolio } from '../models/folio';
-import { AdminStreamAnalysisConfig, AdminStreamConnProperties, AdminStreamLoadConfig } from '../models/data-admin';
 import { SzMatchKeyTokenFilterScope } from '../models/graph';
 import { SzCrossSourceSummaryCategoryType, SzCrossSourceSummaryCategoryTypeToMatchLevel } from '../models/stats';
 import { areArrayMembersEqual } from '../common/utils';
@@ -350,115 +349,6 @@ export class SzDataMartPrefs extends SzSdkPrefsBase {
    **/
   constructor(){
     super();
-    this.prefsChanged.next( this.toJSONObject() );
-  }
-}
-
-/**
- * search form related preferences bus class.
- * used by {@link SzPrefsService} to store it's
- * admin area related prefs.
- * Should really be used from {@link SzPrefsService} context, not on its own.
- *
- * @example
- * this.prefs.admin.streamConnectionProperties = {
-    connected: boolean;
-    clientId?: string;
-    hostname: string;
-    sampleSize: number;
-    port?: number;
-    connectionTest: boolean;
-    reconnectOnClose: boolean;
- * };
- *
- * @example
- * this.prefs.searchResults.prefsChanged.subscribe( (prefs) => { console.log('search form pref change happened.', prefs); })
-
- */
-export class SzAdminPrefs extends SzSdkPrefsBase {
-  // --------------- private vars
-  /** @internal */
-  private _streamAnalysisConfig: AdminStreamAnalysisConfig = {
-    sampleSize: 10000,
-    uploadRate: -1
-  };
-  /** @internal */
-  private _streamConnectionProperties: AdminStreamConnProperties | undefined;
-  /** @internal */
-  private _streamLoadConfig: AdminStreamLoadConfig = {
-    autoCreateMissingDataSources: false,
-    uploadRate: -1
-  };
-  /** @internal */
-  private _useStreamingForAnalysis: boolean = false;
-  /** @internal */
-  private _useStreamingForLoad: boolean = false;
-
-  /** the keys of member setters or variables in the object
-   * to output in json, or to take as json input
-   */
-  override jsonKeys = [
-    'streamAnalysisConfig',
-    'streamConnectionProperties',
-    'streamLoadConfig',
-    'useStreamingForAnalysis',
-    'useStreamingForLoad',
-  ]
-
-  // ------------------- getters and setters
-  /** configuration parameters for doing analysis on a file stream prior to importing */
-  public get streamAnalysisConfig(): AdminStreamAnalysisConfig {
-    return this._streamAnalysisConfig;
-  }
-  /** configuration parameters for doing analysis on a file stream prior to importing */
-  public set streamAnalysisConfig(value: AdminStreamAnalysisConfig) {
-    this._streamAnalysisConfig = value;
-    if(!this.bulkSet) this.prefsChanged.next( this.toJSONObject() );
-  }
-  /** connection parameters defining how and where to stream to bulk-loading endpoints */
-  public get streamConnectionProperties(): AdminStreamConnProperties | undefined {
-    return this._streamConnectionProperties;
-  }
-  /** connection parameters defining how and where to stream to bulk-loading endpoints */
-  public set streamConnectionProperties(value: AdminStreamConnProperties | undefined) {
-    this._streamConnectionProperties = value;
-    if(!this.bulkSet) this.prefsChanged.next( this.toJSONObject() );
-  }
-  /** configuration parameters for related to importing records using the stream connection */
-  public get streamLoadConfig(): AdminStreamLoadConfig {
-    return this._streamLoadConfig;
-  }
-  /** configuration parameters for related to importing records using the stream connection */
-  public set streamLoadConfig(value: AdminStreamLoadConfig) {
-    this._streamLoadConfig = value;
-    if(!this.bulkSet) this.prefsChanged.next( this.toJSONObject() );
-  }
-  /** whether or not to use the streamConnectionProperties to do analysis through websocket stream. */
-  public get useStreamingForAnalysis(): boolean {
-    return this._useStreamingForAnalysis;
-  }
-  /** whether or not to use the streamConnectionProperties to do analysis through websocket stream. */
-  public set useStreamingForAnalysis(value: boolean) {
-    this._useStreamingForAnalysis = value;
-    if(!this.bulkSet) this.prefsChanged.next( this.toJSONObject() );
-  }
-  /** whether or not to use the streamConnectionProperties to do analysis through websocket stream. */
-  public get useStreamingForLoad(): boolean {
-    return this._useStreamingForLoad;
-  }
-  /** whether or not to use the streamConnectionProperties to do record importing through websocket stream. */
-  public set useStreamingForLoad(value: boolean) {
-    this._useStreamingForLoad = value;
-    if(!this.bulkSet) this.prefsChanged.next( this.toJSONObject() );
-  }
-
-  constructor(){
-    super();
-    /**
-     * publish out a "first" real payload so that
-     * subscribers get an initial payload from this subclass
-     * instead of the empty superclass
-     **/
     this.prefsChanged.next( this.toJSONObject() );
   }
 }
@@ -1543,7 +1433,6 @@ export class SzHowPrefs extends SzSdkPrefsBase {
  * events.
  */
 export interface SzSdkPrefsModel {
-  admin?: any
   dataMart?: any,
   entityDetail?: any,
   graph?: any,
@@ -1611,9 +1500,6 @@ export class SzPrefsService implements OnDestroy {
   public graph?: SzGraphPrefs                 = new SzGraphPrefs();
   /** instance of {@link SzHowPrefs} */
   public how?: SzHowPrefs                     = new SzHowPrefs();
-  /** instance of {@link SzAdminPrefs} */
-  public admin?: SzAdminPrefs                 = new SzAdminPrefs();
-
   /**
    * subscribe for state change representation. */
   public prefsChanged: BehaviorSubject<SzSdkPrefsModel> = new BehaviorSubject<SzSdkPrefsModel>( this.toJSONObject() );
@@ -1650,9 +1536,6 @@ export class SzPrefsService implements OnDestroy {
     }
     if(this.how){
       retObj.how = this.how.toJSONObject();
-    }
-    if(this.admin){
-      retObj.admin = this.admin.toJSONObject();
     }
     return retObj;
   }
@@ -1722,7 +1605,6 @@ export class SzPrefsService implements OnDestroy {
     // listen for any prefs changes
     // as one meta-observable
     const concat_prefchanges = merge(
-      this.admin.prefsChanged,
       this.dataMart.prefChanged,
       this.entityDetail.prefsChanged,
       this.graph.prefsChanged,
