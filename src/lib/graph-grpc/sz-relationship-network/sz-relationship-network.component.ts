@@ -25,7 +25,7 @@ import { SzGraphTooltipEntityModel, SzGraphTooltipLinkModel, SzGraphNodeFilterPa
 import { SzGrpcEngineService } from '../../services/grpc/engine.service';
 import { SzFindNetworkEntity, SzSdkEntityFeatures, SzSdkEntityResponse, SzSdkFindNetworkResponse, SzSdkRelatedEntity, SzSdkResolvedEntity, SzSdkSearchMatchLevel } from '../../models/grpc/engine';
 import {
-  SzNetorkGraphCompositeResponse,
+  SzNetworkGraphCompositeResponse,
   SzNetworkGraphInputs,
   SzGraphExport,
   SzGraphExportNode,
@@ -1590,9 +1590,9 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
   }
 
   
-  private getNetworkCompositeGrpc(entityIds: Array<string | number>, maxDegrees: number, buildOut: number, maxEntities: number): Observable<SzNetorkGraphCompositeResponse> {
+  private getNetworkCompositeGrpc(entityIds: Array<string | number>, maxDegrees: number, buildOut: number, maxEntities: number): Observable<SzNetworkGraphCompositeResponse> {
     console.log(`!!!!!!!!!!!!!!!!! getNetworkCompositeGrpc !!!!!!!!!!!!!!!!!`);
-    let returnSubject     = new Subject<SzNetorkGraphCompositeResponse>();
+    let returnSubject     = new Subject<SzNetworkGraphCompositeResponse>();
     let returnObserveable = returnSubject.asObservable();
     if(console.time){
       try {
@@ -1613,8 +1613,8 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
         }catch(err){}
       }) 
     ).subscribe((resp) => {
-      let originalData = Object.assign({}, (resp as SzNetorkGraphCompositeResponse));
-      let _data = Object.assign({ modified: true }, (resp as SzNetorkGraphCompositeResponse));
+      let originalData = Object.assign({}, (resp as SzNetworkGraphCompositeResponse));
+      let _data = Object.assign({ modified: true }, (resp as SzNetworkGraphCompositeResponse));
       let primaryEntitiesById         = new Map<string | number, SzSdkResolvedEntity>();
       let relatedEntitiesById         = new Map<string | number, SzSdkRelatedEntity>();
       let relatedEntitiesByPrimaryId  = new Map<string | number, Map<string | number, SzSdkRelatedEntity>>();
@@ -1925,10 +1925,10 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
     }
   }
   /** take the result from getNetwork and transpose to SzNetworkGraphInputs class  */
-  asGraphInputs(graphResponse: SzNetorkGraphCompositeResponse) : SzNetworkGraphInputs {
+  asGraphInputs(graphResponse: SzNetworkGraphCompositeResponse) : SzNetworkGraphInputs {
     const _showLinkLabels = this.showLinkLabels;
     return new class implements SzNetworkGraphInputs {
-      data = graphResponse; // SzNetorkGraphCompositeResponse
+      data = graphResponse; // SzNetworkGraphCompositeResponse
       showLinkLabels = _showLinkLabels;
     };
   }
@@ -4194,7 +4194,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
 
     return [disclosedKeys, derived_keys]
   }
-  public static responseHasEntities(data: SzNetorkGraphCompositeResponse): boolean {
+  public static responseHasEntities(data: SzNetworkGraphCompositeResponse): boolean {
     let retVal        = false;
     if(data && data.NETWORK_RESPONSES) {
       data.NETWORK_RESPONSES.forEach((networkResponse) => {
@@ -4205,7 +4205,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
     }
     return retVal;
   }
-  public static getEntityIdsFromNetworkData(data: SzNetorkGraphCompositeResponse): Set<number> {
+  public static getEntityIdsFromNetworkData(data: SzNetworkGraphCompositeResponse): Set<number> {
     let retVal = new Set<number>();
     if(data.NETWORK_RESPONSES && data.NETWORK_RESPONSES.forEach) {
       data.NETWORK_RESPONSES.forEach((networkResponse: SzSdkFindNetworkResponse)=>{

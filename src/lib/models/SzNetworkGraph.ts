@@ -2,13 +2,13 @@ import { SzSdkEntityResponse, SzSdkFindNetworkResponse } from "../models/grpc/en
 import { SzDataSourceComposite } from "./data-sources";
 import { SzMatchKeyTokenFilterScope } from "./graph";
 
-export interface SzNetorkGraphCompositeResponse {
+export interface SzNetworkGraphCompositeResponse {
     ENTITY_RESPONSES: SzSdkEntityResponse[],
     NETWORK_RESPONSES: SzSdkFindNetworkResponse[]
 }
 
 export interface SzNetworkGraphInputs {
-    data: SzNetorkGraphCompositeResponse
+    data: SzNetworkGraphCompositeResponse
     showLinkLabels: boolean;
 }
 

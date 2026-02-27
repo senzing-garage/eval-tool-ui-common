@@ -5,7 +5,7 @@ import { Subject } from 'rxjs';
 import { SzEntityData, SzEntityIdentifier, SzEntityNetworkData } from '@senzing/rest-api-client-ng';
 import { SzGraphControlComponent } from './sz-graph-control.component';
 import { SzGraphNodeFilterPair, SzEntityNetworkMatchKeyTokens, SzMatchKeyTokenComposite, SzMatchKeyTokenFilterScope } from '../models/graph';
-import { SzNetorkGraphCompositeResponse, SzNetworkGraphInputs } from '../models/SzNetworkGraph';
+import { SzNetworkGraphCompositeResponse, SzNetworkGraphInputs } from '../models/SzNetworkGraph';
 import { SzRelationshipNetworkComponent } from './sz-relationship-network/sz-relationship-network.component';
 import { parseBool, parseSzIdentifier, sortDataSourcesByIndex } from '../common/utils';
 import { SzDataSourceComposite } from '../models/data-sources';
@@ -544,9 +544,9 @@ export class SzGraphComponentGrpc implements OnInit, OnDestroy {
   /** event is emitted when the graph components data is updated or loaded */
   @Output() dataLoading: EventEmitter<boolean> = new EventEmitter<boolean>();
   /** event is emitted when the graph components data is updated or loaded */
-  @Output() dataLoaded: EventEmitter<SzNetorkGraphCompositeResponse> = new EventEmitter<SzNetorkGraphCompositeResponse>();
+  @Output() dataLoaded: EventEmitter<SzNetworkGraphCompositeResponse> = new EventEmitter<SzNetworkGraphCompositeResponse>();
   /** event is emitted when the graph components data is updated or loaded */
-  @Output() dataUpdated: EventEmitter<SzNetorkGraphCompositeResponse> = new EventEmitter<SzNetorkGraphCompositeResponse>();
+  @Output() dataUpdated: EventEmitter<SzNetworkGraphCompositeResponse> = new EventEmitter<SzNetworkGraphCompositeResponse>();
   /** event is emitted when the collection of matchkeys present in graph dislay change */
   @Output() matchKeysChange: EventEmitter<any> = new EventEmitter<string[]>();
   /** event is emitted when the collection of matchkey tokens present in graph dislay change */

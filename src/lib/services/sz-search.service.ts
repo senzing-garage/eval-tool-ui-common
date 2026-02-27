@@ -14,7 +14,7 @@ import { SzEngineFlags } from '@senzing/sz-sdk-typescript-grpc-web';
 import { SzSdkEntityRecord, SzSdkEntityResponse, SzSdkFindNetworkResponse, SzSdkRelatedEntity, SzSdkResolvedEntity, SzSdkSearchResolvedEntity, SzSdkSearchResponse, SzSdkSearchResult } from '../models/grpc/engine';
 import { SzSdkConfigAttr } from '../models/grpc/config';
 import { SzResumeEntity, SzResumeRelatedEntity } from '../models/SzResumeEntity';
-import { SzNetorkGraphCompositeResponse } from '../models/SzNetworkGraph';
+import { SzNetworkGraphCompositeResponse } from '../models/SzNetworkGraph';
 
 export interface SzSearchEvent {
   params: SzEntitySearchParams,
@@ -244,9 +244,9 @@ export class SzSearchService {
     )
   }
 
-  public getGraphNetworkData(entityIds: Array<string | number>, maxDegrees: number, buildOut: number, maxEntities: number): Observable<SzNetorkGraphCompositeResponse> {
+  public getGraphNetworkData(entityIds: Array<string | number>, maxDegrees: number, buildOut: number, maxEntities: number): Observable<SzNetworkGraphCompositeResponse> {
     console.log(`!!!!!!!!!!!!!!!!! getNetworkCompositeGrpc !!!!!!!!!!!!!!!!!`);
-    let returnSubject     = new Subject<SzNetorkGraphCompositeResponse>();
+    let returnSubject     = new Subject<SzNetworkGraphCompositeResponse>();
     let returnObserveable = returnSubject.asObservable();
     if(console.time){
       try {
@@ -265,8 +265,8 @@ export class SzSearchService {
         }catch(err){}
       }) 
     ).subscribe((resp) => {
-      let originalData = Object.assign({}, (resp as SzNetorkGraphCompositeResponse));
-      let _data = Object.assign({ modified: true }, (resp as SzNetorkGraphCompositeResponse));
+      let originalData = Object.assign({}, (resp as SzNetworkGraphCompositeResponse));
+      let _data = Object.assign({ modified: true }, (resp as SzNetworkGraphCompositeResponse));
       let primaryEntitiesById         = new Map<string | number, SzSdkResolvedEntity>();
       let relatedEntitiesById         = new Map<string | number, SzSdkRelatedEntity>();
       let relatedEntitiesByPrimaryId  = new Map<string | number, Map<string | number, SzSdkRelatedEntity>>();

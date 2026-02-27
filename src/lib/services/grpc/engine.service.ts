@@ -6,7 +6,7 @@ import { SzGrpcConfig } from './config.service';
 import { isNotNull } from '../../common/utils';
 import { SzSdkEntityResponse, SzSdkFindNetworkResponse } from '../../models/grpc/engine';
 import { SzSdkWhyEntitiesResponse, SzSdkWhyRecordInEntityResponse } from '../../models/grpc/why';
-import { SzNetorkGraphCompositeResponse } from '../../models/SzNetworkGraph';
+import { SzNetworkGraphCompositeResponse } from '../../models/SzNetworkGraph';
 
 @Injectable({
   providedIn: 'root'
@@ -96,8 +96,8 @@ export class SzGrpcEngineService {
       return retVal.asObservable();
     }
 
-    public getGraphEntityNetwork(entityIds: Array<number | string>, maxDegrees?: number, buildOutDegrees?: number, buildOutMaxEntities?: number, flags: BigInt | number = SzEngineFlags.SZ_ENTITY_DEFAULT_FLAGS): Observable<SzNetorkGraphCompositeResponse | SzError> {
-      let retVal    = new Subject<SzNetorkGraphCompositeResponse | SzError>();
+    public getGraphEntityNetwork(entityIds: Array<number | string>, maxDegrees?: number, buildOutDegrees?: number, buildOutMaxEntities?: number, flags: BigInt | number = SzEngineFlags.SZ_ENTITY_DEFAULT_FLAGS): Observable<SzNetworkGraphCompositeResponse | SzError> {
+      let retVal    = new Subject<SzNetworkGraphCompositeResponse | SzError>();
       let requests  = [];
 
       if(this.szEnvironment && this.szEnvironment.engine) {
@@ -108,7 +108,7 @@ export class SzGrpcEngineService {
         
         Promise.all(requests).then((resp: string[]) => {
           let networkResponse = JSON.parse( resp.pop() as string)
-          let _retResp: SzNetorkGraphCompositeResponse = {
+          let _retResp: SzNetworkGraphCompositeResponse = {
             ENTITY_RESPONSES: resp.map((_r) => {
               return JSON.parse(_r as string);
             }),
