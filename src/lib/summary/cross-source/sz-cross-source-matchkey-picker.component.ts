@@ -1,11 +1,17 @@
 import { Component, HostBinding, Inject, OnDestroy, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatRadioModule } from '@angular/material/radio';
 import { Subject, take, takeUntil, tap } from 'rxjs';
-import { SzEntityData } from '@senzing/rest-api-client-ng';
+//import { SzEntityData } from '@senzing/rest-api-client-ng';
 import { SzCrossSourceCount, SzCrossSourceSummaryCategoryType } from '../../models/stats';
 import { SzDataMartService } from '../../services/sz-datamart.service';
 import { isNotNull } from '../../common/utils';
 import { SzPrefsService } from '../../services/sz-prefs.service';
+import { SzSampleSetEntity, SzSampleSetRelation } from '../../models/data-sampling';
 
 /**
  * @internal
@@ -14,7 +20,14 @@ import { SzPrefsService } from '../../services/sz-prefs.service';
     selector: 'sz-css-matchkeys-dialog',
     templateUrl: 'sz-cross-source-matchkey-picker.component.html',
     styleUrls: ['sz-cross-source-matchkey-picker.component.scss'],
-    standalone: false
+    imports: [
+        CommonModule, 
+        FormsModule,
+        MatInputModule,
+        MatRadioModule,
+        MatIconModule
+    ],
+    standalone: true
 })
   export class SzCrossSourceSummaryMatchKeyPickerDialog implements OnInit, OnDestroy {
     /** subscription to notify subscribers to unbind */
@@ -133,7 +146,7 @@ import { SzPrefsService } from '../../services/sz-prefs.service';
                 this.dataMartService.sampleSetUnfilteredCount).pipe(
                   takeUntil(this.unsubscribe$),
                   take(1),
-                  tap((data: SzEntityData[]) => {
+                  tap((data: Array<SzSampleSetEntity | SzSampleSetRelation>) => {
                     //this._loading.next(false);
                     //this._onNewSampleSet.next(data);
                     this.dataMartService.doNotFetchSampleSetOnParameterChange = false;

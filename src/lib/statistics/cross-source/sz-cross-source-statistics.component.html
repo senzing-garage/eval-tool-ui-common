@@ -1,6 +1,7 @@
 <div class="sz-css-heading"
     [class.expanded]="headerExpanded">
     <sz-cross-source-select
+        [ignore]="excludedDataSources"
         [default-to-data-source]="defaultToDataSource"
         [default-from-data-source]="defaultFromDataSource"
         (defaultSourcesSelected)="onDefaultSourcesSelected($event)"></sz-cross-source-select>

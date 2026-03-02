@@ -5,8 +5,21 @@ import { Observable, Subject } from 'rxjs';
 import { camelToKebabCase, underscoresToDashes, getMapKeyByValue, parseBool } from '../../common/utils';
 import { SzDataMartService } from '../../services/sz-datamart.service';
 import { SzCrossSourceSummaryCategoryType, SzCrossSourceSummarySelectionEvent, SzCrossSourceSummarySelectionClickEvent, SzStatsSampleTableLoadingEvent, SzCrossSourceSummaryCategoryTypeToMatchLevel } from '../../models/stats';
-import { SzEntitiesPage, SzEntityData, SzEntityIdentifier, SzSourceSummary } from '@senzing/rest-api-client-ng';
+//import { SzEntitiesPage, SzEntityData, SzEntityIdentifier, SzSourceSummary } from '@senzing/rest-api-client-ng';
 import { SzDataTableCellEvent } from '../../models/stats';
+import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
+import { SzCrossSourceResultsDataTable } from '../../statistics/cross-source/sz-cross-source-results.data-table';
+import { SzCrossSourceSelectComponent } from '../../statistics/cross-source/sz-cross-source-select.component';
+import { SzCrossSourceSummaryComponent } from '../../summary/cross-source/sz-cross-source-summary.component';
+import { MatButtonModule } from '@angular/material/button';
+//import { SzEntitiesPage, SzEntityData, SzEntityIdentifier, SzSourceSummary } from '@senzing/rest-api-client-ng';
+//import { SzEntitiesPage } from '../../models/statistics/szEntitiesPage';
+//import { SzEntityData } from '../../models/statistics/szE';
+import { SzEntityData } from '../../services/http/models/szEntityData';
+//import { SzSourceSummary } from '../../models/statistics/szSourceSummary';
+import { SzEntityIdentifier } from '../../services/http/models/szEntityIdentifier';
+import { SzSampleSetEntity, SzSampleSetRelation } from '../../models/data-sampling';
 
 export interface dataSourceSelectionChangeEvent {
   dataSource1?: string,
@@ -29,12 +42,19 @@ export interface dataSourceSelectionChangeEvent {
     selector: 'sz-cross-source-statistics',
     templateUrl: './sz-cross-source-statistics.component.html',
     styleUrls: ['./sz-cross-source-statistics.component.scss'],
-    standalone: false
+    imports: [
+      CommonModule,
+      MatIconModule, MatButtonModule,
+      SzCrossSourceSummaryComponent,
+      SzCrossSourceSelectComponent,
+      SzCrossSourceResultsDataTable
+    ]
 })
 export class SzCrossSourceStatistics implements OnInit, AfterViewInit, OnDestroy {
   /** subscription to notify subscribers to unbind */
   public unsubscribe$ = new Subject<void>();
 
+  private _excludedDataSources: string[] = [];
   private _disableClickingOnZeroResults = true;
   private _isLoading = false;
   private _showTable    = false;
@@ -53,6 +73,12 @@ export class SzCrossSourceStatistics implements OnInit, AfterViewInit, OnDestroy
   /** if set to false no loading spinner for the table will be shown */
   @Input() set showTableLoadingSpinner(value: boolean | string) {
     this._showTableLoadingSpinner = parseBool(value);
+  }
+  @Input() set ignore(value: string[]) {
+    this._excludedDataSources = value || [];
+  }
+  public get excludedDataSources(): string[] {
+    return this._excludedDataSources;
   }
   /** whether or not to disable clicking on venn diagrams with "0" results */
   @Input() set disableClickingOnZeroResults(value: boolean | string) {
@@ -76,7 +102,7 @@ export class SzCrossSourceStatistics implements OnInit, AfterViewInit, OnDestroy
   private   _onNewSampleSetRequested: Subject<boolean> = new Subject();
   @Output() onNewSampleSetRequested = this._onNewSampleSetRequested.asObservable();
   /** when a new sample set has completed it's data requests/initialization */
-  private _onNewSampleSet: Subject<SzEntityData[]> = new Subject();
+  private _onNewSampleSet: Subject<Array<SzSampleSetEntity | SzSampleSetRelation>> = new Subject();
   @Output() onNewSampleSet = this._onNewSampleSet.asObservable();
   /** aggregate observable for when the component is "doing stuff" */
   private _loading: Subject<boolean> = new Subject();
@@ -261,17 +287,14 @@ export class SzCrossSourceStatistics implements OnInit, AfterViewInit, OnDestroy
 
     if(!evt.dataSource1 && evt.dataSource2) {
       // flip-flop if only one ds is defined
-      this.dataMartService.sampleDataSource1  = evt.dataSource2;
-      this.dataMartService.sampleDataSource2  = evt.dataSource2;
-      //console.log(`\tdatasource1 set to datasource2: ["${this.dataMartService.sampleDataSource1}","${this.dataMartService.sampleDataSource2}"]`);
+      this.dataMartService.setSampleDataSources(evt.dataSource2, evt.dataSource2);
+      console.log(`\tdatasource1 set to datasource2: ["${this.dataMartService.sampleDataSource1}","${this.dataMartService.sampleDataSource2}"]`);
     } else if((evt.dataSource1 && !evt.dataSource2) || ((evt.dataSource1 === evt.dataSource2) && evt.dataSource1 !== undefined)) {
-      this.dataMartService.sampleDataSource1  = evt.dataSource1;
-      this.dataMartService.sampleDataSource2  = evt.dataSource1;
-      //console.log(`\tdatasource2 set to datasource1: ["${this.dataMartService.sampleDataSource1}","${this.dataMartService.sampleDataSource2}" | "${evt.dataSource1}","${evt.dataSource2}"]`);
+      this.dataMartService.setSampleDataSources(evt.dataSource1, evt.dataSource1);
+      console.log(`\tdatasource2 set to datasource1: ["${this.dataMartService.sampleDataSource1}","${this.dataMartService.sampleDataSource2}" | "${evt.dataSource1}","${evt.dataSource2}"]`);
     } else {
-      this.dataMartService.sampleDataSource1  = evt.dataSource1;
-      this.dataMartService.sampleDataSource2  = evt.dataSource2;
-      //console.log(`\tset both datasources: ["${this.dataMartService.sampleDataSource1}","${this.dataMartService.sampleDataSource2}"]`);
+      this.dataMartService.setSampleDataSources(evt.dataSource1, evt.dataSource2);
+      console.log(`\tset both datasources: ["${this.dataMartService.sampleDataSource1}","${this.dataMartService.sampleDataSource2}"]`);
     }
 
     // simplify the event payload passed back
@@ -279,6 +302,7 @@ export class SzCrossSourceStatistics implements OnInit, AfterViewInit, OnDestroy
       matchLevel: evt.matchLevel,
       statType: evt.statType
     }
+
     if(this.dataMartService.sampleDataSource1)  _parametersEvt.dataSource1 = this.dataMartService.sampleDataSource1;
     if(this.dataMartService.sampleDataSource2)  _parametersEvt.dataSource2 = this.dataMartService.sampleDataSource2;
     //this.sourceStatisticClick.emit(evt);  // emit the raw event jic someone needs to use stopPropagation or access to the DOM node
@@ -331,7 +355,7 @@ export class SzCrossSourceStatistics implements OnInit, AfterViewInit, OnDestroy
     this.sourceStatisticClick.emit(evt);  // emit the raw event jic someone needs to use stopPropagation or access to the DOM node
 
     // get new sample set
-    //console.log(`\t\tgetting new sample set: `, _parametersEvt, evt);
+    console.log(`\t\tgetting new sample set: `, evt);
     this.getNewSampleSet(evt).subscribe((obs)=>{
       // initialized
       //console.log('initialized new sample set: ', obs, _parametersEvt);
@@ -375,7 +399,7 @@ export class SzCrossSourceStatistics implements OnInit, AfterViewInit, OnDestroy
       parameters.principle).pipe(
         takeUntil(this.unsubscribe$),
         take(1),
-        tap((data: SzEntityData[]) => {
+        tap((data) => {
           this._loading.next(false);
           this._onNewSampleSet.next(data);
         })

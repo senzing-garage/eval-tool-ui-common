@@ -1,10 +1,39 @@
-import { SzLoadedStats, SzSourceLoadedStats, SzLoadedStatsResponse, SzResolvedEntity, SzRelatedEntity, SzRecord, SzMatchedRecord, SzEntityRecord, SzRelation, SzEntity, SzBoundType, SzCrossSourceSummary } from "@senzing/rest-api-client-ng";
+import { SzSdkEntityRecord, SzSdkEntityRelatedRecord, SzSdkRelatedEntity, SzSdkResolvedEntity } from "./grpc/engine";
+import { 
+    SzLoadedStats, 
+    SzSourceLoadedStats, 
+    //SzLoadedStatsResponse, 
+    //SzResolvedEntity, 
+    //SzRelatedEntity,
+    SzRecord, 
+    //SzMatchedRecord, 
+    //SzEntityRecord,
+    SzRelation, 
+    SzEntity, 
+    SzBoundType, 
+    SzCrossSourceSummary 
+} from "./statistics/public-api";
 import { Observable } from "rxjs";
+//import { SzBoundType } from '../services/http/models/szBoundType';
+import { SzCrossSourceMatchCounts } from '../services/http/models/szCrossSourceMatchCounts';
+import { SzCrossSourceRelationCounts } from '../services/http/models/szCrossSourceRelationCounts';
+//import { SzCrossSourceSummary } from '../services/http/models/szCrossSourceSummary';
+import { SzEntityRecord } from '../services/http/models/szEntityRecord';
+//import { SzLoadedStats } from '../services/http/models/szLoadedStats';
+import { SzMatchedRecord } from '../services/http/models/szMatchedRecord';
+import { SzRelatedEntity } from '../services/http/models/szRelatedEntity';
+import { SzResolvedEntity } from '../services/http/models/szResolvedEntity';
+import { SzRelationCounts } from '../services/http/models/szRelationCounts';
+import { SzRelationsPage } from '../services/http/models/szRelationsPage';
+//import { SzSourceLoadedStats } from '../services/http/models/szSourceLoadedStats';
+import { SzSourceSummary } from '../services/http/models/szSourceSummary';
+import { SzSummaryStats } from '../services/http/models/szSummaryStats';
+import { SzSampleSetRelation } from "./data-sampling";
 
-export interface SzCountStatsForDataSourcesResponse extends SzLoadedStatsResponse {
+//export interface SzCountStatsForDataSourcesResponse extends SzLoadedStatsResponse {
     /** override with extended */
-    data?: SzStatCountsForDataSources;
-}
+//    data?: SzStatCountsForDataSources;
+//}
 export interface SzStatCountsForDataSources extends SzLoadedStats {
     /** we add pending count so app can optionally inject values */
     totalPendingCount?: number,
@@ -50,34 +79,15 @@ export interface SzCrossSourceSummarySelectionClickEvent extends MouseEvent {
     statType?: SzCrossSourceSummaryCategoryType
 }
 
-export interface SzStatSampleEntityTableItem extends SzResolvedEntity {
-    relatedEntities?: SzDataTableRelatedEntity[],
-    relatedEntity?: SzDataTableRelatedEntity,
-    recordCount?: number,
-    records?: SzRecord[] | SzMatchedRecord[],
-    rows?: SzStatSampleEntityTableRow[],
-    dataType?: SzStatSampleEntityTableRowType;
-}
-
 export interface SzStatsSampleTableLoadingEvent {
     inflight: boolean,
     source: string
 }
 
-export interface SzDataTableEntity extends SzEntity {
-    dataType?: SzStatSampleEntityTableRowType;
-}
-export interface SzDataTableRelatedEntity extends SzRelatedEntity {
-    rows?: SzStatSampleEntityTableRow[],
-    dataType?: SzStatSampleEntityTableRowType;
-}
-export interface SzDataTableRelation extends SzRelation {
+/*export interface SzDataTableRelation extends SzSampleSetRelation {
     entity: SzDataTableEntity;
-    relatedEntity: SzDataTableEntity;
-}
-
-export interface SzStatSampleEntityTableRowEntity extends SzEntity {
-}
+    relatedEntity: SzDataTableRelatedEntity;
+}*/
 
 export interface SzDataTableCellEvent {
     "key": string,
@@ -101,7 +111,7 @@ let _allColumns = [
     'Relationship Data'
   ];
 */
-export type SzStatSampleEntityTableRowType = 'ENTITY' | 'ENTITY_RECORD' | 'RELATED' | 'RELATED_RECORD' | 'DEBUG' | 'DEBUG2';
+/*export type SzStatSampleEntityTableRowType = 'ENTITY' | 'ENTITY_RECORD' | 'RELATED' | 'RELATED_RECORD' | 'DEBUG' | 'DEBUG2';
 export const SzStatSampleEntityTableRowType = {
     ENTITY: 'ENTITY' as SzStatSampleEntityTableRowType,
     ENTITY_RECORD: 'ENTITY_RECORD' as SzStatSampleEntityTableRowType,
@@ -109,30 +119,7 @@ export const SzStatSampleEntityTableRowType = {
     DEBUG2: 'DEBUG2' as SzStatSampleEntityTableRowType,
     RELATED: 'RELATED' as SzStatSampleEntityTableRowType,
     RELATED_RECORD: 'RELATED_RECORD' as SzStatSampleEntityTableRowType
-};
-
-export interface SzStatSampleEntityTableRow extends SzResolvedEntity, SzMatchedRecord {
-    /**
-     * The data source code identifying the data source from  which the record was loaded.
-     */
-    dataSource?: string;
-    /**
-     * The record ID that uniquely identifies the record within the data source from which it was loaded.
-     */
-    recordId?: string;
-    /**
-     * The optional match key describing why the record merged into the entity to which it belongs.  This may be absent or `null` if this record belongs to a single-record entity or if it was the initial record of the first multi-record entity to which it belonged (even if it later re-resolved into a larger entity).
-     */
-    matchKey?: string;
-    /**
-     * The optional principle identifying the resolution rule that was used to merge the record into the entity to which it belongs.  This may be absent or `null` if this record belongs to a single-record entity or if it was the initial record of the first multi-record entity to which it belonged (even if it later re-resolved into a larger entity).
-     */
-    principle?: string;
-    /**
-     * the type of data construct this row represents
-     */
-    dataType?: SzStatSampleEntityTableRowType
-}
+};*/
 
 export interface SzDataTableRelationsPagingParameters {
     /**

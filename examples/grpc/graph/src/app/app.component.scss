@@ -1,0 +1,27 @@
+
+.example-title {
+    font-size: 1.5em;
+    font-weight: 300;
+    font-family: system-ui;
+    color: #bebebe;
+    text-align: left;
+    background-color: #3a3a3a;
+    padding: 5px 10px;
+    margin: 0;
+}
+
+.graph-container {
+    display: flex;
+    height: calc(100vh - 42px);
+}
+
+.graph-canvas {
+    flex: 1;
+    position: relative;
+}
+
+.graph-filters {
+    width: 300px;
+    border-left: 1px solid #ddd;
+    overflow-y: auto;
+}

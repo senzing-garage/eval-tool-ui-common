@@ -1,0 +1,27 @@
+import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { provideHttpClient } from '@angular/common/http';
+import { provideRouter } from '@angular/router';
+
+import { routes } from './app.routes';
+import { SzGrpcWebEnvironment } from '@senzing/sz-sdk-typescript-grpc-web';
+import { SzRestConfiguration } from '@senzing/eval-tool-ui-common';
+import { Title } from '@angular/platform-browser';
+
+const grpcSdkEnv = new SzGrpcWebEnvironment({
+    connectionString: `http://localhost:8261`
+});
+const restSdkEnv = new SzRestConfiguration({
+  'basePath': '/api',
+  'withCredentials': true
+});
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideHttpClient(),
+    provideRouter(routes),
+    {provide: 'GRPC_ENVIRONMENT', useValue: grpcSdkEnv},
+    {provide: 'REST_ENVIRONMENT', useValue: restSdkEnv},
+    Title
+  ]
+};

@@ -1,8 +1,9 @@
 import { Component, Output, OnInit, OnDestroy, EventEmitter, ChangeDetectorRef, HostBinding, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Observable, Subject, forkJoin, of } from 'rxjs';
 import { skipWhile, take, takeUntil } from 'rxjs/operators';
 
-import { SzCrossSourceSummary, SzMatchCounts, SzRelationCounts } from '@senzing/rest-api-client-ng';
+//import { SzCrossSourceSummary, SzMatchCounts, SzRelationCounts } from '@senzing/rest-api-client-ng';
 import { SzPrefsService } from '../../services/sz-prefs.service';
 import { SzCrossSourceCount, SzCrossSourceSummaryCategoryType, SzCrossSourceSummaryResponses, SzCrossSourceSummarySelectionClickEvent } from '../../models/stats';
 import { SzDataMartService } from '../../services/sz-datamart.service';
@@ -10,6 +11,11 @@ import { SzDataSourcesService } from '../../services/sz-datasources.service';
 import { parseBool } from '../../common/utils';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { SzCrossSourceSummaryMatchKeyPickerDialog } from './sz-cross-source-matchkey-picker.component';
+import { SzVennDiagramsComponent } from '../../charts/versus/sz-venn-diagram.component';
+
+import { SzCrossSourceSummary } from '../../models/statistics/szCrossSourceSummary';
+import { SzMatchCounts } from '../../models/statistics/szMatchCounts';
+import { SzRelationCounts } from '../../models/statistics/szRelationCounts';
 
 /**
  * Embeddable Venn Diagrams component that illustrates:
@@ -36,8 +42,11 @@ import { SzCrossSourceSummaryMatchKeyPickerDialog } from './sz-cross-source-matc
 @Component({
     selector: 'sz-cross-source-summary',
     templateUrl: './sz-cross-source-summary.component.html',
-    styleUrls: ['./sz-cross-source-summary.component.scss'],
-    standalone: false
+    imports: [CommonModule,
+      SzVennDiagramsComponent,
+      SzCrossSourceSummaryMatchKeyPickerDialog
+    ],
+    styleUrls: ['./sz-cross-source-summary.component.scss']
 })
 export class SzCrossSourceSummaryComponent implements OnInit, OnDestroy {
   /** subscription to notify subscribers to unbind */
@@ -159,6 +168,9 @@ export class SzCrossSourceSummaryComponent implements OnInit, OnDestroy {
   @Output() summaryDiagramClick: EventEmitter<any> = new EventEmitter();
   /** when a datasource section on one side or both of the venn diagram is clicked this event is emitted */
   @Output() sourceStatisticClicked: EventEmitter<SzCrossSourceSummarySelectionClickEvent> = new EventEmitter();
+  /** emitted once when the component's initial data has loaded (or errored) */
+  @Output() initialized: EventEmitter<boolean> = new EventEmitter<boolean>();
+  private _initialized = false;
 
   /** if singular datasource set css class 'singular' on host */
   @HostBinding("class.singular") get classSingular() {
@@ -236,9 +248,19 @@ export class SzCrossSourceSummaryComponent implements OnInit, OnDestroy {
       take(1),
       takeUntil(this.unsubscribe$),
     ).subscribe({
-      next: this.onCrossSourceDataChanged.bind(this),
+      next: (data) => {
+        this.onCrossSourceDataChanged(data as SzCrossSourceSummaryResponses);
+        if (!this._initialized) {
+          this._initialized = true;
+          this.initialized.emit(true);
+        }
+      },
       error: (err) => {
         console.warn('error: ',err);
+        if (!this._initialized) {
+          this._initialized = true;
+          this.initialized.emit(false);
+        }
       }
     });
   }
@@ -269,7 +291,7 @@ export class SzCrossSourceSummaryComponent implements OnInit, OnDestroy {
     if(data && data.toDataSource) {
       this._toDataSourceSummaryData = data.toDataSource;
     }
-    console.warn(`onCrossSourceDataChanged: `, this._fromDataSourceSummaryData, this._crossSourceSummaryData, this._toDataSourceSummaryData);
+    console.warn(`onCrossSourceDataChanged: `, data, this._fromDataSourceSummaryData, this._crossSourceSummaryData, this._toDataSourceSummaryData);
   }
   public get legendFrom(): string {
     let retVal = 'A';

@@ -1,0 +1,279 @@
+import { Inject, Injectable, signal } from '@angular/core';
+import { SzEngineFlags, SzError, SzGrpcWebConfig, SzGrpcWebEnvironment, SzGrpcWebEnvironmentOptions } from '@senzing/sz-sdk-typescript-grpc-web';
+import { Observable, Subject, take, takeUntil, throwError } from 'rxjs';
+import { SzProductLicenseResponse, SzProductVersionResponse } from '../../models/grpc/product';
+import { SzGrpcConfig } from './config.service';
+import { isNotNull } from '../../common/utils';
+import { SzSdkEntityResponse, SzSdkFindNetworkResponse } from '../../models/grpc/engine';
+import { SzSdkWhyEntitiesResponse, SzSdkWhyRecordInEntityResponse } from '../../models/grpc/why';
+import { SzNetworkGraphCompositeResponse } from '../../models/SzNetworkGraph';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SzGrpcEngineService {
+    /** subscription to notify subscribers to unbind */
+    public unsubscribe$ = new Subject<void>();
+    
+    public addRecords(recordsAsJson: Array<{[key: string]: any}>) {
+        let retVal      = new Subject();
+        let requests    = [];
+        let ignoredRecs = [];
+        let errors      = [];
+        recordsAsJson.forEach((record)=>{
+            let dsCode      = record['DATA_SOURCE'];
+            let recordId    = record['RECORD_ID'];
+            if(isNotNull(dsCode)) {
+                let _p = new Promise((resolve, reject)=>{
+                    try{
+                        this.addRecord(dsCode, recordId, record).then((result)=>{
+                            resolve(result);
+                        }).catch((err)=>{
+                            errors.push(err);
+                        })
+                    } catch(err) {
+                        errors.push(err);
+                    }
+                })
+                requests.push( _p );
+            } else {
+                ignoredRecs.push(record);
+            }
+        });
+        Promise.all(requests).then((p)=> {
+            console.log(`SzGrpcEngineService.addRecords: `, p, errors);
+            retVal.next(p)
+        })
+        return retVal.asObservable();
+    }
+
+    /**
+     * data_as_json = '{"ADDR_LINE1":"123 Main Street, Las Vegas NV 89132","ADDR_TYPE":"MAILING","AMOUNT":"100","DATE":"1/2/18","DATE_OF_BIRTH":"12/11/1978","EMAIL_ADDRESS":"bsmith@work.com","PHONE_NUMBER":"702-919-1300","PHONE_TYPE":"HOME","PRIMARY_NAME_FIRST":"Robert","PRIMARY_NAME_LAST":"Smith","RECORD_TYPE":"PERSON","STATUS":"Active","DATA_SOURCE":"CUSTOMERS"}'
+     */
+    public addRecord(dataSourceCode: string, recordId: string | number, recordDefinition: any, flags: BigInt | number = SzEngineFlags.SZ_WITH_INFO) {
+        return this.szEnvironment.engine.addRecord(dataSourceCode, recordId, recordDefinition, flags)
+    }
+
+    public getActiveConfigId() {
+        let retVal = new Subject<number | SzError>();
+        console.log(`getting license from grpc...`);
+        if(this.szEnvironment && this.szEnvironment.engine) {
+          this.szEnvironment?.engine?.getActiveConfigId().then((resp) => {
+            retVal.next(resp);
+          })
+        }
+        return retVal;
+    }
+    public getEntityByEntityId(entityId: number, flags: BigInt | number = SzEngineFlags.SZ_ENTITY_DEFAULT_FLAGS): Observable<any | SzError> {
+        let retVal = new Subject<SzSdkEntityResponse | SzError>();
+        console.log(`getting entity by id from grpc...`);
+        if(this.szEnvironment && this.szEnvironment.engine) {
+          this.szEnvironment?.engine?.getEntityByEntityId(entityId, flags).then((resp) => {
+            retVal.next(JSON.parse(resp as string));
+          })
+        }
+        return retVal.asObservable();
+    }
+
+    public getEntitiesByEntityId(entityIds: Array<string | number>, flags: BigInt | number = SzEngineFlags.SZ_ENTITY_DEFAULT_FLAGS): Observable<SzSdkEntityResponse[] | SzError> {
+      let retVal    = new Subject<SzSdkEntityResponse[] | SzError>();
+      let requests  = [];
+      console.log(`getting entities by id from grpc...`);
+      if(this.szEnvironment && this.szEnvironment.engine) {
+        requests = entityIds.map((entityId) => {
+          return this.szEnvironment?.engine?.getEntityByEntityId(entityId as number, flags)
+        });
+        Promise.all(requests).then((resp: string[]) => {
+          let _retResp = resp.map((_r) => {
+            return JSON.parse(_r as string);
+          });
+          console.log(`\t\tgetEntitiesByEntityId(${(entityIds as Array<number | string>).join(',')}): all promises resolved`, _retResp);
+          retVal.next(_retResp);
+        }).catch((error) => {
+          throw error;
+        })
+      }
+      return retVal.asObservable();
+    }
+
+    public getGraphEntityNetwork(entityIds: Array<number | string>, maxDegrees?: number, buildOutDegrees?: number, buildOutMaxEntities?: number, flags: BigInt | number = SzEngineFlags.SZ_ENTITY_DEFAULT_FLAGS): Observable<SzNetworkGraphCompositeResponse | SzError> {
+      let retVal    = new Subject<SzNetworkGraphCompositeResponse | SzError>();
+      let requests  = [];
+
+      if(this.szEnvironment && this.szEnvironment.engine) {
+        requests = entityIds.map((entityId) => {
+          return this.szEnvironment?.engine?.getEntityByEntityId(entityId as number, flags)
+        });
+        requests.push( this.szEnvironment?.engine?.findNetworkByEntityId(entityIds, maxDegrees, buildOutDegrees, buildOutMaxEntities, flags) )
+        
+        Promise.all(requests).then((resp: string[]) => {
+          let networkResponse = JSON.parse( resp.pop() as string)
+          let _retResp: SzNetworkGraphCompositeResponse = {
+            ENTITY_RESPONSES: resp.map((_r) => {
+              return JSON.parse(_r as string);
+            }),
+            NETWORK_RESPONSES: [networkResponse]
+          }
+
+          console.log(`\t\tgetEntitiesByEntityId(${(entityIds as Array<number | string>).join(',')}): all promises resolved`, _retResp);
+          retVal.next(_retResp);
+        }).catch((error) => {
+          throw error;
+        })
+      }
+      return retVal.asObservable();
+    }
+
+    public getVirtualEntityByRecordId(recordKeys: Array<[string, string | number]>, flags: BigInt | number = SzEngineFlags.SZ_ENTITY_DEFAULT_FLAGS): Observable<any | SzError> {
+      let retVal = new Subject<SzSdkEntityResponse | SzError>();
+      console.log(`getting virtual entity by record id from grpc...`, recordKeys);
+      if(this.szEnvironment && this.szEnvironment.engine) {
+        this.szEnvironment?.engine?.getVirtualEntityByRecordId(recordKeys, flags).then((resp) => {
+          retVal.next(JSON.parse(resp as string));
+        })
+      }
+      return retVal.asObservable();
+    }
+
+    public searchByAttributes(attributes: string | Map<any, any> | {[key: string] : any}, flags: BigInt | number = SzEngineFlags.SZ_SEARCH_BY_ATTRIBUTES_DEFAULT_FLAGS, searchProfile: string = ""): Observable<any | SzError> {
+        let retVal = new Subject<string | SzError>();
+        flags = SzEngineFlags.SZ_SEARCH_BY_ATTRIBUTES_DEFAULT_FLAGS |
+        SzEngineFlags.SZ_SEARCH_BY_ATTRIBUTES_STRONG | 
+        SzEngineFlags.SZ_INCLUDE_FEATURE_SCORES | 
+        SzEngineFlags.SZ_INCLUDE_MATCH_KEY_DETAILS | 
+        SzEngineFlags.SZ_ENTITY_INCLUDE_ENTITY_NAME | 
+        SzEngineFlags.SZ_ENTITY_INCLUDE_RECORD_DATA;
+        
+        console.log(`getting search results from grpc...`, flags);
+
+
+        if(this.szEnvironment && this.szEnvironment.engine) {
+          this.szEnvironment?.engine?.searchByAttributes(attributes, flags, searchProfile).then((resp) => {
+            retVal.next(JSON.parse(resp as string));
+          })
+        }
+        return retVal.asObservable();
+    }
+    public getEntityByRecordId(dataSourceCode: string, recordId: string, flags: BigInt | number = SzEngineFlags.SZ_ENTITY_DEFAULT_FLAGS): Observable<any | SzError> {
+      let retVal = new Subject<string | SzError>();
+      console.log(`getting entity by record id from grpc...`);
+      if(this.szEnvironment && this.szEnvironment.engine) {
+        this.szEnvironment?.engine?.getEntityByRecordId(dataSourceCode, recordId, flags).then((resp) => {
+          retVal.next(JSON.parse(resp as string));
+        })
+      }
+      return retVal.asObservable();
+    }
+    public getRecord(dataSourceCode: string, recordId: string, flags: BigInt | number = SzEngineFlags.SZ_RECORD_DEFAULT_FLAGS): Observable<any | SzError> {
+      let retVal = new Subject<string | SzError>();
+      console.log(`getting record from grpc...`);
+      if(this.szEnvironment && this.szEnvironment.engine) {
+        this.szEnvironment?.engine?.getEntityByRecordId(dataSourceCode, recordId, flags).then((resp) => {
+          retVal.next(JSON.parse(resp as string));
+        })
+      }
+      return retVal.asObservable();
+    }
+    entityIds: string | Array<number | string>
+    public findNetworkByEntityId(entityId: string, maxDegrees?: number, buildOutDegrees?: number, buildOutMaxEntities?: number, flags?: BigInt)
+    public findNetworkByEntityId(entityId: number, maxDegrees?: number, buildOutDegrees?: number, buildOutMaxEntities?: number, flags?: BigInt)
+    public findNetworkByEntityId(entityIds: Array<number | string>, maxDegrees?: number, buildOutDegrees?: number, buildOutMaxEntities?: number, flags?: BigInt)
+    public findNetworkByEntityId(entityIds: string | number | Array<number | string>, maxDegrees?: number, buildOutDegrees?: number, buildOutMaxEntities?: number, flags: BigInt | number = SzEngineFlags.SZ_ENTITY_DEFAULT_FLAGS): Observable<any | SzError> {
+      let retVal = new Subject<SzSdkFindNetworkResponse | SzError>();
+      console.log(`find network by id from grpc...`);
+      if(this.szEnvironment && this.szEnvironment.engine) {
+        // convert single string to array with 1 string
+        entityIds = typeof entityIds === 'string' ? [entityIds as string] : entityIds;
+        // convert single number to array with 1 string
+        entityIds = typeof entityIds === 'number' ? [`${entityIds as number}`] : entityIds;
+        this.szEnvironment?.engine?.findNetworkByEntityId(entityIds, maxDegrees, buildOutDegrees, buildOutMaxEntities, flags).then((resp) => {
+          console.log(`\t\tfindNetworkByEntityId(${(entityIds as Array<number | string>).join(',')}) promises resolved: `, JSON.parse(resp as string));
+          retVal.next(JSON.parse(resp as string));
+        }).catch((err) => {
+          console.error(`findNetworkByEntityId 1: Exception: `+ err.message);
+          retVal.error(err);
+          throw err;
+        });
+      }
+      return retVal.asObservable();
+    }
+    public reinitialize(configId: number) {
+        let retVal = new Subject<unknown>();
+        console.log(`reinitialize engine with #${configId}...`);
+        if(this.szEnvironment && this.szEnvironment.engine) {
+          this.szEnvironment?.engine?.reinitialize(configId).then((resp) => {
+            retVal.next(resp);
+          })
+        }
+        return retVal.asObservable();
+    }
+    public reevaluateEntity(entityId: number, flags: BigInt | number = 0): Observable<any | SzError> {
+      let retVal = new Subject<any | SzError>();
+      console.log(`reevaluate entity by id from grpc...`);
+      if(this.szEnvironment && this.szEnvironment.engine) {
+        this.szEnvironment?.engine?.reevaluateEntity(entityId, flags).then((resp) => {
+          retVal.next(JSON.parse(resp as string));
+        })
+      }
+      return retVal.asObservable();
+    }
+    public reevaluateRecord(dataSourceCode: string, recordId: string, flags?: BigInt | number): Observable<any | SzError> {
+      let retVal = new Subject<any | SzError>();
+      console.log(`reevaluate entity by id from grpc...`);
+      if(this.szEnvironment && this.szEnvironment.engine) {
+        this.szEnvironment?.engine?.reevaluateRecord(dataSourceCode, recordId, flags).then((resp) => {
+          retVal.next(JSON.parse(resp as string));
+        })
+      }
+      return retVal.asObservable();
+    }
+
+    public whyEntities(entityId1: number, entityId2: number, flags: BigInt | number = SzEngineFlags.SZ_WHY_ENTITIES_DEFAULT_FLAGS): Observable<SzSdkWhyEntitiesResponse | SzError> {
+      let retVal = new Subject<SzSdkWhyEntitiesResponse | SzError>();
+      console.log(`why entities from grpc...`);
+      if(this.szEnvironment && this.szEnvironment.engine) {
+        this.szEnvironment?.engine?.whyEntities(entityId1, entityId2, flags).then((resp) => {
+          retVal.next(JSON.parse(resp as string));
+        }).catch((err) => {
+          console.error(`whyEntities: Exception: ` + err.message);
+          retVal.error(err);
+        });
+      }
+      return retVal.asObservable();
+    }
+
+    public whyRecordInEntity(dataSourceCode: string, recordId: string, flags: BigInt | number = SzEngineFlags.SZ_WHY_RECORDS_DEFAULT_FLAGS): Observable<SzSdkWhyRecordInEntityResponse | SzError> {
+      let retVal = new Subject<SzSdkWhyRecordInEntityResponse | SzError>();
+      console.log(`why record in entity from grpc...`);
+      if(this.szEnvironment && this.szEnvironment.engine) {
+        this.szEnvironment?.engine?.whyRecordInEntity(dataSourceCode, recordId, flags).then((resp) => {
+          retVal.next(JSON.parse(resp as string));
+        }).catch((err) => {
+          console.error(`whyRecordInEntity: Exception: ` + err.message);
+          retVal.error(err);
+        });
+      }
+      return retVal.asObservable();
+    }
+
+    public howEntityByEntityId(entityId: number, flags?: BigInt | number): Observable<any | SzError> {
+      let retVal = new Subject<any | SzError>();
+      console.log(`how report by id from grpc...`);
+      if(this.szEnvironment && this.szEnvironment.engine) {
+        this.szEnvironment?.engine?.howEntityByEntityId(entityId, flags).then((resp) => {
+          console.log(`how response: `, resp);
+          retVal.next(JSON.parse(resp as string));
+        })
+      }
+      return retVal.asObservable();
+    }
+    
+    constructor(
+        // Make GRPC Environment an injection token
+        @Inject('GRPC_ENVIRONMENT') private szEnvironment: SzGrpcWebEnvironment
+    ) {
+      szEnvironment.addEventListener('connectionChange', () => {
+
+      })
+    }
+}

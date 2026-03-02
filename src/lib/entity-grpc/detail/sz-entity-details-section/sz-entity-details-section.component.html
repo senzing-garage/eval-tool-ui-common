@@ -1,0 +1,78 @@
+<sz-entity-detail-section-header-grpc
+  [sectionTitle]="sectionTitle"
+  [sectionCount]="sectionCount"
+  [sectionIcon]="sectionIcon"
+  [sectionId]="sectionId"
+  [layoutClasses]="_layoutClasses"
+  [ngClass]="_layoutClasses">
+</sz-entity-detail-section-header-grpc>
+<div [ngClass]="_layoutClasses">
+  
+  <ng-container *ngIf="showByDataSource">
+    <sz-entity-detail-section-collapsible-card-grpc
+      class="by-datasource"
+      *ngFor="let dataSourceRecords of _sectionRecordsByDataSource | keyvalue"
+      [showIcon]="showIcon"
+      [headerIcon]="headerIcon"
+      displayType="record"
+      [showWhyUtilities]="showWhyUtilities"
+      (onCompareRecordsForWhy)="_onCompareRecordsForWhy($event)"
+      [recordsByDataSource]="getDataSourceRecordsAsMap(dataSourceRecords)"
+      [collapsedStatePrefsKey]="this.collapsedStatePrefsKey"
+      [columnsShown]="this.sectionsShownColumns"
+      [layoutClasses]="_layoutClasses"
+      (onCollapsedChange)="this.onCollapsibleCardStateChange($event)"
+      [truncateResults]="true"
+      [dataSourceRecordsSelected]="selectedDataSourceRecords"
+      (dataSourceRecordClicked)="onDataSourceRecordClick($event)"
+      (dataSourceRecordWhyClicked)="onDataSourceRecordWhyClick($event)"
+      [recordWhyMultiselectActive]="dataSourceIsSelectable"
+      [whySelectionMode]="whySelectionMode"
+      (dataSourceSelectModeChanged)="onDataSourceSelectModeChanged($event)"
+      (entityRecordClick)="onEntityRecordClick($event)">
+    </sz-entity-detail-section-collapsible-card-grpc>
+  </ng-container>
+  <ng-container *ngIf="showEntitiesByMatchKey">
+    <sz-entity-detail-section-collapsible-card-grpc
+      class="by-matchkey"
+      *ngFor="let entitiesByMatchKey of _sectionEntitiesByMatchKey | keyvalue"
+      [showIcon]="showIcon"
+      [headerIcon]="headerIcon"
+      displayType="entity"
+      [entitiesByMatchKey]="getRelatedEntitiesAsMap(entitiesByMatchKey)"
+      [truncateResults]="true"
+      [collapsedStatePrefsKey]="this.collapsedStatePrefsKey"
+      [layoutClasses]="_layoutClasses"
+      [showOtherDataInEntities]="showOtherDataInEntities"
+      [showBestNameOnlyinEntities]="showBestNameOnlyInEntities"
+      [showNameDataInEntities]="showNameDataInEntities"
+      [whySelectionMode]="whySelectionMode"
+      (onCollapsedChange)="this.onCollapsibleCardStateChange($event)"
+      (onCompareEntitiesForWhyNot)="_onCompareEntitiesForWhyNot($event)"
+      (entityRecordClick)="onEntityRecordClick($event)"
+      (entityRecordWhyNotClick)="onEntityRecordWhyNotClick($event)"
+      class="by-match-key">
+    </sz-entity-detail-section-collapsible-card-grpc>
+  </ng-container>
+  <!--<ng-container *ngIf="!showByDataSource && !showEntitiesByMatchKey">
+    <sz-entity-detail-section-collapsible-card-grpc
+      class="by-entity"
+      *ngFor="let relatedEntity of _sectionEntities"
+      [showIcon]="showIcon"
+      [headerIcon]="headerIcon"
+      displayType="entity"
+      [entities]="relatedEntity"
+      [collapsedStatePrefsKey]="this.collapsedStatePrefsKey"
+      [layoutClasses]="_layoutClasses"
+      (onCollapsedChange)="this.onCollapsibleCardStateChange($event)"
+      (onCompareEntitiesForWhyNot)="_onCompareEntitiesForWhyNot($event)"
+      [truncateResults]="true"
+      [showBestNameOnlyinEntities]="showBestNameOnlyInEntities"
+      [showNameDataInEntities]="showNameDataInEntities"
+      [whySelectionMode]="whySelectionMode"
+      (entityRecordClick)="onEntityRecordClick($event)"
+      (entityRecordWhyNotClick)="onEntityRecordWhyNotClick($event)">
+    </sz-entity-detail-section-collapsible-card-grpc>
+  </ng-container>-->
+</div>
+

@@ -1,18 +1,55 @@
 import { Component, ChangeDetectorRef, OnInit, Input, Inject, OnDestroy, Output, EventEmitter, ViewChild, HostBinding, ChangeDetectionStrategy, TemplateRef, ViewContainerRef, ElementRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Observable, Subject, Subscription, filter, fromEvent, take, takeUntil, throwError, zip } from 'rxjs';
-import {CdkMenu, CdkMenuItem, CdkContextMenuTrigger} from '@angular/cdk/menu';
+import { CdkMenuModule} from '@angular/cdk/menu';
+import { TemplatePortal } from '@angular/cdk/portal';
+import { CdkTableModule } from '@angular/cdk/table';
+import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
-
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatTableModule } from '@angular/material/table';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { SzDataTable } from '../../shared/data-table/sz-data-table.component';
-import { SzCrossSourceSummaryCategoryType, SzCrossSourceSummaryCategoryTypeToMatchLevel, SzDataTableEntity, SzDataTableRelation, SzStatSampleEntityTableItem, SzStatSampleEntityTableRow, SzStatSampleEntityTableRowType, SzStatsSampleTableLoadingEvent } from '../../models/stats';
+import { SzCrossSourceSummaryCategoryType, SzCrossSourceSummaryCategoryTypeToMatchLevel, SzStatsSampleTableLoadingEvent } from '../../models/stats';
 import { SzPrefsService } from '../../services/sz-prefs.service';
 import { SzDataMartService } from '../../services/sz-datamart.service';
 import { SzCSSClassService } from '../../services/sz-css-class.service';
-import { SzEntity, SzEntityData, SzEntityIdentifier, SzMatchedRecord, SzRecord, SzRelation } from '@senzing/rest-api-client-ng';
-import { getMapKeyByValue, interpolateTemplate, parseBool } from '../../common/utils';
+import { camelToKebabCase, getMapKeyByValue, interpolateTemplate, parseBool, underscoresToDashes } from '../../common/utils';
 import { ConnectionPositionPair, Overlay, OverlayRef } from '@angular/cdk/overlay';
-import { TemplatePortal } from '@angular/cdk/portal';
+import { SzCrossSourcePagingComponent } from './sz-cross-source-results.pager';
 import { SzCrossSourceSummaryMatchKeyPickerDialog } from '../../summary/cross-source/sz-cross-source-matchkey-picker.component';
+import { SzOrderedMapEntries } from '../../pipes/mapentries.pipe';
+/** deprecate ? */
+/*
+import { 
+  SzEntity, 
+  //SzEntityData, 
+  //SzEntityIdentifier, 
+  //SzMatchedRecord, 
+  SzRecord, 
+  SzRelation 
+} from '../../models/statistics/public-api';*/
+//import { SzEntityData } from '../../services/http/models/szEntityData';
+//import { SzEntity } from '../../services/http/models/szEntity';
+//import { SzRecord } from '../../services/http/models/szRecord';
+//import { SzMatchedRecord } from '../../services/http/models/szMatchedRecord';
+//import { SzRelation } from '../../services/http/models/szRelation';
+import { 
+  SzSampleSetEntity, 
+  SzSampleSetRelation, 
+  SzSampleSetEntityTableItem, 
+  SzSampleSetEntityTableRow, 
+  SzSampleSetRelationTableRow,
+  SzSampleSetTableRowType,
+  SzDataTableEntity, 
+  SzDataTableRelatedEntity,
+} from '../../models/data-sampling';
+import { SzSdkEntityRecord } from '../../models/grpc/engine';
+import { getStringEntityFeatures, getStringRecordFeatures, getUnmappedJsonDataFields } from '../../common/entity-utils';
+import { SzGrpcConfigManagerService } from '../../services/grpc/configManager.service';
+
+//import { SzSdkEntityResponse, SzSdkResolvedEntity, SzSdkRelatedEntity } from '../../models/grpc/engine'
 
 /**
  * Data Table with specific overrides and formatting for displaying
@@ -23,7 +60,20 @@ import { SzCrossSourceSummaryMatchKeyPickerDialog } from '../../summary/cross-so
     templateUrl: './sz-cross-source-results.data-table.html',
     styleUrls: ['./sz-cross-source-results.data-table.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+    imports: [
+      CommonModule,
+      CdkMenuModule,
+      CdkTableModule,
+      MatButtonModule,
+      MatIconModule,
+      MatInputModule,
+      MatTableModule,
+      MatTooltipModule,
+      SzCrossSourcePagingComponent,
+      SzCrossSourceSummaryMatchKeyPickerDialog,
+      SzOrderedMapEntries
+    ],
+    standalone: true
 })
 export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit, OnDestroy {
 
@@ -32,48 +82,46 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
      * Columns that cannot be hidden/collapsed.
      * @internal
     */
-    private _alwaysVisibleColumns: string[] = ['entityId'];
-
-    /**
-     * Stores how many times a column has data available to be displayed. Used to automatically
+    private _alwaysVisibleColumns: string[] = ['ENTITY_ID'];
+    
+    /** 
+     * Stores how many times a column has data available to be displayed. Used to automatically 
      * collapse columns that have no data available to display
      */
     private _colDataCount: Map<string, number> = new Map();
     /** display the columns in this order */
     override _colOrder: Map<string,number> = new Map([
-      ['entityId', 0],
-      ['resolutionRuleCode', 1],
-      ['matchKey', 2],
+      ['ENTITY_ID', 0],
+      ['ERRULE_CODE', 1],
+      ['MATCH_KEY', 2],
       ['relatedEntityId', 3],
-      ['dataSource', 4],
-      ['recordId', 5],
-      ['nameData', 6],
-      ['attributeData', 7],
-      ['identifierData', 8],
-      ['addressData', 9],
-      ['phoneData', 10],
-      ['relationshipData', 11],
-      ['entityData', 12],
-      ['otherData', 13]
+      ['DATA_SOURCE', 4],
+      ['RECORD_ID', 5],
+      ['NAME_DATA', 6],
+      ['ATTRIBUTE_DATA', 7],
+      ['IDENTIFIER_DATA', 8],
+      ['ADDRESS_DATA', 9],
+      ['PHONE_DATA', 10],
+      ['RELATIONSHIP_DATA', 11],
+      ['OTHER_DATA', 12]
     ]);
     /** Maps the internal field name of a column to the human readable title
      * @internal
     */
     override _cols: Map<string,string> = new Map([
-      ['entityId', 'Entity ID'],
-      ['resolutionRuleCode', 'ER Code'],
-      ['matchKey', 'Match Key'],
+      ['ENTITY_ID', 'Entity ID'],
+      ['ERRULE_CODE', 'ER Code'],
+      ['MATCH_KEY', 'Match Key'],
       ['relatedEntityId', 'Related Entity'],
-      ['dataSource', 'Data Source'],
-      ['recordId', 'Record ID'],
-      ['nameData', 'Name Data'],
-      ['attributeData', 'Attribute Data'],
-      ['identifierData', 'Identifier Data'],
-      ['addressData', 'Address Data'],
-      ['phoneData', 'Phone Data'],
-      ['relationshipData', 'Relationship Data'],
-      ['entityData', 'Entity Data'],
-      ['otherData', 'Other Data']
+      ['DATA_SOURCE', 'Data Source'],
+      ['RECORD_ID', 'Record ID'],
+      ['NAME_DATA', 'Name Data'],
+      ['ATTRIBUTE_DATA', 'Attribute Data'],
+      ['IDENTIFIER_DATA', 'Identifier Data'],
+      ['ADDRESS_DATA', 'Address Data'],
+      ['PHONE_DATA', 'Phone Data'],
+      ['RELATIONSHIP_DATA', 'Relationship Data'],
+      ['OTHER_DATA', 'Other Data']
     ]);
     /** when the column picker pulldown is visible this is `true`
      * @internal
@@ -100,51 +148,48 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
     /** different "matchLevel"s can have different columns displayed. */
     private _matchLevelToColumnsMap  = new Map<number, string[]>([
       [1,[
-        'entityId',
-        'resolutionRuleCode',
-        'matchKey',
-        'dataSource',
-        'recordId',
-        'nameData',
-        'attributeData',
-        'identifierData',
-        'addressData',
-        'phoneData',
-        'relationshipData',
-        'entityData',
-        'otherData'
+        'ENTITY_ID',
+        'ERRULE_CODE',
+        'MATCH_KEY',
+        'DATA_SOURCE',
+        'RECORD_ID',
+        'NAME_DATA',
+        'ATTRIBUTE_DATA',
+        'IDENTIFIER_DATA',
+        'ADDRESS_DATA',
+        'PHONE_DATA',
+        'RELATIONSHIP_DATA',
+        'OTHER_DATA'
       ]],
       [2,[
-        'entityId',
-        /*'resolutionRuleCode',*/
-        'matchKey',
+        'ENTITY_ID',
+        /*'ERRULE_CODE',*/
+        'MATCH_KEY',
         'relatedEntityId',
-        'dataSource',
-        'recordId',
-        'nameData',
-        'attributeData',
-        'identifierData',
-        'addressData',
-        'phoneData',
-        'relationshipData',
-        'entityData',
-        'otherData'
+        'DATA_SOURCE',
+        'RECORD_ID',
+        'NAME_DATA',
+        'ATTRIBUTE_DATA',
+        'IDENTIFIER_DATA',
+        'ADDRESS_DATA',
+        'PHONE_DATA',
+        'RELATIONSHIP_DATA',
+        'OTHER_DATA'
       ]],
       [3,[
-        'entityId',
-        /*'resolutionRuleCode',*/
-        'matchKey',
+        'ENTITY_ID',
+        /*'ERRULE_CODE',*/
+        'MATCH_KEY',
         'relatedEntityId',
-        'dataSource',
-        'recordId',
-        'nameData',
-        'attributeData',
-        'identifierData',
-        'addressData',
-        'phoneData',
-        'relationshipData',
-        'entityData',
-        'otherData'
+        'DATA_SOURCE',
+        'RECORD_ID',
+        'NAME_DATA',
+        'ATTRIBUTE_DATA',
+        'IDENTIFIER_DATA',
+        'ADDRESS_DATA',
+        'PHONE_DATA',
+        'RELATIONSHIP_DATA',
+        'OTHER_DATA'
       ]]
     ]);
     /** used for positioning the prefs menu */
@@ -168,20 +213,19 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
      * @internal
     */
     override _selectableColumns: string[] = [
-      'entityId',
-      'resolutionRuleCode',
-      'matchKey',
+      'ENTITY_ID',
+      'ERRULE_CODE',
+      'MATCH_KEY',
       'relatedEntityId',
-      'dataSource',
-      'recordId',
-      'nameData',
-      'attributeData',
-      'identifierData',
-      'addressData',
-      'phoneData',
-      'relationshipData',
-      'entityData',
-      'otherData'
+      'DATA_SOURCE',
+      'RECORD_ID',
+      'ENTITY_NAME',
+      'ATTRIBUTE_DATA',
+      'IDENTIFIER_DATA',
+      'ADDRESS_DATA',
+      'PHONE_DATA',
+      'RELATIONSHIP_DATA',
+      'OTHER_DATA'
     ];
     /** this is the columns that CAN be shown and is generated from the data
      * so that if the columns are not present in the data AND in the "_selectableColumns"
@@ -258,13 +302,13 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
     /** @internal */
     private _onNoData: Subject<boolean> = new Subject();
     /** @internal */
-    private _onEntityIdClick: Subject<SzEntityIdentifier> = new Subject();
+    private _onEntityIdClick: Subject<number> = new Subject();
     /** aggregate observable for when the component is either loading data, transforming data, or rendering. */
     @Output() loading: Observable<SzStatsSampleTableLoadingEvent> = this._loading.asObservable();
     /** when requests have completed but there are no results available to display */
     @Output() onNoData: Observable<boolean> = this._onNoData.asObservable();
     /** when either a "entityId" or "relatedEntityId" is clicked on */
-    @Output() onEntityIdClick: Observable<SzEntityIdentifier> = this._onEntityIdClick.asObservable();
+    @Output() onEntityIdClick: Observable<number> = this._onEntityIdClick.asObservable();
 
     // --------------------------------- getters and setters ---------------------------------
     /** custom formatting for specific cells
@@ -286,20 +330,26 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
         return retVal;
       }
       return {
-        'nameData': dataFieldRenderer,
-        'identifierData': dataFieldRenderer,
-        'addressData': dataFieldRenderer,
-        'phoneData': dataFieldRenderer,
-        'relationshipData': dataFieldRenderer,
-        'otherData': dataFieldRenderer,
+        'NAME_DATA': dataFieldRenderer,
+        'IDENTIFIER_DATA': dataFieldRenderer,
+        'ATTRIBUTE_DATA': dataFieldRenderer,
+        'ADDRESS_DATA': dataFieldRenderer,
+        'PHONE_DATA': dataFieldRenderer,
+        'RELATIONSHIP_DATA': dataFieldRenderer,
+        'OTHER_DATA': dataFieldRenderer,
       }
     }
     /** get counts of how many rows have values for a particular column */
     public get colDataCount(): Map<string, number> {
       return this._colDataCount;
     }
-    /** Sets the inline style tag for the entire data table. Mainly used for setting
-     * the grid column sizes.
+    override cellClass(fieldName: string, prefix?: string, suffix?: string) {
+        let fieldNameAsKebab = fieldName && fieldName.toUpperCase && fieldName.toUpperCase() === fieldName ? fieldName : camelToKebabCase(fieldName);
+        fieldNameAsKebab = underscoresToDashes(fieldNameAsKebab.toLocaleLowerCase());
+        return (prefix !== undefined ? prefix+ '-' : '')+ fieldNameAsKebab + (suffix !== undefined ? '-' + suffix : '')
+    }
+    /** Sets the inline style tag for the entire data table. Mainly used for setting 
+     * the grid column sizes. 
      * @internal
      */
     override get gridStyle(): string {
@@ -396,6 +446,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
     constructor(
       public prefs: SzPrefsService,
       private cd: ChangeDetectorRef,
+      private configManager: SzGrpcConfigManagerService,
       private cssService: SzCSSClassService,
       private dataMartService: SzDataMartService,
       public dialog: MatDialog,
@@ -584,7 +635,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
      * Get the data table row count for a specific item. This is used to set the expand/collapse row-span for the
      * entityId cells for the main entity row and it's related entity row (if not statType of "Matches")
      */
-    public getRowCountInSelectedDataSources(item: SzStatSampleEntityTableItem, dataType?: SzStatSampleEntityTableRowType[]) {
+    public getRowCountInSelectedDataSources(item: SzSampleSetEntityTableItem, dataType?: SzSampleSetTableRowType[]) {
       let retVal = 0;
       if(!dataType || (dataType && dataType.includes(item.dataType))) {
         // how would you check the datasource match on "SzStatSampleEntityTableItem"
@@ -594,8 +645,8 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
       if(item.rows && item.rows.length) {
         let _dataSourcesToMatch = this.dataMartService.sampleMatchLevel === SzCrossSourceSummaryCategoryTypeToMatchLevel.MATCHES ? [this.dataMartService.sampleDataSource1, this.dataMartService.sampleDataSource2] : [this.dataMartService.sampleDataSource1];
         let rowsInSelectedDataSources = item.rows.filter((row) => {
-          if(!dataType || (dataType && dataType.includes(row.dataType))) {
-            return (row.dataSource !== undefined && _dataSourcesToMatch.indexOf(row.dataSource) > -1) ? 1 : 0;
+          if(!dataType || (dataType && dataType.includes(row.DATA_TYPE))) {
+            return (row.DATA_SOURCE !== undefined && _dataSourcesToMatch.indexOf(row.DATA_SOURCE) > -1) ? 1 : 0;
           }
           return false;
         });
@@ -611,8 +662,8 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
           let _dataSourcesToMatch = this.dataMartService.sampleMatchLevel === SzCrossSourceSummaryCategoryTypeToMatchLevel.MATCHES ? [this.dataMartService.sampleDataSource1, this.dataMartService.sampleDataSource2] : this.dataMartService.sampleDataSource2 && this.dataMartService.sampleDataSource2 !== undefined ? [this.dataMartService.sampleDataSource2] : [this.dataMartService.sampleDataSource1];
           //retVal    += item.relatedEntity.rows.length;
           let rowsInSelectedDataSources = item.relatedEntity.rows.filter((row) => {
-            if(!dataType || (dataType && dataType.includes(row.dataType))) {
-              return (row.dataSource !== undefined && _dataSourcesToMatch.indexOf(row.dataSource) > -1) ? 1 : 0;
+            if(!dataType || (dataType && dataType.includes(row.DATA_TYPE))) {
+              return (row.DATA_SOURCE !== undefined && _dataSourcesToMatch.indexOf(row.DATA_SOURCE) > -1) ? 1 : 0;
             }
             return false;
           });
@@ -624,40 +675,40 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
     public getRowIndex() {
       return this.rowCount;
     }
-    public getRowSpanForEntityIdCell(rows: SzStatSampleEntityTableRow[]) {
+    public getRowSpanForEntityIdCell(rows: SzSampleSetEntityTableRow[]) {
       let retVal = 0;
       if(rows) {
         let rowsInSelectedDataSources = rows.filter((row) => {
-          return (row.dataSource !== undefined && [this.dataMartService.dataSource1, this.dataMartService.dataSource2].indexOf(row.dataSource) > -1) ? 1 : 0;
+          return (row.DATA_SOURCE !== undefined && [this.dataMartService.dataSource1, this.dataMartService.dataSource2].indexOf(row.DATA_SOURCE) > -1) ? 1 : 0;
         });
       }
       return retVal;
     }
     /** get the total data table row count for an entity or related entity. Optionally count only row types matching items in the "dataType" parameter. */
-    public getTotalRowCount(item: SzStatSampleEntityTableItem, dataType?: SzStatSampleEntityTableRowType[]) {
+    public getTotalRowCount(item: SzSampleSetEntityTableItem, dataType?: SzSampleSetTableRowType[]) {
       let retVal      = 0;
-      if(!dataType || (dataType && dataType.includes(SzStatSampleEntityTableRowType.ENTITY) && item.dataType === SzStatSampleEntityTableRowType.ENTITY)) {
+      if(!dataType || (dataType && dataType.includes(SzSampleSetTableRowType.ENTITY) && item.dataType === SzSampleSetTableRowType.ENTITY)) {
         retVal++;
       }
       if(item.rows && item.rows.length) {
         if(!dataType) {
           retVal      += item.rows.length;
         } else if(dataType) {
-          retVal      += item.rows.filter((row: SzStatSampleEntityTableRow) => {
-            return dataType.includes(row.dataType);
+          retVal      += item.rows.filter((row: SzSampleSetEntityTableRow) => {
+            return dataType.includes(row.DATA_TYPE);
           }).length;
         }
       }
       if(item.relatedEntity) {
-        if(!dataType || dataType.includes(SzStatSampleEntityTableRowType.RELATED)) {
+        if(!dataType || dataType.includes(SzSampleSetTableRowType.RELATED)) {
           retVal++;
         }
         if(item.relatedEntity.rows && item.relatedEntity.rows.length) {
           if(!dataType) {
             retVal    += item.relatedEntity.rows.length;
           } else if(dataType) {
-            retVal    += item.relatedEntity.rows.filter((row: SzStatSampleEntityTableRow) => {
-              return dataType.includes(row.dataType);
+            retVal    += item.relatedEntity.rows.filter((row: SzSampleSetRelationTableRow) => {
+              return dataType.includes(row.DATA_TYPE);
             }).length;
           }
         }
@@ -695,10 +746,12 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
     public isDataSourceSelected(dataSource: string, dataSourceName?: string) {
       // check if there is only "1" datasource, if row specifies to only match the second one and it's null flip it over to the first
       dataSourceName = dataSourceName && dataSourceName === 'sampleDataSource2' &&  this.dataMartService.sampleDataSource2 === undefined ? 'sampleDataSource1' : dataSourceName;
-      let _dataSourcesToMatch = this.dataMartService.sampleMatchLevel === SzCrossSourceSummaryCategoryTypeToMatchLevel.MATCHES ? [this.dataMartService.sampleDataSource1, this.dataMartService.sampleDataSource2] : this.dataMartService && this.dataMartService[dataSourceName] ? this.dataMartService[dataSourceName] : [];
-      return (dataSource !== undefined &&
+      let _dataSourcesToMatch = this.dataMartService.sampleMatchLevel === SzCrossSourceSummaryCategoryTypeToMatchLevel.MATCHES ? [this.dataMartService.sampleDataSource1, this.dataMartService.sampleDataSource2] : this.dataMartService && this.dataMartService.sampleDataSource1 ? [this.dataMartService.sampleDataSource1] :  this.dataMartService && this.dataMartService.sampleDataSource2 ? [this.dataMartService.sampleDataSource2] : [];
+      let retVal = (dataSource !== undefined && 
         _dataSourcesToMatch
         .indexOf(dataSource) > -1) ? true : false;
+      //console.log(`isDataSourceSelected("${dataSource}","${dataSourceName}"): [${_dataSourcesToMatch.join(',')}].indexOf("${dataSource} > -1 ?")`, retVal);
+      return retVal
     }
     /** used for detected whether or not a cell value has displayable data
      * @internal
@@ -775,7 +828,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
     /** emit an entityId click programmatically. (used in id field context menu) */
     public openEntityById(value: any) {
       console.log(`open entity: `, value);
-      this._onEntityIdClick.next(value as SzEntityIdentifier);
+      this._onEntityIdClick.next(value as number);
     }
     /** open the matchKey filtering dialog */
     public openFilterDialog() {
@@ -812,14 +865,14 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
     /** get the css vars for a particular result which is then used by the css for particular
      * display states.
      */
-    public rowGroupStyle(item?: SzStatSampleEntityTableItem) {
+    public rowGroupStyle(item?: SzSampleSetEntityTableItem) {
       let retVal = '';
       retVal += '--column-count: '+ this.getColCount() +';';
       if(item) {
-        retVal += ' --entity-row-count: '+ this.getTotalRowCount(item, [SzStatSampleEntityTableRowType.ENTITY_RECORD]) +';';
-        retVal += ' --selected-datasources-entity-row-count: '+ this.getRowCountInSelectedDataSources(item, [SzStatSampleEntityTableRowType.ENTITY_RECORD]) +';';
-        retVal += ' --related-row-count: '+ this.getTotalRowCount(item, [SzStatSampleEntityTableRowType.RELATED_RECORD]) +';';
-        retVal += ' --selected-datasources-related-row-count: '+ this.getRowCountInSelectedDataSources(item, [SzStatSampleEntityTableRowType.RELATED_RECORD]) +';';
+        retVal += ' --entity-row-count: '+ this.getTotalRowCount(item, [SzSampleSetTableRowType.ENTITY_RECORD]) +';';
+        retVal += ' --selected-datasources-entity-row-count: '+ this.getRowCountInSelectedDataSources(item, [SzSampleSetTableRowType.ENTITY_RECORD]) +';';
+        retVal += ' --related-row-count: '+ this.getTotalRowCount(item, [SzSampleSetTableRowType.RELATED_RECORD]) +';';
+        retVal += ' --selected-datasources-related-row-count: '+ this.getRowCountInSelectedDataSources(item, [SzSampleSetTableRowType.RELATED_RECORD]) +';';
       }
       return retVal;
     }
@@ -928,8 +981,8 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
      */
     override onCellClick(cellName: string, data: any, event?: MouseEvent, element?: HTMLElement) {
       console.log(`on${cellName}Click: `, event, data);
-      if((cellName === 'relatedEntityId' || cellName === 'entityId') && data) {
-        this._onEntityIdClick.next(data as SzEntityIdentifier);
+      if((cellName === 'relatedEntityId' || cellName === 'ENTITY_ID') && data) {
+        this._onEntityIdClick.next(data as number);
       }
       this.cellClick.emit({key: cellName, value: data});
       if(element) {
@@ -1026,7 +1079,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
 
     /** when new sample set data has changed the data is transformed, indexes reset,
      * and counts generated. */
-    private onSampleSetDataChange(data: SzEntityData[] | SzRelation[] | undefined) {
+    private onSampleSetDataChange(data: SzSampleSetRelation[] | SzSampleSetEntity[] | undefined) {
       if(data === undefined) {
         this.data = [];
         this._noData = true;
@@ -1036,52 +1089,99 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
       }
       this.resetRenderingIndexes();
       // flatten/normalize data so we can display it
-      let transformed: SzStatSampleEntityTableItem[] = data.map((item: SzEntityData | SzRelation) => {
+      let transformed: SzSampleSetEntityTableItem[] = data.map((item: SzSampleSetEntity | SzSampleSetRelation) => {
         // is it a relation or a entity
-        let isRelation = (item as SzEntityData).resolvedEntity ? false : true;
+        let isRelation = (item as SzSampleSetRelation).entity ? false : true;
         if(isRelation) {
-          // base item is entity
-          let baseItem  = (item as SzRelation).entity as SzDataTableEntity;
-          baseItem.dataType = SzStatSampleEntityTableRowType.ENTITY;
+          // base item is relation's entity
+          let baseItem  = (item as SzSampleSetRelation).entity as SzDataTableEntity;
+          console.log(`\tsetting relation baseItem: `, (item as SzSampleSetRelation), baseItem);
+          baseItem.dataType = SzSampleSetTableRowType.ENTITY;
           // related item is related entity
-          let relItem   = (item as SzRelation).relatedEntity as SzDataTableEntity;
-          relItem.dataType  = SzStatSampleEntityTableRowType.RELATED;
-
+          let relItem   = (item as SzSampleSetRelation).relatedEntity as SzDataTableEntity;
+          relItem.dataType  = SzSampleSetTableRowType.RELATED;
+          
           // add "rows: SzStatSampleEntityTableRow[]" // SzStatSampleEntityTableRow
-          let _entRows = baseItem.records && baseItem.records.map ? baseItem.records.map((rec: SzRecord) => {
-            let retVal      = Object.assign({dataType: SzStatSampleEntityTableRowType.ENTITY_RECORD}, rec);
+          let _entRows = baseItem.RECORDS && baseItem.RECORDS.map ? baseItem.RECORDS.map((rec: SzSdkEntityRecord) => {
+            let retVal = Object.assign({
+              ENTITY_ID: baseItem.ENTITY_ID,
+              ENTITY_NAME: baseItem.ENTITY_NAME,
+              DATA_TYPE: SzSampleSetTableRowType.ENTITY_RECORD
+            }, rec) as SzSampleSetEntityTableRow;
+            if(rec.FEATURES && Object.keys(rec.FEATURES).length > 0) {
+              let _featuresAsStrings = getStringRecordFeatures(rec.FEATURES, true, this.configManager.fTypeToAttrClassMap, true, true);
+              if(_featuresAsStrings.has('ATTRIBUTE'))      retVal.ATTRIBUTE_DATA      = _featuresAsStrings.get('ATTRIBUTE');
+              if(_featuresAsStrings.has('ADDRESS'))        retVal.ADDRESS_DATA        = _featuresAsStrings.get('ADDRESS');
+              if(_featuresAsStrings.has('IDENTIFIER'))     retVal.IDENTIFIER_DATA     = _featuresAsStrings.get('IDENTIFIER');
+              if(_featuresAsStrings.has('NAME'))           retVal.NAME_DATA           = _featuresAsStrings.get('NAME');
+              if(_featuresAsStrings.has('PHONE'))          retVal.PHONE_DATA          = _featuresAsStrings.get('PHONE');
+              if(_featuresAsStrings.has('DOB'))            retVal.DOB_DATA            = _featuresAsStrings.get('DOB_DATA');
+              if(_featuresAsStrings.has('RELATIONSHIP'))   retVal.RELATIONSHIP_DATA   = _featuresAsStrings.get('RELATIONSHIP');
+
+              if(_featuresAsStrings.has('OTHER'))          retVal.OTHER_DATA          = _featuresAsStrings.get('OTHER');
+            }
+            // Add unmapped passthrough fields from JSON_DATA
+            const _unmapped = getUnmappedJsonDataFields(rec);
+            if (_unmapped.length > 0) {
+              const existing = retVal.OTHER_DATA || [];
+              retVal.OTHER_DATA = existing.concat(_unmapped.map(f => `${f.key}: ${f.value}`));
+            }
             return retVal;
           }) : undefined;
 
-          let _relRows = relItem.records && relItem.records.map ? relItem.records.map((rec: SzRecord) => {
-            let retVal      = Object.assign({dataType: SzStatSampleEntityTableRowType.RELATED_RECORD}, rec);
+          let _relRows = relItem.RECORDS && relItem.RECORDS.map ? relItem.RECORDS.map((rec: SzSdkEntityRecord) => {
+            let retVal: SzSampleSetRelationTableRow      = Object.assign({DATA_TYPE: SzSampleSetTableRowType.RELATED_RECORD}, rec);
             return retVal;
           }) : undefined;
 
           // mash them up in to one object
           return Object.assign(baseItem, {
             relatedEntity: Object.assign(
-              (item as SzRelation).relatedEntity,
+              (item as SzSampleSetRelation).relatedEntity, 
               {
-                rows: _relRows,
-                relatedEntityId:  (item as SzRelation).relatedEntity.entityId,
-                relatedMatchKey:  (item as SzRelation).matchKey,
-                relatedMatchType: (item as SzRelation).matchType
+                rows: _relRows, 
+                relatedEntityId:  (item as SzSampleSetRelation).entity.ENTITY_ID,
+                relatedMatchKey:  (item as SzSampleSetRelation).matchKey,
+                relatedMatchType: (item as SzSampleSetRelation).matchType
               }
             ), rows: _entRows});
         } else {
           // base item is entity
-          let baseItem = (item as SzEntityData).resolvedEntity as SzDataTableEntity;
-          baseItem.dataType = SzStatSampleEntityTableRowType.ENTITY;
+          let baseItem = (item as SzSampleSetEntity).entity as SzDataTableEntity;
+          //console.log(`\tsetting entity baseItem: `, (item as SzEntityData), baseItem);
+          console.log(`\tsetting entity baseItem: `, (item as SzSampleSetEntity), baseItem);
+          baseItem.dataType = SzSampleSetTableRowType.ENTITY;
 
           // add "rows: SzStatSampleEntityTableRow[]" // SzStatSampleEntityTableRow
-          let rows = baseItem.records && baseItem.records.map ? baseItem.records.map((rec: SzMatchedRecord) => {
-            let retVal: SzStatSampleEntityTableRow = rec;
-            retVal.dataType = SzStatSampleEntityTableRowType.ENTITY_RECORD;
+          let rows = baseItem.RECORDS && baseItem.RECORDS.map ? baseItem.RECORDS.map((rec: SzSdkEntityRecord) => {
+            let retVal = Object.assign({
+              ENTITY_ID: baseItem.ENTITY_ID,
+              ENTITY_NAME: baseItem.ENTITY_NAME,
+              DATA_TYPE: SzSampleSetTableRowType.ENTITY_RECORD
+            }, rec) as SzSampleSetEntityTableRow;
+            if(rec.FEATURES && Object.keys(rec.FEATURES).length > 0) {
+              let _featuresAsStrings = getStringRecordFeatures(rec.FEATURES, true, this.configManager.fTypeToAttrClassMap, true, true);
+              if(_featuresAsStrings.has('ATTRIBUTE'))      retVal.ATTRIBUTE_DATA      = _featuresAsStrings.get('ATTRIBUTE');
+              if(_featuresAsStrings.has('ADDRESS'))        retVal.ADDRESS_DATA        = _featuresAsStrings.get('ADDRESS');
+              if(_featuresAsStrings.has('IDENTIFIER'))     retVal.IDENTIFIER_DATA     = _featuresAsStrings.get('IDENTIFIER');
+              if(_featuresAsStrings.has('NAME'))           retVal.NAME_DATA           = _featuresAsStrings.get('NAME');
+              if(_featuresAsStrings.has('PHONE'))          retVal.PHONE_DATA          = _featuresAsStrings.get('PHONE');
+              if(_featuresAsStrings.has('DOB'))            retVal.DOB_DATA            = _featuresAsStrings.get('DOB_DATA');
+              if(_featuresAsStrings.has('RELATIONSHIP'))   retVal.RELATIONSHIP_DATA   = _featuresAsStrings.get('RELATIONSHIP');
+
+              if(_featuresAsStrings.has('OTHER'))          retVal.OTHER_DATA          = _featuresAsStrings.get('OTHER');
+            }
+            // Add unmapped passthrough fields from JSON_DATA
+            const _unmapped = getUnmappedJsonDataFields(rec);
+            if (_unmapped.length > 0) {
+              const existing = retVal.OTHER_DATA || [];
+              retVal.OTHER_DATA = existing.concat(_unmapped.map(f => `${f.key}: ${f.value}`));
+            }
             return retVal;
           }) : undefined;
+
           // mash them up in to one object
-          return Object.assign(baseItem, {relatedEntities: (item as SzEntityData).relatedEntities, rows: rows});
+          return Object.assign(baseItem, {relatedEntities: (item as SzSampleSetEntity).relatedEntities, rows: rows});
         }
       });
       if(transformed && transformed.length > 0) {
@@ -1129,7 +1229,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
           }
         }
       });
-      console.warn(`@senzing/sdk-components-grpc-web/sz-cross-source-results.onSampleSetDataChange()`, data, transformed);
+      console.warn(`@senzing/eval-tool-ui-common/sz-cross-source-results.onSampleSetDataChange()`, data, transformed);
       this.data     = transformed;
       this._loading.next({inflight: false, source: 'SzCrossSourceResultsDataTable.onSampleSetDataChange'});
       this.cd.markForCheck();

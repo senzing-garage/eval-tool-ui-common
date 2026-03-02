@@ -19,7 +19,7 @@ import {
   SzStandaloneGraphComponent,
   SzRelationshipNetworkComponent,
   SzRelationshipPathComponent
-} from '@senzing/sdk-components-grpc-web';
+} from '@senzing/sz-sdk-components-grpc-web';
 
 /**
 * Pull in api configuration(SzRestConfigurationParameters)

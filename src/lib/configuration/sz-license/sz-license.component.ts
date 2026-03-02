@@ -1,13 +1,19 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { Router } from '@angular/router';
-import { Subject, filter, takeUntil } from 'rxjs';
-import { SzLoadedStats, SzLicenseInfo } from '@senzing/rest-api-client-ng';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, Inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Subject, interval, filter, take, takeUntil } from 'rxjs';
+//import { SzLoadedStats } from '@senzing/rest-api-client-ng';
 
 import { parseBool, parseNumber } from '../../common/utils';
-import { SzAdminService } from '../../services/sz-admin.service';
+//import { SzAdminService } from '../../services/sz-admin.service';
 import { SzDataMartService } from '../../services/sz-datamart.service';
 import { SzLicenseUpgradeType } from '../../models/data-license';
 import { SzLicenseUpgradeMouseEvent } from '../../models/event-license';
+import { SzProductLicenseResponse } from '../../models/grpc/product';
+import { SzGrpcProductService } from '../../services/grpc/product.service';
+import { SzShortNumberPipe } from '../../pipes/shortnumber.pipe';
+import { SzLoadedStats } from '../../services/http/models/szLoadedStats';
+import { MatButtonModule } from '@angular/material/button';
+
 /**
  * A simple "license info" component.
  * Used for displaying the current senzing license info.
@@ -23,16 +29,24 @@ import { SzLicenseUpgradeMouseEvent } from '../../models/event-license';
 @Component({
     selector: 'sz-license',
     templateUrl: './sz-license.component.html',
+    imports: [
+      CommonModule, 
+      MatButtonModule,
+      SzShortNumberPipe
+    ],
     styleUrls: ['./sz-license.component.scss'],
-    standalone: false
+    providers:[
+      { provide: SzDataMartService, useClass: SzDataMartService },
+      { provide: SzGrpcProductService, useClass: SzGrpcProductService }
+    ]
 })
-export class SzLicenseInfoComponent implements OnInit {
+export class SzLicenseInfoComponent implements OnInit, OnDestroy {
   /** subscription to notify subscribers to unbind */
   public unsubscribe$ = new Subject<void>();
   /** this brings in the enum to local scope for html template access */
   readonly SzLicenseUpgradeType = SzLicenseUpgradeType;
 
-  private _licenseInfo: SzLicenseInfo = {};
+  private _licenseInfo: SzProductLicenseResponse = {};
   private _countStats: SzLoadedStats;
   private _recordCount: number;
   private _showUpgradeButton: boolean = true;
@@ -58,13 +72,13 @@ export class SzLicenseInfoComponent implements OnInit {
     return this.licenseLimitRatio;
   }
   public get expirationDate(): Date {
-    return this._licenseInfo.expirationDate;
+    return this._licenseInfo.expireDate;
   }
   public get recordLimit() {
     return this.licenseInfo.recordLimit;
   }
 
-  public get licenseInfo() : SzLicenseInfo {
+  public get licenseInfo() : SzProductLicenseResponse {
     return this._licenseInfo;
   }
 
@@ -83,7 +97,7 @@ export class SzLicenseInfoComponent implements OnInit {
 
   public get expirationInvalid() : boolean {
     if (!this.licenseInfo) return false;
-    const expDate = this.licenseInfo.expirationDate;
+    const expDate = this.licenseInfo.expireDate;
     if (expDate === null || expDate === undefined) return true;
     return false;
   }
@@ -102,6 +116,7 @@ export class SzLicenseInfoComponent implements OnInit {
     const limit = this.licenseInfo.recordLimit;
     if (limit === null || limit === undefined) return 0;
     if (limit === 0) return 1;
+    if (!this._recordCount || this._recordCount === 0) return 0;
     return (this._recordCount / limit);
   }
 
@@ -113,7 +128,7 @@ export class SzLicenseInfoComponent implements OnInit {
 
   public get licenseDays() : number | null {
     if (!this.licenseInfo) return 0;
-    const expDate = this.licenseInfo.expirationDate;
+    const expDate = this.licenseInfo.expireDate;
     if (!expDate) return null;
     const exp = expDate.getTime() - (1000 * 60 * 60 * 24);
     const now = (new Date()).getTime();
@@ -127,7 +142,7 @@ export class SzLicenseInfoComponent implements OnInit {
 
   public get expired() : boolean {
     if (!this.licenseInfo) return false;
-    const expDate = this.licenseInfo.expirationDate;
+    const expDate = this.licenseInfo.expireDate;
     if (!expDate) return false;
     const expYear  = expDate.getFullYear();
     const expMonth = expDate.getMonth();
@@ -151,28 +166,75 @@ export class SzLicenseInfoComponent implements OnInit {
 
   /** when a user clicks the info link inside of a step card this event is emitted*/
   @Output() public upgradeLicense             = new EventEmitter<SzLicenseUpgradeMouseEvent>();
+  /** emitted once when the component's initial data has loaded (or errored) */
+  @Output() initialized: EventEmitter<boolean> = new EventEmitter<boolean>();
+  private _initialized = false;
+  private _countStatsReceived = false;
+  private _licenseReceived = false;
 
   //@Input() format = 'small';
   constructor(
-    private adminService: SzAdminService,
     private dmService: SzDataMartService,
-    private router: Router) {}
+    private productService: SzGrpcProductService
+  ) {}
+
+  ngOnDestroy() {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+  }
 
   ngOnInit() {
-    this.dmService.onCountStats.pipe(filter( (val) => val !== undefined)).subscribe( (resp: SzLoadedStats) => {
+    this.dmService.onCountStats.pipe(
+      takeUntil(this.unsubscribe$),
+      filter( (val) => val !== undefined)
+    ).subscribe( (resp: SzLoadedStats) => {
       this._countStats = resp;
+      console.log(`count stats: `, this._countStats);
       if(this._countStats.totalRecordCount) {
         this._recordCount = this._countStats.totalRecordCount;
       }
+      this._countStatsReceived = true;
+      this._checkInitialized(true);
     });
-    this.adminService.onLicenseInfo.subscribe( (resp: SzLicenseInfo) => {
-      this._licenseInfo = resp;
-    });
+    this.productService.getLicense().pipe(
+       takeUntil(this.unsubscribe$)
+    ).subscribe({
+      next: (resp: SzProductLicenseResponse) => {
+        this._licenseInfo = resp;
+        console.log(`license info: `, this._licenseInfo);
+        this._licenseReceived = true;
+        this._checkInitialized(true);
+      },
+      error: () => {
+        this._licenseReceived = true;
+        this._checkInitialized(false);
+      }
+    })
     // if "openUpgradeButtonLink" is true then redirect to senzing.com on click
     this.upgradeLicense.pipe(
       takeUntil(this.unsubscribe$),
       filter(() => this._openUpgradeButtonLink)
-    ).subscribe(this.handleUpgradeLicenseClick)
+    ).subscribe(this.handleUpgradeLicenseClick);
+
+    // trigger data retrieval if no count stats
+    if(!this._countStats) {
+      let temp = this.dmService.loadedStatistics;
+      console.log(`default count stats: `, temp);
+    }
+
+    // periodically refresh record counts (data mart may still be processing)
+    interval(20000).pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe(() => {
+      this.dmService.getLoadedStatistics().pipe(take(1)).subscribe();
+    });
+  }
+
+  private _checkInitialized(success: boolean) {
+    if (!this._initialized && this._countStatsReceived && this._licenseReceived) {
+      this._initialized = true;
+      this.initialized.emit(success);
+    }
   }
 
   public handleUpgradeButtonClicked(event: Event) {

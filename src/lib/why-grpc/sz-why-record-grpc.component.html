@@ -1,0 +1,8 @@
+<div class="table-format">
+  <div class="tr" [class.thead]="rI==0" *ngFor="let row of rows; let rI = index">
+    <div class="col-title">{{row.title}}</div>
+    <div class="td" *ngFor="let tCell of getRowValuesForData(row.key)">
+      <div [innerHTML]="tCell"></div>
+    </div>
+  </div>
+</div>

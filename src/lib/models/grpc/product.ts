@@ -1,0 +1,27 @@
+export interface SzProductVersionResponse {
+    "PRODUCT_NAME": string;
+    "VERSION": string;
+    "BUILD_VERSION": string;
+    "BUILD_DATE": Date;
+    "BUILD_NUMBER": string;
+    "COMPATIBILITY_VERSION": {
+      "CONFIG_VERSION": string
+    },
+    "SCHEMA_VERSION": {
+      "ENGINE_SCHEMA_VERSION": string,
+      "MINIMUM_REQUIRED_SCHEMA_VERSION": string,
+      "MAXIMUM_REQUIRED_SCHEMA_VERSION": string
+    }
+}
+
+export interface SzProductLicenseResponse {
+    "advSearch"?: string,
+    "customer"?: string,
+    "contract"?: string,
+    "issueDate"?: Date,
+    "licenseType"?: string,
+    "licenseLevel"?: string,
+    "billing"?: string,
+    "expireDate"?: Date,
+    "recordLimit"?: number
+  }

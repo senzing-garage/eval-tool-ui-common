@@ -3,7 +3,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
     name: 'SzOrderedMapEntries',
-    standalone: false
+    standalone: true
 })
 export class SzOrderedMapEntries implements PipeTransform {
 

@@ -159,6 +159,21 @@ export function sortMatchKeysByIndex(value: SzMatchKeyComposite[]): SzMatchKeyCo
   return retVal;
 }
 
+/**
+ * detect what line endings are majority present in a file or string
+ */
+export function detectLineEndings(text) {
+  let countResults = new Map([
+    ['\r\n',  (text.indexOf('\r\n') !== -1) ?  text.split('\r\n').length : 0],
+    ['\n',    (text.indexOf('\n') !== -1) ?    text.split('\n').length   : 0],
+    ['\r',    (text.indexOf('\r') !== -1) ?    text.split('\r').length   : 0]
+  ])
+  const sortedResults = [...countResults.entries()].sort(([, a], [, b]) => b - a);
+  let retVal = sortedResults[0][0];
+  //console.log(`detectLineEndings: ${retVal}`, sortedResults);
+  return retVal;
+}
+
 export function getArrayOfPairsFromMatchKey(matchKey: string): Array<{prefix: string, value: string}> {
   // tokenize by "+" first
   let _pairs  = matchKey.split('+').filter((t)=>{ return t !== undefined && t !== null && t.trim() !== ''; });

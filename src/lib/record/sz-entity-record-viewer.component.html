@@ -9,16 +9,15 @@
       <li class="json" (click)="showTab('json')">JSON</li>
     </ul>
     <div class="tabset-view">
-        <sz-entity-record-card-content
+        <sz-entity-record-card-content-grpc
         [showOtherData]="true"
         [ignorePrefOtherDataChanges]="true"
-        [entity]="record"
-        [parentEntity]="record"
+        [record]="record"
         [layoutClasses]="layoutClasses"
         [ngClass]="{'open': true, 'no-shade': true}"
         [truncateResults]="false"
         [truncatedTooltip]="'click to expand.'"
-      ></sz-entity-record-card-content>
+      ></sz-entity-record-card-content-grpc>
       <ngx-json-viewer *ngIf="showJSON" [json]="record"></ngx-json-viewer>
     </div>
   </div>

@@ -1,4 +1,4 @@
-import { SzRestConfigurationParameters } from '@senzing/sdk-components-grpc-web';
+import { SzRestConfigurationParameters } from '@senzing/sz-sdk-components-grpc-web';
 
 export const environment = {
   production: true

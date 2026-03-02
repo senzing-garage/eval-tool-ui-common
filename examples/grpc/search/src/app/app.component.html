@@ -1,0 +1,42 @@
+<h2 class="example-title">&#64;senzing/eval-tool-ui-common/search example</h2>
+<sz-search-grpc
+  #searchBox
+  name="Eddie Kusha"
+  address="1304 Poppy Hills Dr Blacklick OHIO"
+  (resultsChange)="onSearchResults($event)"
+  (resultsCleared)="onSearchResultsCleared($event)"
+  (exception)="onSearchException($event)"
+  (parameterChange)="onSearchParameterChange($event)"
+  ></sz-search-grpc>
+<!-- start search results -->
+<div class="component-example">
+  <sz-search-results-grpc *ngIf="showSearchResults" 
+  [results]="currentSearchResults" 
+  [parameters]="currentSearchParameters"
+  (resultClick)="onSearchResultClick($event)"></sz-search-results-grpc>
+</div>
+<!--<button (click)="getConfig()">Get Config</button>-->
+<!-- end search results -->
+ <!-- start entity detail -->
+<div *ngIf="showSearchResultDetail">
+  <!--<button class="download-pdf" type="button" (click)="onEntityPDFDownloadClick( $event )">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/><path d="M0 0h24v24H0z" fill="none"/></svg> Print
+  </button>-->
+  <div class="detail-wrapper">
+      <button (click)="onBackToSearchResultsClick($event)">&lt;&lt; Go Back to Search Results</button>
+  </div>
+  <sz-entity-detail-grpc
+    #entityDetailComponent
+    [showRecordWhyUtilities]="false"
+    [showEntityHowFunction]="true"
+    [entityId]="currentlySelectedEntityId"></sz-entity-detail-grpc>
+</div>
+<div *ngIf="showHowReport">
+  <sz-how-entity-grpc
+  #howGraph
+  [entityId]="currentlySelectedEntityId"
+  showNavigation="true"
+  (dataChanged)="onHowDataChange($event)"
+></sz-how-entity-grpc>
+</div>
+<!-- end entity detail -->

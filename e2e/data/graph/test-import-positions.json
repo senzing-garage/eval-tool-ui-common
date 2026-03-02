@@ -1,0 +1,2270 @@
+{
+  "version": "1.0",
+  "exportedAt": "2026-02-15T04:23:12.345Z",
+  "query": {
+    "graphIds": [
+      1
+    ],
+    "maxDegreesOfSeparation": 1,
+    "maxEntities": 7,
+    "buildOut": 1
+  },
+  "viewport": {
+    "zoom": 1,
+    "panX": 818,
+    "panY": 249
+  },
+  "nodes": [
+    {
+      "entityId": 1,
+      "isPrimaryEntity": true,
+      "isCoreNode": false,
+      "isQueriedNode": false,
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "state": {
+        "isHidden": false,
+        "hasCollapsedRelationships": false,
+        "areAllRelatedEntitiesOnDeck": false,
+        "numberRelated": 3,
+        "numberRelatedOnDeck": 3,
+        "numberRelatedHidden": 0
+      },
+      "relatedEntities": [
+        5,
+        145,
+        144
+      ],
+      "iconType": "default",
+      "name": "Robert Smith",
+      "orgName": "Robert Smith",
+      "address": {
+        "FEAT_DESC": "1515 Adela Lane Las Vegas NV 89111",
+        "LIB_FEAT_ID": 22,
+        "USAGE_TYPE": "HOME",
+        "FEAT_DESC_VALUES": [
+          {
+            "FEAT_DESC": "1515 Adela Lane Las Vegas NV 89111",
+            "LIB_FEAT_ID": 22
+          },
+          {
+            "FEAT_DESC": "1515 Adela Ln Las Vegas NV 89132",
+            "LIB_FEAT_ID": 46
+          }
+        ]
+      },
+      "phone": {
+        "FEAT_DESC": "702-919-1300",
+        "LIB_FEAT_ID": 4,
+        "USAGE_TYPE": "HOME",
+        "FEAT_DESC_VALUES": [
+          {
+            "FEAT_DESC": "702-919-1300",
+            "LIB_FEAT_ID": 4
+          }
+        ]
+      },
+      "dataSources": [
+        "CUSTOMERS"
+      ],
+      "recordSummaries": [
+        {
+          "DATA_SOURCE": "CUSTOMERS",
+          "RECORD_COUNT": 4
+        }
+      ],
+      "matchKeyTokens": {
+        "coreRelationshipMatchKeyTokens": [
+          "NAME",
+          "ADDRESS",
+          "SURNAME"
+        ],
+        "relationshipMatchKeyTokens": [
+          "NAME",
+          "ADDRESS",
+          "SURNAME"
+        ]
+      },
+      "resolvedEntityData": {
+        "ENTITY_ID": 1,
+        "ENTITY_NAME": "Robert Smith",
+        "FEATURES": {
+          "ADDRESS": [
+            {
+              "FEAT_DESC": "1515 Adela Lane Las Vegas NV 89111",
+              "LIB_FEAT_ID": 22,
+              "USAGE_TYPE": "HOME",
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "1515 Adela Lane Las Vegas NV 89111",
+                  "LIB_FEAT_ID": 22
+                },
+                {
+                  "FEAT_DESC": "1515 Adela Ln Las Vegas NV 89132",
+                  "LIB_FEAT_ID": 46
+                }
+              ]
+            },
+            {
+              "FEAT_DESC": "123 Main Street, Las Vegas NV 89132",
+              "LIB_FEAT_ID": 3,
+              "USAGE_TYPE": "MAILING",
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "123 Main Street, Las Vegas NV 89132",
+                  "LIB_FEAT_ID": 3
+                }
+              ]
+            }
+          ],
+          "DOB": [
+            {
+              "FEAT_DESC": "11/12/1979",
+              "LIB_FEAT_ID": 45,
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "11/12/1979",
+                  "LIB_FEAT_ID": 45
+                }
+              ]
+            },
+            {
+              "FEAT_DESC": "12/11/1978",
+              "LIB_FEAT_ID": 2,
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "12/11/1978",
+                  "LIB_FEAT_ID": 2
+                },
+                {
+                  "FEAT_DESC": "11/12/1978",
+                  "LIB_FEAT_ID": 21
+                }
+              ]
+            }
+          ],
+          "EMAIL": [
+            {
+              "FEAT_DESC": "bsmith@work.com",
+              "LIB_FEAT_ID": 5,
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "bsmith@work.com",
+                  "LIB_FEAT_ID": 5
+                }
+              ]
+            }
+          ],
+          "NAME": [
+            {
+              "FEAT_DESC": "B Smith",
+              "LIB_FEAT_ID": 44,
+              "USAGE_TYPE": "PRIMARY",
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "B Smith",
+                  "LIB_FEAT_ID": 44
+                }
+              ]
+            },
+            {
+              "FEAT_DESC": "Robert Smith",
+              "LIB_FEAT_ID": 1,
+              "USAGE_TYPE": "PRIMARY",
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "Robert Smith",
+                  "LIB_FEAT_ID": 1
+                },
+                {
+                  "FEAT_DESC": "Bob J Smith",
+                  "LIB_FEAT_ID": 38
+                },
+                {
+                  "FEAT_DESC": "Bob Smith",
+                  "LIB_FEAT_ID": 20
+                }
+              ]
+            }
+          ],
+          "PHONE": [
+            {
+              "FEAT_DESC": "702-919-1300",
+              "LIB_FEAT_ID": 4,
+              "USAGE_TYPE": "HOME",
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "702-919-1300",
+                  "LIB_FEAT_ID": 4
+                }
+              ]
+            },
+            {
+              "FEAT_DESC": "702-919-1300",
+              "LIB_FEAT_ID": 4,
+              "USAGE_TYPE": "MOBILE",
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "702-919-1300",
+                  "LIB_FEAT_ID": 4
+                }
+              ]
+            }
+          ],
+          "RECORD_TYPE": [
+            {
+              "FEAT_DESC": "PERSON",
+              "LIB_FEAT_ID": 10,
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "PERSON",
+                  "LIB_FEAT_ID": 10
+                }
+              ]
+            }
+          ]
+        },
+        "RECORD_SUMMARY": [
+          {
+            "DATA_SOURCE": "CUSTOMERS",
+            "RECORD_COUNT": 4
+          }
+        ],
+        "RECORDS": [
+          {
+            "DATA_SOURCE": "CUSTOMERS",
+            "RECORD_ID": "1002",
+            "INTERNAL_ID": 2,
+            "MATCH_KEY": "",
+            "MATCH_LEVEL_CODE": "",
+            "ERRULE_CODE": ""
+          },
+          {
+            "DATA_SOURCE": "CUSTOMERS",
+            "RECORD_ID": "1001",
+            "INTERNAL_ID": 1,
+            "MATCH_KEY": "+NAME+DOB+PHONE+EMAIL",
+            "MATCH_LEVEL_CODE": "RESOLVED",
+            "ERRULE_CODE": "SF1_SNAME_CFF_CSTAB"
+          },
+          {
+            "DATA_SOURCE": "CUSTOMERS",
+            "RECORD_ID": "1003",
+            "INTERNAL_ID": 3,
+            "MATCH_KEY": "+NAME+DOB+EMAIL",
+            "MATCH_LEVEL_CODE": "RESOLVED",
+            "ERRULE_CODE": "SF1_PNAME_CSTAB"
+          },
+          {
+            "DATA_SOURCE": "CUSTOMERS",
+            "RECORD_ID": "1004",
+            "INTERNAL_ID": 4,
+            "MATCH_KEY": "+NAME+DOB+ADDRESS",
+            "MATCH_LEVEL_CODE": "RESOLVED",
+            "ERRULE_CODE": "CNAME_CFF_CEXCL"
+          }
+        ]
+      },
+      "relatedEntitiesData": [
+        {
+          "ENTITY_ID": 5,
+          "MATCH_LEVEL_CODE": "POSSIBLY_SAME",
+          "MATCH_KEY": "+NAME+ADDRESS-DOB",
+          "ERRULE_CODE": "CNAME_CFF_DEXCL",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "Robert E Smith Sr",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 1
+            },
+            {
+              "DATA_SOURCE": "WATCHLIST",
+              "RECORD_COUNT": 1
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 145,
+          "MATCH_LEVEL_CODE": "POSSIBLY_SAME",
+          "MATCH_KEY": "+NAME",
+          "ERRULE_CODE": "SNAME",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "Robert Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "WATCHLIST",
+              "RECORD_COUNT": 1
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 144,
+          "MATCH_LEVEL_CODE": "POSSIBLY_RELATED",
+          "MATCH_KEY": "+SURNAME+ADDRESS",
+          "ERRULE_CODE": "CFF_SURNAME",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "Patricia Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "WATCHLIST",
+              "RECORD_COUNT": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "entityId": 5,
+      "isPrimaryEntity": false,
+      "isCoreNode": false,
+      "isQueriedNode": false,
+      "position": {
+        "x": -324.9254455566406,
+        "y": -1.6464080810546875
+      },
+      "state": {
+        "isHidden": false,
+        "hasCollapsedRelationships": false,
+        "areAllRelatedEntitiesOnDeck": false,
+        "numberRelated": 2,
+        "numberRelatedOnDeck": 2,
+        "numberRelatedHidden": 0
+      },
+      "relatedEntities": [
+        1,
+        145
+      ],
+      "iconType": "default",
+      "name": "Robert E Smith Sr",
+      "orgName": "Robert E Smith Sr",
+      "address": "",
+      "phone": "",
+      "dataSources": [
+        "CUSTOMERS",
+        "WATCHLIST"
+      ],
+      "recordSummaries": [
+        {
+          "DATA_SOURCE": "CUSTOMERS",
+          "RECORD_COUNT": 1
+        },
+        {
+          "DATA_SOURCE": "WATCHLIST",
+          "RECORD_COUNT": 1
+        }
+      ],
+      "matchKeyTokens": {
+        "coreRelationshipMatchKeyTokens": [
+          "NAME",
+          "ADDRESS"
+        ],
+        "relationshipMatchKeyTokens": [
+          "NAME",
+          "ADDRESS"
+        ]
+      },
+      "resolvedEntityData": {
+        "ENTITY_ID": 5,
+        "MATCH_LEVEL_CODE": "POSSIBLY_SAME",
+        "MATCH_KEY": "+NAME+ADDRESS-DOB",
+        "ERRULE_CODE": "CNAME_CFF_DEXCL",
+        "IS_DISCLOSED": 0,
+        "IS_AMBIGUOUS": 0,
+        "ENTITY_NAME": "Robert E Smith Sr",
+        "RECORD_SUMMARY": [
+          {
+            "DATA_SOURCE": "CUSTOMERS",
+            "RECORD_COUNT": 1
+          },
+          {
+            "DATA_SOURCE": "WATCHLIST",
+            "RECORD_COUNT": 1
+          }
+        ]
+      },
+      "relatedEntitiesData": [
+        {
+          "ENTITY_ID": 1,
+          "MATCH_LEVEL_CODE": "POSSIBLY_SAME",
+          "MATCH_KEY": "+NAME+ADDRESS-DOB",
+          "ERRULE_CODE": "CNAME_CFF_DEXCL",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "Robert Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 4
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 145,
+          "MATCH_LEVEL_CODE": "POSSIBLY_SAME",
+          "MATCH_KEY": "+NAME",
+          "ERRULE_CODE": "SNAME",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "Robert Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "WATCHLIST",
+              "RECORD_COUNT": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "entityId": 144,
+      "isPrimaryEntity": false,
+      "isCoreNode": false,
+      "isQueriedNode": false,
+      "position": {
+        "x": 78.74936512112617,
+        "y": 273.9998779296875
+      },
+      "state": {
+        "isHidden": false,
+        "hasCollapsedRelationships": false,
+        "areAllRelatedEntitiesOnDeck": false,
+        "numberRelated": 4,
+        "numberRelatedOnDeck": 4,
+        "numberRelatedHidden": 0
+      },
+      "relatedEntities": [
+        29,
+        30,
+        31,
+        1
+      ],
+      "iconType": "default",
+      "name": "Patricia Smith",
+      "orgName": "Patricia Smith",
+      "address": "",
+      "phone": "",
+      "dataSources": [
+        "WATCHLIST"
+      ],
+      "recordSummaries": [
+        {
+          "DATA_SOURCE": "WATCHLIST",
+          "RECORD_COUNT": 1
+        }
+      ],
+      "matchKeyTokens": {
+        "coreRelationshipMatchKeyTokens": [
+          "SURNAME",
+          "ADDRESS"
+        ],
+        "relationshipMatchKeyTokens": [
+          "SURNAME",
+          "ADDRESS"
+        ]
+      },
+      "resolvedEntityData": {
+        "ENTITY_ID": 144,
+        "MATCH_LEVEL_CODE": "POSSIBLY_RELATED",
+        "MATCH_KEY": "+SURNAME+ADDRESS",
+        "ERRULE_CODE": "CFF_SURNAME",
+        "IS_DISCLOSED": 0,
+        "IS_AMBIGUOUS": 0,
+        "ENTITY_NAME": "Patricia Smith",
+        "RECORD_SUMMARY": [
+          {
+            "DATA_SOURCE": "WATCHLIST",
+            "RECORD_COUNT": 1
+          }
+        ]
+      },
+      "relatedEntitiesData": [
+        {
+          "ENTITY_ID": 29,
+          "MATCH_LEVEL_CODE": "POSSIBLY_SAME",
+          "MATCH_KEY": "+NAME",
+          "ERRULE_CODE": "CNAME",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "Patrick Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 1
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 30,
+          "MATCH_LEVEL_CODE": "POSSIBLY_SAME",
+          "MATCH_KEY": "+NAME",
+          "ERRULE_CODE": "SNAME",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "Patricia Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 2
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 31,
+          "MATCH_LEVEL_CODE": "POSSIBLY_SAME",
+          "MATCH_KEY": "+NAME",
+          "ERRULE_CODE": "SNAME",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "Pat Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 1
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 1,
+          "MATCH_LEVEL_CODE": "POSSIBLY_RELATED",
+          "MATCH_KEY": "+SURNAME+ADDRESS",
+          "ERRULE_CODE": "CFF_SURNAME",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "Robert Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "entityId": 145,
+      "isPrimaryEntity": false,
+      "isCoreNode": false,
+      "isQueriedNode": false,
+      "position": {
+        "x": -259.80718994140625,
+        "y": -150.09043884277344
+      },
+      "state": {
+        "isHidden": false,
+        "hasCollapsedRelationships": false,
+        "areAllRelatedEntitiesOnDeck": false,
+        "numberRelated": 2,
+        "numberRelatedOnDeck": 2,
+        "numberRelatedHidden": 0
+      },
+      "relatedEntities": [
+        1,
+        5
+      ],
+      "iconType": "default",
+      "name": "Robert Smith",
+      "orgName": "Robert Smith",
+      "address": "",
+      "phone": "",
+      "dataSources": [
+        "WATCHLIST"
+      ],
+      "recordSummaries": [
+        {
+          "DATA_SOURCE": "WATCHLIST",
+          "RECORD_COUNT": 1
+        }
+      ],
+      "matchKeyTokens": {
+        "coreRelationshipMatchKeyTokens": [
+          "NAME"
+        ],
+        "relationshipMatchKeyTokens": [
+          "NAME"
+        ]
+      },
+      "resolvedEntityData": {
+        "ENTITY_ID": 145,
+        "MATCH_LEVEL_CODE": "POSSIBLY_SAME",
+        "MATCH_KEY": "+NAME",
+        "ERRULE_CODE": "SNAME",
+        "IS_DISCLOSED": 0,
+        "IS_AMBIGUOUS": 0,
+        "ENTITY_NAME": "Robert Smith",
+        "RECORD_SUMMARY": [
+          {
+            "DATA_SOURCE": "WATCHLIST",
+            "RECORD_COUNT": 1
+          }
+        ]
+      },
+      "relatedEntitiesData": [
+        {
+          "ENTITY_ID": 1,
+          "MATCH_LEVEL_CODE": "POSSIBLY_SAME",
+          "MATCH_KEY": "+NAME",
+          "ERRULE_CODE": "SNAME",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "Robert Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 4
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 5,
+          "MATCH_LEVEL_CODE": "POSSIBLY_SAME",
+          "MATCH_KEY": "+NAME",
+          "ERRULE_CODE": "SNAME",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "Robert E Smith Sr",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 1
+            },
+            {
+              "DATA_SOURCE": "WATCHLIST",
+              "RECORD_COUNT": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "entityId": 29,
+      "isPrimaryEntity": false,
+      "isCoreNode": true,
+      "isQueriedNode": true,
+      "position": {
+        "x": 285.82098388671875,
+        "y": 250.35833740234375
+      },
+      "state": {
+        "isHidden": false,
+        "hasCollapsedRelationships": false,
+        "areAllRelatedEntitiesOnDeck": false,
+        "numberRelated": 6,
+        "numberRelatedOnDeck": 6,
+        "numberRelatedHidden": 0
+      },
+      "relatedEntities": [
+        30,
+        31,
+        144,
+        27,
+        28,
+        154
+      ],
+      "iconType": "default",
+      "name": "Patrick Smith",
+      "orgName": "Patrick Smith",
+      "address": {
+        "FEAT_DESC": "3212 W. 32nd St Palm Harbor, FL 60527",
+        "LIB_FEAT_ID": 320,
+        "USAGE_TYPE": "HOME",
+        "FEAT_DESC_VALUES": [
+          {
+            "FEAT_DESC": "3212 W. 32nd St Palm Harbor, FL 60527",
+            "LIB_FEAT_ID": 320
+          }
+        ]
+      },
+      "phone": "",
+      "dataSources": [
+        "CUSTOMERS"
+      ],
+      "recordSummaries": [
+        {
+          "DATA_SOURCE": "CUSTOMERS",
+          "RECORD_COUNT": 1
+        }
+      ],
+      "matchKeyTokens": {
+        "coreRelationshipMatchKeyTokens": [],
+        "relationshipMatchKeyTokens": [
+          "NAME",
+          "ADDRESS",
+          "Ambiguous",
+          "PASSPORT "
+        ]
+      },
+      "resolvedEntityData": {
+        "ENTITY_ID": 29,
+        "ENTITY_NAME": "Patrick Smith",
+        "FEATURES": {
+          "ADDRESS": [
+            {
+              "FEAT_DESC": "3212 W. 32nd St Palm Harbor, FL 60527",
+              "LIB_FEAT_ID": 320,
+              "USAGE_TYPE": "HOME",
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "3212 W. 32nd St Palm Harbor, FL 60527",
+                  "LIB_FEAT_ID": 320
+                }
+              ]
+            }
+          ],
+          "DOB": [
+            {
+              "FEAT_DESC": "10/10/70",
+              "LIB_FEAT_ID": 318,
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "10/10/70",
+                  "LIB_FEAT_ID": 318
+                }
+              ]
+            }
+          ],
+          "NAME": [
+            {
+              "FEAT_DESC": "Patrick Smith",
+              "LIB_FEAT_ID": 335,
+              "USAGE_TYPE": "PRIMARY",
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "Patrick Smith",
+                  "LIB_FEAT_ID": 335
+                }
+              ]
+            }
+          ],
+          "PASSPORT": [
+            {
+              "FEAT_DESC": "10251111 US",
+              "LIB_FEAT_ID": 336,
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "10251111 US",
+                  "LIB_FEAT_ID": 336
+                }
+              ]
+            }
+          ],
+          "RECORD_TYPE": [
+            {
+              "FEAT_DESC": "PERSON",
+              "LIB_FEAT_ID": 10,
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "PERSON",
+                  "LIB_FEAT_ID": 10
+                }
+              ]
+            }
+          ]
+        },
+        "RECORD_SUMMARY": [
+          {
+            "DATA_SOURCE": "CUSTOMERS",
+            "RECORD_COUNT": 1
+          }
+        ],
+        "RECORDS": [
+          {
+            "DATA_SOURCE": "CUSTOMERS",
+            "RECORD_ID": "1043",
+            "INTERNAL_ID": 29,
+            "MATCH_KEY": "",
+            "MATCH_LEVEL_CODE": "",
+            "ERRULE_CODE": ""
+          }
+        ]
+      },
+      "relatedEntitiesData": [
+        {
+          "ENTITY_ID": 30,
+          "MATCH_LEVEL_CODE": "POSSIBLY_SAME",
+          "MATCH_KEY": "+NAME+ADDRESS-DOB-PASSPORT",
+          "ERRULE_CODE": "CNAME_CFF_DEXCL",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "Patricia Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 2
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 31,
+          "MATCH_LEVEL_CODE": "POSSIBLY_SAME",
+          "MATCH_KEY": "+NAME+ADDRESS+PASSPORT (Ambiguous)",
+          "ERRULE_CODE": "CNAME_CFF",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 1,
+          "ENTITY_NAME": "Pat Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 1
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 144,
+          "MATCH_LEVEL_CODE": "POSSIBLY_SAME",
+          "MATCH_KEY": "+NAME",
+          "ERRULE_CODE": "CNAME",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "Patricia Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "WATCHLIST",
+              "RECORD_COUNT": 1
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 27,
+          "MATCH_LEVEL_CODE": "POSSIBLY_RELATED",
+          "MATCH_KEY": "+SURNAME+DOB+ADDRESS",
+          "ERRULE_CODE": "CFF_SURNAME",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "John Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 1
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 28,
+          "MATCH_LEVEL_CODE": "POSSIBLY_RELATED",
+          "MATCH_KEY": "+SURNAME+ADDRESS-DOB",
+          "ERRULE_CODE": "CFF_SURNAME",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "John Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 1
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 154,
+          "MATCH_LEVEL_CODE": "POSSIBLY_RELATED",
+          "MATCH_KEY": "+SURNAME+ADDRESS",
+          "ERRULE_CODE": "CFF_SURNAME",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "John Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "WATCHLIST",
+              "RECORD_COUNT": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "entityId": 30,
+      "isPrimaryEntity": false,
+      "isCoreNode": true,
+      "isQueriedNode": true,
+      "position": {
+        "x": 193.48758512735367,
+        "y": 420.999755859375
+      },
+      "state": {
+        "isHidden": false,
+        "hasCollapsedRelationships": false,
+        "areAllRelatedEntitiesOnDeck": false,
+        "numberRelated": 6,
+        "numberRelatedOnDeck": 6,
+        "numberRelatedHidden": 0
+      },
+      "relatedEntities": [
+        29,
+        31,
+        144,
+        27,
+        28,
+        154
+      ],
+      "iconType": "default",
+      "name": "Patricia Smith",
+      "orgName": "Patricia Smith",
+      "address": {
+        "FEAT_DESC": "3212 W. 32nd St Palm Harbor, FL 60527",
+        "LIB_FEAT_ID": 320,
+        "USAGE_TYPE": "HOME",
+        "FEAT_DESC_VALUES": [
+          {
+            "FEAT_DESC": "3212 W. 32nd St Palm Harbor, FL 60527",
+            "LIB_FEAT_ID": 320
+          }
+        ]
+      },
+      "phone": "",
+      "dataSources": [
+        "CUSTOMERS"
+      ],
+      "recordSummaries": [
+        {
+          "DATA_SOURCE": "CUSTOMERS",
+          "RECORD_COUNT": 2
+        }
+      ],
+      "matchKeyTokens": {
+        "coreRelationshipMatchKeyTokens": [],
+        "relationshipMatchKeyTokens": [
+          "NAME",
+          "ADDRESS",
+          "Ambiguous",
+          "ADDRESS "
+        ]
+      },
+      "resolvedEntityData": {
+        "ENTITY_ID": 30,
+        "ENTITY_NAME": "Patricia Smith",
+        "FEATURES": {
+          "ADDRESS": [
+            {
+              "FEAT_DESC": "3212 W. 32nd St Palm Harbor, FL 60527",
+              "LIB_FEAT_ID": 320,
+              "USAGE_TYPE": "HOME",
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "3212 W. 32nd St Palm Harbor, FL 60527",
+                  "LIB_FEAT_ID": 320
+                }
+              ]
+            }
+          ],
+          "DOB": [
+            {
+              "FEAT_DESC": "3/15/90",
+              "LIB_FEAT_ID": 331,
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "3/15/90",
+                  "LIB_FEAT_ID": 331
+                }
+              ]
+            }
+          ],
+          "NAME": [
+            {
+              "FEAT_DESC": "Patricia Smith",
+              "LIB_FEAT_ID": 354,
+              "USAGE_TYPE": "PRIMARY",
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "Patricia Smith",
+                  "LIB_FEAT_ID": 354
+                },
+                {
+                  "FEAT_DESC": "Pat Smith",
+                  "LIB_FEAT_ID": 368
+                }
+              ]
+            }
+          ],
+          "PASSPORT": [
+            {
+              "FEAT_DESC": "10252222 USA",
+              "LIB_FEAT_ID": 372,
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "10252222 USA",
+                  "LIB_FEAT_ID": 372
+                },
+                {
+                  "FEAT_DESC": "10252222 US",
+                  "LIB_FEAT_ID": 355
+                }
+              ]
+            }
+          ],
+          "RECORD_TYPE": [
+            {
+              "FEAT_DESC": "PERSON",
+              "LIB_FEAT_ID": 10,
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "PERSON",
+                  "LIB_FEAT_ID": 10
+                }
+              ]
+            }
+          ]
+        },
+        "RECORD_SUMMARY": [
+          {
+            "DATA_SOURCE": "CUSTOMERS",
+            "RECORD_COUNT": 2
+          }
+        ],
+        "RECORDS": [
+          {
+            "DATA_SOURCE": "CUSTOMERS",
+            "RECORD_ID": "1044",
+            "INTERNAL_ID": 30,
+            "MATCH_KEY": "",
+            "MATCH_LEVEL_CODE": "",
+            "ERRULE_CODE": ""
+          },
+          {
+            "DATA_SOURCE": "CUSTOMERS",
+            "RECORD_ID": "1046",
+            "INTERNAL_ID": 32,
+            "MATCH_KEY": "+NAME+ADDRESS+PASSPORT",
+            "MATCH_LEVEL_CODE": "RESOLVED",
+            "ERRULE_CODE": "SF1_PNAME_CFF"
+          }
+        ]
+      },
+      "relatedEntitiesData": [
+        {
+          "ENTITY_ID": 29,
+          "MATCH_LEVEL_CODE": "POSSIBLY_SAME",
+          "MATCH_KEY": "+NAME+ADDRESS-DOB-PASSPORT",
+          "ERRULE_CODE": "CNAME_CFF_DEXCL",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "Patrick Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 1
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 31,
+          "MATCH_LEVEL_CODE": "POSSIBLY_SAME",
+          "MATCH_KEY": "+NAME+ADDRESS (Ambiguous)",
+          "ERRULE_CODE": "CNAME_CFF",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 1,
+          "ENTITY_NAME": "Pat Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 1
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 144,
+          "MATCH_LEVEL_CODE": "POSSIBLY_SAME",
+          "MATCH_KEY": "+NAME",
+          "ERRULE_CODE": "SNAME",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "Patricia Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "WATCHLIST",
+              "RECORD_COUNT": 1
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 27,
+          "MATCH_LEVEL_CODE": "POSSIBLY_RELATED",
+          "MATCH_KEY": "+SURNAME+ADDRESS-DOB",
+          "ERRULE_CODE": "CFF_SURNAME",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "John Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 1
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 28,
+          "MATCH_LEVEL_CODE": "POSSIBLY_RELATED",
+          "MATCH_KEY": "+SURNAME+DOB+ADDRESS",
+          "ERRULE_CODE": "CFF_SURNAME",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "John Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 1
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 154,
+          "MATCH_LEVEL_CODE": "POSSIBLY_RELATED",
+          "MATCH_KEY": "+SURNAME+ADDRESS",
+          "ERRULE_CODE": "CFF_SURNAME",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "John Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "WATCHLIST",
+              "RECORD_COUNT": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "entityId": 31,
+      "isPrimaryEntity": false,
+      "isCoreNode": true,
+      "isQueriedNode": true,
+      "position": {
+        "x": 154.93927001953125,
+        "y": 85.90464782714844
+      },
+      "state": {
+        "isHidden": false,
+        "hasCollapsedRelationships": false,
+        "areAllRelatedEntitiesOnDeck": false,
+        "numberRelated": 6,
+        "numberRelatedOnDeck": 6,
+        "numberRelatedHidden": 0
+      },
+      "relatedEntities": [
+        29,
+        30,
+        144,
+        27,
+        28,
+        154
+      ],
+      "iconType": "default",
+      "name": "Pat Smith",
+      "orgName": "Pat Smith",
+      "address": {
+        "FEAT_DESC": "3212 W. 32nd St Palm Harbor, FL 60527",
+        "LIB_FEAT_ID": 320,
+        "USAGE_TYPE": "HOME",
+        "FEAT_DESC_VALUES": [
+          {
+            "FEAT_DESC": "3212 W. 32nd St Palm Harbor, FL 60527",
+            "LIB_FEAT_ID": 320
+          }
+        ]
+      },
+      "phone": "",
+      "dataSources": [
+        "CUSTOMERS"
+      ],
+      "recordSummaries": [
+        {
+          "DATA_SOURCE": "CUSTOMERS",
+          "RECORD_COUNT": 1
+        }
+      ],
+      "matchKeyTokens": {
+        "coreRelationshipMatchKeyTokens": [],
+        "relationshipMatchKeyTokens": [
+          "Ambiguous",
+          "NAME",
+          "ADDRESS",
+          "PASSPORT ",
+          "ADDRESS "
+        ]
+      },
+      "resolvedEntityData": {
+        "ENTITY_ID": 31,
+        "ENTITY_NAME": "Pat Smith",
+        "FEATURES": {
+          "ADDRESS": [
+            {
+              "FEAT_DESC": "3212 W. 32nd St Palm Harbor, FL 60527",
+              "LIB_FEAT_ID": 320,
+              "USAGE_TYPE": "HOME",
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "3212 W. 32nd St Palm Harbor, FL 60527",
+                  "LIB_FEAT_ID": 320
+                }
+              ]
+            }
+          ],
+          "AMBIGUOUS_ENTITY": [
+            {
+              "FEAT_DESC": "CONFLICTING EXCLUSIVE,TIER 60,DOB",
+              "LIB_FEAT_ID": 370,
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "CONFLICTING EXCLUSIVE,TIER 60,DOB",
+                  "LIB_FEAT_ID": 370
+                }
+              ]
+            },
+            {
+              "FEAT_DESC": "FTYPE ABSENCE,TIER 60",
+              "LIB_FEAT_ID": 371,
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "FTYPE ABSENCE,TIER 60",
+                  "LIB_FEAT_ID": 371
+                }
+              ]
+            }
+          ],
+          "NAME": [
+            {
+              "FEAT_DESC": "Pat Smith",
+              "LIB_FEAT_ID": 368,
+              "USAGE_TYPE": "PRIMARY",
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "Pat Smith",
+                  "LIB_FEAT_ID": 368
+                }
+              ]
+            }
+          ],
+          "PASSPORT": [
+            {
+              "FEAT_DESC": "10251111",
+              "LIB_FEAT_ID": 369,
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "10251111",
+                  "LIB_FEAT_ID": 369
+                }
+              ]
+            }
+          ],
+          "RECORD_TYPE": [
+            {
+              "FEAT_DESC": "PERSON",
+              "LIB_FEAT_ID": 10,
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "PERSON",
+                  "LIB_FEAT_ID": 10
+                }
+              ]
+            }
+          ]
+        },
+        "RECORD_SUMMARY": [
+          {
+            "DATA_SOURCE": "CUSTOMERS",
+            "RECORD_COUNT": 1
+          }
+        ],
+        "RECORDS": [
+          {
+            "DATA_SOURCE": "CUSTOMERS",
+            "RECORD_ID": "1045",
+            "INTERNAL_ID": 31,
+            "MATCH_KEY": "",
+            "MATCH_LEVEL_CODE": "",
+            "ERRULE_CODE": ""
+          }
+        ]
+      },
+      "relatedEntitiesData": [
+        {
+          "ENTITY_ID": 29,
+          "MATCH_LEVEL_CODE": "POSSIBLY_SAME",
+          "MATCH_KEY": "+NAME+ADDRESS+PASSPORT (Ambiguous)",
+          "ERRULE_CODE": "CNAME_CFF",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 1,
+          "ENTITY_NAME": "Patrick Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 1
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 30,
+          "MATCH_LEVEL_CODE": "POSSIBLY_SAME",
+          "MATCH_KEY": "+NAME+ADDRESS (Ambiguous)",
+          "ERRULE_CODE": "CNAME_CFF",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 1,
+          "ENTITY_NAME": "Patricia Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 2
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 144,
+          "MATCH_LEVEL_CODE": "POSSIBLY_SAME",
+          "MATCH_KEY": "+NAME",
+          "ERRULE_CODE": "SNAME",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "Patricia Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "WATCHLIST",
+              "RECORD_COUNT": 1
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 27,
+          "MATCH_LEVEL_CODE": "POSSIBLY_RELATED",
+          "MATCH_KEY": "+SURNAME+ADDRESS",
+          "ERRULE_CODE": "CFF_SURNAME",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "John Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 1
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 28,
+          "MATCH_LEVEL_CODE": "POSSIBLY_RELATED",
+          "MATCH_KEY": "+SURNAME+ADDRESS",
+          "ERRULE_CODE": "CFF_SURNAME",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "John Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 1
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 154,
+          "MATCH_LEVEL_CODE": "POSSIBLY_RELATED",
+          "MATCH_KEY": "+SURNAME+ADDRESS",
+          "ERRULE_CODE": "CFF_SURNAME",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "John Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "WATCHLIST",
+              "RECORD_COUNT": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "entityId": 27,
+      "isPrimaryEntity": false,
+      "isCoreNode": true,
+      "isQueriedNode": true,
+      "position": {
+        "x": 488.8927001953125,
+        "y": 101.71586608886719
+      },
+      "state": {
+        "isHidden": false,
+        "hasCollapsedRelationships": false,
+        "areAllRelatedEntitiesOnDeck": false,
+        "numberRelated": 5,
+        "numberRelatedOnDeck": 5,
+        "numberRelatedHidden": 0
+      },
+      "relatedEntities": [
+        28,
+        154,
+        29,
+        30,
+        31
+      ],
+      "iconType": "default",
+      "name": "John Smith",
+      "orgName": "John Smith",
+      "address": {
+        "FEAT_DESC": "3212 W. 32nd St Palm Harbor, FL 60527",
+        "LIB_FEAT_ID": 320,
+        "USAGE_TYPE": "HOME",
+        "FEAT_DESC_VALUES": [
+          {
+            "FEAT_DESC": "3212 W. 32nd St Palm Harbor, FL 60527",
+            "LIB_FEAT_ID": 320
+          }
+        ]
+      },
+      "phone": "",
+      "dataSources": [
+        "CUSTOMERS"
+      ],
+      "recordSummaries": [
+        {
+          "DATA_SOURCE": "CUSTOMERS",
+          "RECORD_COUNT": 1
+        }
+      ],
+      "matchKeyTokens": {
+        "coreRelationshipMatchKeyTokens": [],
+        "relationshipMatchKeyTokens": [
+          "NAME",
+          "ADDRESS",
+          "SURNAME",
+          "DOB",
+          "Ambiguous",
+          "ADDRESS "
+        ]
+      },
+      "resolvedEntityData": {
+        "ENTITY_ID": 27,
+        "ENTITY_NAME": "John Smith",
+        "FEATURES": {
+          "ADDRESS": [
+            {
+              "FEAT_DESC": "3212 W. 32nd St Palm Harbor, FL 60527",
+              "LIB_FEAT_ID": 320,
+              "USAGE_TYPE": "HOME",
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "3212 W. 32nd St Palm Harbor, FL 60527",
+                  "LIB_FEAT_ID": 320
+                }
+              ]
+            }
+          ],
+          "DOB": [
+            {
+              "FEAT_DESC": "10/10/70",
+              "LIB_FEAT_ID": 318,
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "10/10/70",
+                  "LIB_FEAT_ID": 318
+                }
+              ]
+            }
+          ],
+          "GENDER": [
+            {
+              "FEAT_DESC": "M",
+              "LIB_FEAT_ID": 319,
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "M",
+                  "LIB_FEAT_ID": 319
+                }
+              ]
+            }
+          ],
+          "NAME": [
+            {
+              "FEAT_DESC": "John Smith",
+              "LIB_FEAT_ID": 317,
+              "USAGE_TYPE": "PRIMARY",
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "John Smith",
+                  "LIB_FEAT_ID": 317
+                }
+              ]
+            }
+          ],
+          "RECORD_TYPE": [
+            {
+              "FEAT_DESC": "PERSON",
+              "LIB_FEAT_ID": 10,
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "PERSON",
+                  "LIB_FEAT_ID": 10
+                }
+              ]
+            }
+          ]
+        },
+        "RECORD_SUMMARY": [
+          {
+            "DATA_SOURCE": "CUSTOMERS",
+            "RECORD_COUNT": 1
+          }
+        ],
+        "RECORDS": [
+          {
+            "DATA_SOURCE": "CUSTOMERS",
+            "RECORD_ID": "1039",
+            "INTERNAL_ID": 27,
+            "MATCH_KEY": "",
+            "MATCH_LEVEL_CODE": "",
+            "ERRULE_CODE": ""
+          }
+        ]
+      },
+      "relatedEntitiesData": [
+        {
+          "ENTITY_ID": 28,
+          "MATCH_LEVEL_CODE": "POSSIBLY_SAME",
+          "MATCH_KEY": "+NAME+ADDRESS-DOB",
+          "ERRULE_CODE": "CNAME_CFF_DEXCL",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "John Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 1
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 154,
+          "MATCH_LEVEL_CODE": "POSSIBLY_SAME",
+          "MATCH_KEY": "+NAME+ADDRESS (Ambiguous)",
+          "ERRULE_CODE": "CNAME_CFF",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 1,
+          "ENTITY_NAME": "John Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "WATCHLIST",
+              "RECORD_COUNT": 2
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 29,
+          "MATCH_LEVEL_CODE": "POSSIBLY_RELATED",
+          "MATCH_KEY": "+SURNAME+DOB+ADDRESS",
+          "ERRULE_CODE": "CFF_SURNAME",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "Patrick Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 1
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 30,
+          "MATCH_LEVEL_CODE": "POSSIBLY_RELATED",
+          "MATCH_KEY": "+SURNAME+ADDRESS-DOB",
+          "ERRULE_CODE": "CFF_SURNAME",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "Patricia Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 2
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 31,
+          "MATCH_LEVEL_CODE": "POSSIBLY_RELATED",
+          "MATCH_KEY": "+SURNAME+ADDRESS",
+          "ERRULE_CODE": "CFF_SURNAME",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "Pat Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "entityId": 28,
+      "isPrimaryEntity": false,
+      "isCoreNode": true,
+      "isQueriedNode": true,
+      "position": {
+        "x": 415.5607604980469,
+        "y": 413.3582763671875
+      },
+      "state": {
+        "isHidden": false,
+        "hasCollapsedRelationships": false,
+        "areAllRelatedEntitiesOnDeck": false,
+        "numberRelated": 5,
+        "numberRelatedOnDeck": 5,
+        "numberRelatedHidden": 0
+      },
+      "relatedEntities": [
+        27,
+        154,
+        29,
+        30,
+        31
+      ],
+      "iconType": "default",
+      "name": "John Smith",
+      "orgName": "John Smith",
+      "address": {
+        "FEAT_DESC": "3212 W. 32nd St Palm Harbor, FL 60527",
+        "LIB_FEAT_ID": 320,
+        "USAGE_TYPE": "HOME",
+        "FEAT_DESC_VALUES": [
+          {
+            "FEAT_DESC": "3212 W. 32nd St Palm Harbor, FL 60527",
+            "LIB_FEAT_ID": 320
+          }
+        ]
+      },
+      "phone": "",
+      "dataSources": [
+        "CUSTOMERS"
+      ],
+      "recordSummaries": [
+        {
+          "DATA_SOURCE": "CUSTOMERS",
+          "RECORD_COUNT": 1
+        }
+      ],
+      "matchKeyTokens": {
+        "coreRelationshipMatchKeyTokens": [],
+        "relationshipMatchKeyTokens": [
+          "NAME",
+          "ADDRESS",
+          "SURNAME",
+          "DOB",
+          "Ambiguous",
+          "ADDRESS "
+        ]
+      },
+      "resolvedEntityData": {
+        "ENTITY_ID": 28,
+        "ENTITY_NAME": "John Smith",
+        "FEATURES": {
+          "ADDRESS": [
+            {
+              "FEAT_DESC": "3212 W. 32nd St Palm Harbor, FL 60527",
+              "LIB_FEAT_ID": 320,
+              "USAGE_TYPE": "HOME",
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "3212 W. 32nd St Palm Harbor, FL 60527",
+                  "LIB_FEAT_ID": 320
+                }
+              ]
+            }
+          ],
+          "DOB": [
+            {
+              "FEAT_DESC": "3/15/90",
+              "LIB_FEAT_ID": 331,
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "3/15/90",
+                  "LIB_FEAT_ID": 331
+                }
+              ]
+            }
+          ],
+          "NAME": [
+            {
+              "FEAT_DESC": "John Smith",
+              "LIB_FEAT_ID": 317,
+              "USAGE_TYPE": "PRIMARY",
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "John Smith",
+                  "LIB_FEAT_ID": 317
+                }
+              ]
+            }
+          ],
+          "RECORD_TYPE": [
+            {
+              "FEAT_DESC": "PERSON",
+              "LIB_FEAT_ID": 10,
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "PERSON",
+                  "LIB_FEAT_ID": 10
+                }
+              ]
+            }
+          ]
+        },
+        "RECORD_SUMMARY": [
+          {
+            "DATA_SOURCE": "CUSTOMERS",
+            "RECORD_COUNT": 1
+          }
+        ],
+        "RECORDS": [
+          {
+            "DATA_SOURCE": "CUSTOMERS",
+            "RECORD_ID": "1040",
+            "INTERNAL_ID": 28,
+            "MATCH_KEY": "",
+            "MATCH_LEVEL_CODE": "",
+            "ERRULE_CODE": ""
+          }
+        ]
+      },
+      "relatedEntitiesData": [
+        {
+          "ENTITY_ID": 27,
+          "MATCH_LEVEL_CODE": "POSSIBLY_SAME",
+          "MATCH_KEY": "+NAME+ADDRESS-DOB",
+          "ERRULE_CODE": "CNAME_CFF_DEXCL",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "John Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 1
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 154,
+          "MATCH_LEVEL_CODE": "POSSIBLY_SAME",
+          "MATCH_KEY": "+NAME+ADDRESS (Ambiguous)",
+          "ERRULE_CODE": "CNAME_CFF",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 1,
+          "ENTITY_NAME": "John Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "WATCHLIST",
+              "RECORD_COUNT": 2
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 29,
+          "MATCH_LEVEL_CODE": "POSSIBLY_RELATED",
+          "MATCH_KEY": "+SURNAME+ADDRESS-DOB",
+          "ERRULE_CODE": "CFF_SURNAME",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "Patrick Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 1
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 30,
+          "MATCH_LEVEL_CODE": "POSSIBLY_RELATED",
+          "MATCH_KEY": "+SURNAME+DOB+ADDRESS",
+          "ERRULE_CODE": "CFF_SURNAME",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "Patricia Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 2
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 31,
+          "MATCH_LEVEL_CODE": "POSSIBLY_RELATED",
+          "MATCH_KEY": "+SURNAME+ADDRESS",
+          "ERRULE_CODE": "CFF_SURNAME",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "Pat Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "entityId": 154,
+      "isPrimaryEntity": false,
+      "isCoreNode": true,
+      "isQueriedNode": true,
+      "position": {
+        "x": 322.01110076904297,
+        "y": 72.26375579833984
+      },
+      "state": {
+        "isHidden": false,
+        "hasCollapsedRelationships": false,
+        "areAllRelatedEntitiesOnDeck": false,
+        "numberRelated": 5,
+        "numberRelatedOnDeck": 5,
+        "numberRelatedHidden": 0
+      },
+      "relatedEntities": [
+        27,
+        28,
+        29,
+        30,
+        31
+      ],
+      "iconType": "default",
+      "name": "John Smith",
+      "orgName": "John Smith",
+      "address": {
+        "FEAT_DESC": "3212 W. 32nd St Palm Harbor, FL 60527",
+        "LIB_FEAT_ID": 320,
+        "USAGE_TYPE": "HOME",
+        "FEAT_DESC_VALUES": [
+          {
+            "FEAT_DESC": "3212 W. 32nd St Palm Harbor, FL 60527",
+            "LIB_FEAT_ID": 320
+          }
+        ]
+      },
+      "phone": "",
+      "dataSources": [
+        "WATCHLIST"
+      ],
+      "recordSummaries": [
+        {
+          "DATA_SOURCE": "WATCHLIST",
+          "RECORD_COUNT": 2
+        }
+      ],
+      "matchKeyTokens": {
+        "coreRelationshipMatchKeyTokens": [],
+        "relationshipMatchKeyTokens": [
+          "Ambiguous",
+          "NAME",
+          "ADDRESS ",
+          "SURNAME",
+          "ADDRESS"
+        ]
+      },
+      "resolvedEntityData": {
+        "ENTITY_ID": 154,
+        "ENTITY_NAME": "John Smith",
+        "FEATURES": {
+          "ADDRESS": [
+            {
+              "FEAT_DESC": "3212 W. 32nd St Palm Harbor, FL 60527",
+              "LIB_FEAT_ID": 320,
+              "USAGE_TYPE": "HOME",
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "3212 W. 32nd St Palm Harbor, FL 60527",
+                  "LIB_FEAT_ID": 320
+                }
+              ]
+            }
+          ],
+          "AMBIGUOUS_ENTITY": [
+            {
+              "FEAT_DESC": "CONFLICTING EXCLUSIVE,TIER 60,DOB",
+              "LIB_FEAT_ID": 370,
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "CONFLICTING EXCLUSIVE,TIER 60,DOB",
+                  "LIB_FEAT_ID": 370
+                }
+              ]
+            },
+            {
+              "FEAT_DESC": "FTYPE ABSENCE,TIER 60",
+              "LIB_FEAT_ID": 371,
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "FTYPE ABSENCE,TIER 60",
+                  "LIB_FEAT_ID": 371
+                }
+              ]
+            }
+          ],
+          "GENDER": [
+            {
+              "FEAT_DESC": "M",
+              "LIB_FEAT_ID": 319,
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "M",
+                  "LIB_FEAT_ID": 319
+                }
+              ]
+            }
+          ],
+          "NAME": [
+            {
+              "FEAT_DESC": "John Smith",
+              "LIB_FEAT_ID": 317,
+              "USAGE_TYPE": "PRIMARY",
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "John Smith",
+                  "LIB_FEAT_ID": 317
+                }
+              ]
+            }
+          ],
+          "RECORD_TYPE": [
+            {
+              "FEAT_DESC": "PERSON",
+              "LIB_FEAT_ID": 10,
+              "FEAT_DESC_VALUES": [
+                {
+                  "FEAT_DESC": "PERSON",
+                  "LIB_FEAT_ID": 10
+                }
+              ]
+            }
+          ]
+        },
+        "RECORD_SUMMARY": [
+          {
+            "DATA_SOURCE": "WATCHLIST",
+            "RECORD_COUNT": 2
+          }
+        ],
+        "RECORDS": [
+          {
+            "DATA_SOURCE": "WATCHLIST",
+            "RECORD_ID": "1041",
+            "INTERNAL_ID": 154,
+            "MATCH_KEY": "",
+            "MATCH_LEVEL_CODE": "",
+            "ERRULE_CODE": ""
+          },
+          {
+            "DATA_SOURCE": "WATCHLIST",
+            "RECORD_ID": "1042",
+            "INTERNAL_ID": 155,
+            "MATCH_KEY": "+NAME+ADDRESS",
+            "MATCH_LEVEL_CODE": "RESOLVED",
+            "ERRULE_CODE": "CNAME_CFF"
+          }
+        ]
+      },
+      "relatedEntitiesData": [
+        {
+          "ENTITY_ID": 27,
+          "MATCH_LEVEL_CODE": "POSSIBLY_SAME",
+          "MATCH_KEY": "+NAME+ADDRESS (Ambiguous)",
+          "ERRULE_CODE": "CNAME_CFF",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 1,
+          "ENTITY_NAME": "John Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 1
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 28,
+          "MATCH_LEVEL_CODE": "POSSIBLY_SAME",
+          "MATCH_KEY": "+NAME+ADDRESS (Ambiguous)",
+          "ERRULE_CODE": "CNAME_CFF",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 1,
+          "ENTITY_NAME": "John Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 1
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 29,
+          "MATCH_LEVEL_CODE": "POSSIBLY_RELATED",
+          "MATCH_KEY": "+SURNAME+ADDRESS",
+          "ERRULE_CODE": "CFF_SURNAME",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "Patrick Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 1
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 30,
+          "MATCH_LEVEL_CODE": "POSSIBLY_RELATED",
+          "MATCH_KEY": "+SURNAME+ADDRESS",
+          "ERRULE_CODE": "CFF_SURNAME",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "Patricia Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 2
+            }
+          ]
+        },
+        {
+          "ENTITY_ID": 31,
+          "MATCH_LEVEL_CODE": "POSSIBLY_RELATED",
+          "MATCH_KEY": "+SURNAME+ADDRESS",
+          "ERRULE_CODE": "CFF_SURNAME",
+          "IS_DISCLOSED": 0,
+          "IS_AMBIGUOUS": 0,
+          "ENTITY_NAME": "Pat Smith",
+          "RECORD_SUMMARY": [
+            {
+              "DATA_SOURCE": "CUSTOMERS",
+              "RECORD_COUNT": 1
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "links": [
+    {
+      "id": 0,
+      "sourceEntityId": 5,
+      "targetEntityId": 1,
+      "matchLevel": "POSSIBLY_SAME",
+      "matchKey": "+NAME+ADDRESS-DOB",
+      "isCoreLink": false,
+      "isHidden": false
+    },
+    {
+      "id": 1,
+      "sourceEntityId": 144,
+      "targetEntityId": 1,
+      "matchLevel": "POSSIBLY_RELATED",
+      "matchKey": "+SURNAME+ADDRESS",
+      "isCoreLink": false,
+      "isHidden": false
+    },
+    {
+      "id": 2,
+      "sourceEntityId": 145,
+      "targetEntityId": 1,
+      "matchLevel": "POSSIBLY_SAME",
+      "matchKey": "+NAME",
+      "isCoreLink": false,
+      "isHidden": false
+    },
+    {
+      "id": 3,
+      "sourceEntityId": 145,
+      "targetEntityId": 5,
+      "matchLevel": "POSSIBLY_SAME",
+      "matchKey": "+NAME",
+      "isCoreLink": false,
+      "isHidden": false
+    },
+    {
+      "id": 4,
+      "sourceEntityId": 29,
+      "targetEntityId": 144,
+      "matchLevel": "POSSIBLY_SAME",
+      "matchKey": "+NAME",
+      "isCoreLink": false,
+      "isHidden": false
+    },
+    {
+      "id": 5,
+      "sourceEntityId": 30,
+      "targetEntityId": 29,
+      "matchLevel": "POSSIBLY_SAME",
+      "matchKey": "+NAME+ADDRESS-DOB-PASSPORT",
+      "isCoreLink": false,
+      "isHidden": false
+    },
+    {
+      "id": 6,
+      "sourceEntityId": 30,
+      "targetEntityId": 144,
+      "matchLevel": "POSSIBLY_SAME",
+      "matchKey": "+NAME",
+      "isCoreLink": false,
+      "isHidden": false
+    },
+    {
+      "id": 7,
+      "sourceEntityId": 31,
+      "targetEntityId": 29,
+      "matchLevel": "POSSIBLY_SAME",
+      "matchKey": "+NAME+ADDRESS+PASSPORT (Ambiguous)",
+      "isCoreLink": false,
+      "isHidden": false
+    },
+    {
+      "id": 8,
+      "sourceEntityId": 31,
+      "targetEntityId": 30,
+      "matchLevel": "POSSIBLY_SAME",
+      "matchKey": "+NAME+ADDRESS (Ambiguous)",
+      "isCoreLink": false,
+      "isHidden": false
+    },
+    {
+      "id": 9,
+      "sourceEntityId": 31,
+      "targetEntityId": 144,
+      "matchLevel": "POSSIBLY_SAME",
+      "matchKey": "+NAME",
+      "isCoreLink": false,
+      "isHidden": false
+    },
+    {
+      "id": 10,
+      "sourceEntityId": 27,
+      "targetEntityId": 29,
+      "matchLevel": "POSSIBLY_RELATED",
+      "matchKey": "+SURNAME+DOB+ADDRESS",
+      "isCoreLink": false,
+      "isHidden": false
+    },
+    {
+      "id": 11,
+      "sourceEntityId": 27,
+      "targetEntityId": 30,
+      "matchLevel": "POSSIBLY_RELATED",
+      "matchKey": "+SURNAME+ADDRESS-DOB",
+      "isCoreLink": false,
+      "isHidden": false
+    },
+    {
+      "id": 12,
+      "sourceEntityId": 27,
+      "targetEntityId": 31,
+      "matchLevel": "POSSIBLY_RELATED",
+      "matchKey": "+SURNAME+ADDRESS",
+      "isCoreLink": false,
+      "isHidden": false
+    },
+    {
+      "id": 13,
+      "sourceEntityId": 28,
+      "targetEntityId": 27,
+      "matchLevel": "POSSIBLY_SAME",
+      "matchKey": "+NAME+ADDRESS-DOB",
+      "isCoreLink": false,
+      "isHidden": false
+    },
+    {
+      "id": 14,
+      "sourceEntityId": 28,
+      "targetEntityId": 29,
+      "matchLevel": "POSSIBLY_RELATED",
+      "matchKey": "+SURNAME+ADDRESS-DOB",
+      "isCoreLink": false,
+      "isHidden": false
+    },
+    {
+      "id": 15,
+      "sourceEntityId": 28,
+      "targetEntityId": 30,
+      "matchLevel": "POSSIBLY_RELATED",
+      "matchKey": "+SURNAME+DOB+ADDRESS",
+      "isCoreLink": false,
+      "isHidden": false
+    },
+    {
+      "id": 16,
+      "sourceEntityId": 28,
+      "targetEntityId": 31,
+      "matchLevel": "POSSIBLY_RELATED",
+      "matchKey": "+SURNAME+ADDRESS",
+      "isCoreLink": false,
+      "isHidden": false
+    },
+    {
+      "id": 17,
+      "sourceEntityId": 154,
+      "targetEntityId": 27,
+      "matchLevel": "POSSIBLY_SAME",
+      "matchKey": "+NAME+ADDRESS (Ambiguous)",
+      "isCoreLink": false,
+      "isHidden": false
+    },
+    {
+      "id": 18,
+      "sourceEntityId": 154,
+      "targetEntityId": 28,
+      "matchLevel": "POSSIBLY_SAME",
+      "matchKey": "+NAME+ADDRESS (Ambiguous)",
+      "isCoreLink": false,
+      "isHidden": false
+    },
+    {
+      "id": 19,
+      "sourceEntityId": 154,
+      "targetEntityId": 29,
+      "matchLevel": "POSSIBLY_RELATED",
+      "matchKey": "+SURNAME+ADDRESS",
+      "isCoreLink": false,
+      "isHidden": false
+    },
+    {
+      "id": 20,
+      "sourceEntityId": 154,
+      "targetEntityId": 30,
+      "matchLevel": "POSSIBLY_RELATED",
+      "matchKey": "+SURNAME+ADDRESS",
+      "isCoreLink": false,
+      "isHidden": false
+    },
+    {
+      "id": 21,
+      "sourceEntityId": 154,
+      "targetEntityId": 31,
+      "matchLevel": "POSSIBLY_RELATED",
+      "matchKey": "+SURNAME+ADDRESS",
+      "isCoreLink": false,
+      "isHidden": false
+    }
+  ],
+  "graphPrefs": {
+    "openInNewTab": false,
+    "openInSidePanel": false,
+    "dataSourceColors": [],
+    "showLinkLabels": true,
+    "rememberStateOptions": true,
+    "maxDegreesOfSeparation": 1,
+    "maxEntities": 40,
+    "buildOut": 1,
+    "dataSourcesFiltered": [
+      "SAMPLE PERSON"
+    ],
+    "matchKeysIncluded": [],
+    "matchKeyTokensIncluded": [],
+    "matchKeyCoreTokensIncluded": [],
+    "neverFilterQueriedEntityIds": true,
+    "queriedEntitiesColor": "#465BA8",
+    "focusedEntitiesColor": "#465BA8",
+    "linkColor": "#a25757",
+    "indirectLinkColor": "#999",
+    "unlimitedMaxEntities": true,
+    "unlimitedMaxScope": false,
+    "suppressL1InterLinks": true,
+    "matchKeyTokenSelectionScope": 0
+  }
+}
