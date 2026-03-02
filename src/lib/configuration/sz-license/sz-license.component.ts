@@ -87,11 +87,16 @@ export class SzLicenseInfoComponent implements OnInit, OnDestroy {
     return (this.licenseInfo.licenseType === "EVAL" || (this.licenseInfo.licenseType && this.licenseInfo.licenseType.indexOf && this.licenseInfo.licenseType.indexOf('EVAL') > -1));
   }
 
+  public get unlimitedLicense() : boolean {
+    if (!this.licenseInfo) return false;
+    return this.licenseInfo.recordLimit === 0;
+  }
+
   public get limitInvalid() : boolean {
     if (!this.licenseInfo) return false;
     const limit = this.licenseInfo.recordLimit;
     if (limit === null || limit === undefined) return true;
-    if (limit <= 0) return true;
+    if (limit < 0) return true;
     return false;
   }
 
@@ -104,9 +109,9 @@ export class SzLicenseInfoComponent implements OnInit, OnDestroy {
 
   public get approachingLimit() : boolean {
     if (!this.licenseInfo) return false;
+    if (this.unlimitedLicense) return false;
     const limit = this.licenseInfo.recordLimit;
     if (limit === null || limit === undefined) return false;
-    if (limit === 0) return true;
     const ratio = this.licenseLimitRatio;
     return (ratio > 0.95) ? true : false;
   }
