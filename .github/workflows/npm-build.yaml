@@ -42,7 +42,6 @@ jobs:
         run: |
           npm run build
 
-
   slack-notification:
     needs: [npm-build]
     if: ${{ always() && contains(fromJSON('["failure", "cancelled"]'), needs.npm-build.outputs.status ) && github.ref_name == github.event.repository.default_branch }}
