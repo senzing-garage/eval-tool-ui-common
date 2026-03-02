@@ -303,7 +303,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
     private _onNoData: Subject<boolean> = new Subject();
     /** @internal */
     private _onEntityIdClick: Subject<number> = new Subject();
-    /** aggregate observeable for when the component is either loading data, transforming data, or rendering. */
+    /** aggregate observable for when the component is either loading data, transforming data, or rendering. */
     @Output() loading: Observable<SzStatsSampleTableLoadingEvent> = this._loading.asObservable();
     /** when requests have completed but there are no results available to display */
     @Output() onNoData: Observable<boolean> = this._onNoData.asObservable();

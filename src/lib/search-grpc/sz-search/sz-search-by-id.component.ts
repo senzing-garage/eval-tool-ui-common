@@ -124,23 +124,23 @@ export class SzSearchByIdGrpcComponent implements OnInit, OnDestroy {
   @Output() exception: EventEmitter<Error> = new EventEmitter<Error>();
 
   /**
-   * emmitted when the results have been cleared.
+   * emitted when the results have been cleared.
    * @memberof SzSearchByIdComponent
    */
   @Output() resultCleared: EventEmitter<void> = new EventEmitter<void>();
   /**
-   * emmitted when the search results have been changed.
+   * emitted when the search results have been changed.
    * @memberof SzSearchByIdComponent
    */
   @Output() resultChange: EventEmitter<SzSdkEntityRecord> = new EventEmitter<SzSdkEntityRecord>();
 
   /** the result of the get "by entity id" submitSearch query. */
   private _entity: SzSdkResolvedEntity;
-  /** event emmiter for when the _entity property has changed */
+  /** event emitter for when the _entity property has changed */
   @Output() entityChange: EventEmitter<SzSdkResolvedEntity> = new EventEmitter<SzSdkResolvedEntity>();
 
   /**
-   * emmitted when parameters of the search have been changed.
+   * emitted when parameters of the search have been changed.
    *
    * @memberof SzSearchByIdComponent
    */
@@ -203,7 +203,7 @@ export class SzSearchByIdGrpcComponent implements OnInit, OnDestroy {
       this.disableDataSourceOption(opt);
     });
   }
-  /** @interal */
+  /** @internal */
   public getAnyDisabled(keys: string[]): string {
     const _some = keys.some((key) => {
       return this.disabledFields[ key ];
@@ -213,7 +213,7 @@ export class SzSearchByIdGrpcComponent implements OnInit, OnDestroy {
     }
     return null;
   }
-  /** @interal */
+  /** @internal */
   public getDisabled(key: string): string {
     if(this.disabledFields && this.disabledFields[ key ]) {
       return '';
@@ -545,7 +545,7 @@ export class SzSearchByIdGrpcComponent implements OnInit, OnDestroy {
    * submit current search params to search service.
    * when search service returns a result it publishes the result
    * through the resultChange event emitter, and
-   * any parameter changes through the paramsChange emmitter.
+   * any parameter changes through the paramsChange emitter.
    */
   public submitSearch(): void {
     const searchParams = this.getSearchParams();

@@ -373,7 +373,7 @@ export class SzImportFileComponent implements OnInit, OnDestroy {
         const lines           = _fileContents.split(lineEndingStyle);
         if(lines && lines.length <= 1) {
           // assume it's one line ???
-          console.warn(`whut? "${lineEndingStyle}"`, lineEndingStyle);
+          console.warn(`what? "${lineEndingStyle}"`, lineEndingStyle);
           return;
         }
         //console.log(`parseFile: on read end.`, lineEndingStyle, lines);

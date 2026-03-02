@@ -138,7 +138,7 @@ export class SzEntityDetailGrpcComponent implements OnInit, OnDestroy, AfterView
   private _showPossibleMatchesSection: boolean = true;
   private _showPossibleRelationshipsSection: boolean = true;
   private _showDisclosedSection: boolean = true;
-  // collapse or expand specific setions
+  // collapse or expand specific sections
   private _graphSectionCollapsed: boolean = true;
   private _recordsSectionCollapsed: boolean = false;
   private _possibleMatchesSectionCollapsed: boolean = false;
@@ -169,7 +169,7 @@ export class SzEntityDetailGrpcComponent implements OnInit, OnDestroy, AfterView
 
   /** @internal */
   private _headerHowButtonClicked: Subject<howClickEvent> = new Subject<howClickEvent>();
-  /** (Observeable) when the user clicks on the "how" button in header under the icon */
+  /** (Observable) when the user clicks on the "how" button in header under the icon */
   public headerHowButtonClicked = this._headerHowButtonClicked.asObservable();
   /** (Event Emitter) when the user clicks on the "How" button in header under the icon */
   @Output() howButtonClick        = new EventEmitter<howClickEvent>();
@@ -180,11 +180,11 @@ export class SzEntityDetailGrpcComponent implements OnInit, OnDestroy, AfterView
 
   /** @internal */
   private _headerWhyButtonClicked: Subject<SzEntityIdentifier> = new Subject<SzEntityIdentifier>();
-  /** (Observeable) when the user clicks on the "Why" button in header under the icon */
+  /** (Observable) when the user clicks on the "Why" button in header under the icon */
   public headerWhyButtonClicked = this._headerWhyButtonClicked.asObservable();
   /** @internal */
   private _headerReEvaluateButtonClicked: Subject<howClickEvent> = new Subject<howClickEvent>();
-  /** (Observeable) when the user clicks on the "reevalute" button in header under the icon */
+  /** (Observable) when the user clicks on the "reevaluate" button in header under the icon */
   public headerReEvaluateButtonClicked = this._headerReEvaluateButtonClicked.asObservable();
   /** (Event Emitter) when the user clicks on the "Why" button in header under the icon */
   @Output() headerWhyButtonClick = new EventEmitter<SzEntityIdentifier>();
@@ -351,11 +351,11 @@ export class SzEntityDetailGrpcComponent implements OnInit, OnDestroy, AfterView
   public recordCount(records: SzSdkEntityRecord[]): number {
     return records.length;
   }
-  /** message to show when re-evalution is required */
+  /** message to show when re-evaluation is required */
   public get reEvaluateMessage(): string {
     return this._reEvaluationMessage;
   }
-  /** message to show when re-evalution is required */
+  /** message to show when re-evaluation is required */
   @Input() set reEvaluateMessage(value: string) {
     this._reEvaluationMessage = value;
   }
@@ -426,12 +426,12 @@ export class SzEntityDetailGrpcComponent implements OnInit, OnDestroy, AfterView
    */
   @Output() exception: EventEmitter<Error> = new EventEmitter<Error>();
   /**
-   * emmitted when the entity data to display has been changed.
+   * emitted when the entity data to display has been changed.
    */
   @Output('dataChanged')
   dataChanged: Subject<SzResumeEntity> = new Subject<SzResumeEntity>();
   /**
-   * emmitted when the entity id has been changed.
+   * emitted when the entity id has been changed.
    */
   @Output('entityIdChanged')
   entityIdChanged: EventEmitter<number> = new EventEmitter<number>();
@@ -861,7 +861,7 @@ export class SzEntityDetailGrpcComponent implements OnInit, OnDestroy, AfterView
     this.showPossibleRelationshipsSection = prefs.showPossibleRelationshipsSection;
     this.showDisclosedSection = prefs.showDisclosedSection;
 
-    // collapse or expand specific setions
+    // collapse or expand specific sections
     this.graphSectionCollapsed = prefs.graphSectionCollapsed;
     this.recordsSectionCollapsed = prefs.recordsSectionCollapsed;
     this.possibleMatchesSectionCollapsed = prefs.possibleMatchesSectionCollapsed;

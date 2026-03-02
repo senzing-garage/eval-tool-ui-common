@@ -271,6 +271,7 @@
     "dist/**",
     "docs/**",
     "e2e/data/**",
+    "e2e/tests/**",
     "examples/**",
     "node_modules/**",
     "packages/**",

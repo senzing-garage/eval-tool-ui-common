@@ -78,7 +78,7 @@ export class SzEntityDetailSectionCollapsibleCardComponentGrpc implements OnInit
   @Input()
   set expanded(value) {
     this.isOpen = value;
-    // publish event change emmitter
+    // publish event change emitter
     this.onCollapsedChange.emit(!this.isOpen);
   }
   /**

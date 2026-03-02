@@ -129,7 +129,7 @@ export class SzHowNavComponent implements OnInit, OnDestroy {
         }
         return retVal;
     }
-    /** gets the total number of steps where two virtual entitities where merged together */
+    /** gets the total number of steps where two virtual entities where merged together */
     get numberOfMergeSteps(): number {
         let retVal = 0;
         if(this.mergeSteps) {
@@ -211,7 +211,7 @@ export class SzHowNavComponent implements OnInit, OnDestroy {
     /** @internal */
     private _filterByVirtualEntityCreation: boolean     = false;
     /** @internal */
-    private _filterByMergeInterimEntitites: boolean     = false;
+    private _filterByMergeInterimEntities: boolean     = false;
     /** @internal */
     private _filterByAddRecordtoVirtualEntity: boolean  = false;
     /** @internal */
@@ -226,7 +226,7 @@ export class SzHowNavComponent implements OnInit, OnDestroy {
         /** whether or not to include steps that created a new virtual entity  */
         get filterByVirtualEntityCreation(): boolean       { return this._filterByVirtualEntityCreation; }
         /** whether or not to include steps that merged one or more virtual entities */
-        get filterByMergeInterimEntitites(): boolean       { return this._filterByMergeInterimEntitites; }
+        get filterByMergeInterimEntities(): boolean       { return this._filterByMergeInterimEntities; }
         /** whether or not to include steps where a record was added to a virtual entity */
         get filterByAddRecordtoVirtualEntity(): boolean    { return this._filterByAddRecordtoVirtualEntity; }
         /** whether or not to include steps where names where not a close or same match */
@@ -246,8 +246,8 @@ export class SzHowNavComponent implements OnInit, OnDestroy {
             this._filterByVirtualEntityCreation = parseBool(value);
         }
         /** whether or not to include steps that merged one or more virtual entities */
-        @Input() set filterByMergeInterimEntitites(value: boolean | undefined) {
-            this._filterByMergeInterimEntitites = parseBool(value);
+        @Input() set filterByMergeInterimEntities(value: boolean | undefined) {
+            this._filterByMergeInterimEntities = parseBool(value);
         }
         /** whether or not to include steps where a record was added to a virtual entity */
         @Input() set filterByAddRecordtoVirtualEntity(value: boolean | undefined) {
@@ -317,7 +317,7 @@ export class SzHowNavComponent implements OnInit, OnDestroy {
                 _hasParamsChecked = true;
                 _inc = _inc || step.actionType == SzResolutionStepDisplayType.ADD;
             }
-            if(this._filterByMergeInterimEntitites) {
+            if(this._filterByMergeInterimEntities) {
                 _hasParamsChecked = true;
                 _inc = _inc || step.actionType == SzResolutionStepDisplayType.MERGE;
             }

@@ -171,12 +171,12 @@ export class SzSearchService {
     let _retSubject = new Subject<SzSdkEntityResponse[]>();
     let _retVal     = _retSubject.asObservable();
 
-    let _listOfObserveables = entityIds.map((eId) => {
+    let _listOfObservables = entityIds.map((eId) => {
       //return this.engineService.getEntityByEntityId(eId, detailLevel, undefined, undefined, undefined, undefined, withRelatedStr)
       return this.engineService.getEntityByEntityId(eId)
     })
 
-    forkJoin(_listOfObserveables).pipe(
+    forkJoin(_listOfObservables).pipe(
       map((res: SzSdkEntityResponse[]) => {
         return res.map((res: SzSdkEntityResponse) => (res as SzSdkEntityResponse))
       })
@@ -247,7 +247,7 @@ export class SzSearchService {
   public getGraphNetworkData(entityIds: Array<string | number>, maxDegrees: number, buildOut: number, maxEntities: number): Observable<SzNetworkGraphCompositeResponse> {
     console.log(`!!!!!!!!!!!!!!!!! getNetworkCompositeGrpc !!!!!!!!!!!!!!!!!`);
     let returnSubject     = new Subject<SzNetworkGraphCompositeResponse>();
-    let returnObserveable = returnSubject.asObservable();
+    let returnObservable = returnSubject.asObservable();
     if(console.time){
       try {
         console.time('graph data')
@@ -316,7 +316,7 @@ export class SzSearchService {
       console.log(`!!!!!!!!!!!!!! getGraphEntityNetwork: SWEET !!!!!!!!!!!!!!`, originalData, _data );
       returnSubject.next(_data);
     });
-    return returnObserveable;
+    return returnObservable;
   }
 
   /**

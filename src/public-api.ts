@@ -81,7 +81,7 @@ export { SzBulkDataAnalysis } from './lib/models/data-analysis';
 export { SzBulkLoadStatus } from './lib/models/data-importing';
 export { SzEntitySearchParams } from './lib/models/entity-search';
 export { SzEntityDetailSectionData } from './lib/models/entity-detail-section-data';
-export { SzSearchResultEntityData } from './lib/models/responces/search-results/sz-search-result-entity-data';
+export { SzSearchResultEntityData } from './lib/models/responses/search-results/sz-search-result-entity-data';
 export { SzDataSourceRecordAnalysis, SzDataSourceComposite } from './lib/models/data-sources';
 export { SzGraphTooltipEntityModel, SzGraphTooltipLinkModel, SzGraphNodeFilterPair, SzMatchKeyComposite, SzMatchKeyTokenComposite, SzEntityNetworkMatchKeyTokens, SzMatchKeyTokenFilterScope } from './lib/models/graph';
 export { SzNetworkGraphInputs } from './lib/models/SzNetworkGraph'

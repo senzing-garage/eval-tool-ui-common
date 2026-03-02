@@ -397,14 +397,14 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
     return <FormArray>this.filterByMatchKeyTokensForm.get('matchkeytokens');
   }*/
 
-  // --------------------------------- event emmitters and subjects ----------------------
+  // --------------------------------- event emitters and subjects ----------------------
   /**
-   * emmitted when a property has been changed.
+   * emitted when a property has been changed.
    * used mostly for diagnostics.
    */
   @Output()
   public prefsChange: EventEmitter<SzSdkPrefsModel> = new EventEmitter<SzSdkPrefsModel>();
-  /** inheirited from "SzEntityDetailGraphControlComponent" code. wanted it to be interchangeable */
+  /** inherited from "SzEntityDetailGraphControlComponent" code. wanted it to be interchangeable */
   @Output() public optionChanged = new EventEmitter<{name: string, value: any}>();
   /** emitted when the user clicks the export button */
   @Output() public exportGraph = new EventEmitter<void>();
@@ -465,7 +465,7 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
 
   // --------------------------------- start event handlers -----------------------
 
-  /** handler for when a filter by datasouce value in the "filterByDataSourcesForm" has changed */
+  /** handler for when a filter by datasource value in the "filterByDataSourcesForm" has changed */
   onDsFilterChange(dsValue: string, evt?) {
     const filteredDataSourceNames = this.filterByDataSourcesForm.value.datasources
       .map((v, i) => v ? null : this.dataSources[i].name)
@@ -529,7 +529,7 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
         // add to included token list
         _matchKeyTokensIncludedMemCopy.push( mkName );
         this.prefs.graph.matchKeyCoreTokensIncluded = _matchKeyTokensIncludedMemCopy;
-        console.log(`@senzing/eval-tool-ui-common/sz-entity-detail-graph-filter.onCoreMkTagFilterToggle: addeded ${mkName}(${_existingKeyPos}) to cloud value`,_matchKeyTokensIncludedMemCopy);
+        console.log(`@senzing/eval-tool-ui-common/sz-entity-detail-graph-filter.onCoreMkTagFilterToggle: added ${mkName}(${_existingKeyPos}) to cloud value`,_matchKeyTokensIncludedMemCopy);
       }
     } else {
       console.log(`matchKeyCoreTokensIncluded: ${this.matchKeyCoreTokensIncluded}`);

@@ -99,7 +99,7 @@ export class SzGrpcConfig {
     }
     verifyConfig() {
         let retVal  = new Subject<any>();
-        console.log(`verifying througb grpc...`);
+        console.log(`verifying through grpc...`);
 
         this.config.verifyConfig().then((configResp) => {
             retVal.next(configResp);

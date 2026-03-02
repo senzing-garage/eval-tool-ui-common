@@ -210,12 +210,12 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
   };
   public entityId: number | undefined;
   chart: any;
-  /** whethor or not to show the tooltip */
+  /** whether or not to show the tooltip */
   tooltipShowing      = false;
   graphData: any;
   /** tooltip data for entity hover */
   public toolTipEntData: SzGraphTooltipEntityModel | undefined;
-  /** tooltip daata for entity relationship links */
+  /** tooltip data for entity relationship links */
   public toolTipLinkData: SzGraphTooltipLinkModel | undefined;
   /** data used to populate tooltip template, switched ref to either "toolTipEntData" or "toolTipLinkData" */
   public toolTipData: SzGraphTooltipEntityModel | SzGraphTooltipLinkModel | undefined;
@@ -235,31 +235,31 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
 
   /** @internal */
   private _dataRequested  = new BehaviorSubject<boolean>(false);
-  /** observeable for when new data has been requested from the api */
+  /** observable for when new data has been requested from the api */
   public dataRequested    = this._dataRequested.asObservable();
   /** @internal */
   private _dataLoaded     = new Subject<SzNetworkGraphInputs>();
-  /** observeable for when data has been updated */
+  /** observable for when data has been updated */
   public dataLoaded       = this._dataLoaded.asObservable();
   /** @internal */
   private _requestStarted: Subject<boolean> = new BehaviorSubject<boolean>(false);
-  /** observeable for when new data has been requested from the api */
+  /** observable for when new data has been requested from the api */
   public requestStarted   = this._requestStarted.asObservable().pipe(filter((value) => value !== false));
   /** @internal */
   private _requestComplete: Subject<boolean> = new BehaviorSubject<boolean>(false);
-  /** observeable stream for the event that occurs when a network api request is completed */
+  /** observable stream for the event that occurs when a network api request is completed */
   public requestComplete  = this._requestComplete.asObservable().pipe(filter((value) => value !== false));
   /** @internal */
   private _renderStarted: Subject<boolean> = new BehaviorSubject<boolean>(false);
-  /** Observeable stream that occurs when the rendering cycle of a graph is in progress */
+  /** Observable stream that occurs when the rendering cycle of a graph is in progress */
   public renderStarted = this._renderStarted.asObservable().pipe(filter((value) => value !== false));
   /** @internal */
   private _renderComplete: Subject<boolean> = new BehaviorSubject<boolean>(false);
-  /** observeable stream for the event that occurs when a draw operation is completed */
+  /** observable stream for the event that occurs when a draw operation is completed */
   public renderComplete = this._renderComplete.asObservable().pipe(filter((value) => value !== false));
   /** @internal */
   private _requestNoResults: Subject<boolean> = new BehaviorSubject<boolean>(false);
-  /** observeable stream for the event that occurs when a request completed but has no results */
+  /** observable stream for the event that occurs when a request completed but has no results */
   public noResults = this._requestNoResults.asObservable().pipe(filter((value) => value !== false));
   /** @internal */
   private _lastPrimaryRequestParameters: {
@@ -270,7 +270,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
   } = undefined;
   /** @internal */
   private _onZoom: Subject<number> = new Subject<number>();
-  /** observeable stream for when the canvas zoom level is changed */
+  /** observable stream for when the canvas zoom level is changed */
   public onZoom: Observable<number> = this._onZoom.asObservable();
 
   /** Event emitter for the event that occurs when a network request is initiated*/
@@ -405,7 +405,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
 
   /**
    * the preserveAspectRatio attribute on the svg element.
-   * @interal
+   * @internal
    */
   private _preserveAspectRatio: string = "xMidYMid meet";
    /**
@@ -633,7 +633,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
     if(value > 0) {
       this._scaleMin = value;
     } else {
-      console.warn('graph minumum zoom cannot be less than 1');
+      console.warn('graph minimum zoom cannot be less than 1');
     }
   }
 
@@ -1593,7 +1593,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
   private getNetworkCompositeGrpc(entityIds: Array<string | number>, maxDegrees: number, buildOut: number, maxEntities: number): Observable<SzNetworkGraphCompositeResponse> {
     console.log(`!!!!!!!!!!!!!!!!! getNetworkCompositeGrpc !!!!!!!!!!!!!!!!!`);
     let returnSubject     = new Subject<SzNetworkGraphCompositeResponse>();
-    let returnObserveable = returnSubject.asObservable();
+    let returnObservable = returnSubject.asObservable();
     if(console.time){
       try {
         console.time('graph data')
@@ -1664,137 +1664,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
       console.log(`!!!!!!!!!!!!!! getGraphEntityNetwork: SWEET !!!!!!!!!!!!!!`, originalData, _data );
       returnSubject.next(_data);
     });
-    return returnObserveable;
-  }
-  /*
-  private getNetworkCompositeLLL(entityIds: Array<string | number>, maxDegrees: number, buildOut: number, maxEntities: number) {
-    let returnSubject     = new Subject<SzEntityNetworkResponse>();
-    let returnObserveable = returnSubject.asObservable();
-    if(console.time){
-      try {
-        console.time('graph composite data')
-        console.time('graph entity data')
-        console.time('graph network data')
-
-      }catch(err){}
-    }
-    this._requestStarted.next(true);
-    this._dataRequested.next(true);
-
-    let entitiesRequests: Observable<SzSdkEntityResponse[]> = this.engineService.getEntitiesByEntityId(
-      entityIds
-    ).pipe(
-      tap(() => {
-        if(console.time){
-          try {
-            console.timeEnd('graph entity data')
-          }catch(err){}
-        }
-      })
-    )
-    let networkRequests: Observable<SzSdkFindNetworkResponse> = this.engineService.findNetworkByEntityId(
-      entityIds,
-      maxDegrees,
-      1,
-      maxEntities
-    ).pipe(
-      tap(() => {
-        if(console.time){
-          try {
-            console.timeEnd('graph network data')
-          }catch(err){}
-        }
-      })
-    )
-
-    forkJoin({
-        entities: entitiesRequests,
-        network: networkRequests,
-        delay: timer(4000)
-      }).subscribe((responses) => {
-        console.log(`!!BLEEEEEEEP!!`, responses);
-
-        console.warn(`got here!`, responses);
-        let entityResp    = responses.entities;
-        let networkResp   = responses.network;
-        //let modifiedResp  = this.mergeEntityResponseWithNetworkResponse(entityResp, networkResp);
-        //console.info('getNetworkComposite: ', responses, modifiedResp);
-        console.info('getNetworkComposite: ', responses);
-
-        if(console.time){
-          try {
-            console.timeEnd('graph composite data')
-          }catch(err){}
-        }
-        //returnSubject.next(modifiedResp);
-    });
-    return returnObserveable
-  }
-  */
-
-
-  /**
-   * make graph network request using input parameters
-   */
-  private getNetworkBlorp(entityIds: Array<number | string>, maxDegrees: number, buildOut: number, maxEntities: number) {
-    let _lastPrimaryRequestParameters = {
-      entityIds: entityIds,
-      maxDegrees: maxDegrees,
-      buildOut: buildOut,
-      maxEntities: maxEntities
-    }
-    let _parametersChanged = false;
-    let _noLastRequestParameters = this._lastPrimaryRequestParameters ? false : true;
-    if(
-      this._lastPrimaryRequestParameters && (
-      this._lastPrimaryRequestParameters.entityIds !== _lastPrimaryRequestParameters.entityIds ||
-      this._lastPrimaryRequestParameters.maxDegrees !== _lastPrimaryRequestParameters.maxDegrees || 
-      this._lastPrimaryRequestParameters.buildOut !== _lastPrimaryRequestParameters.buildOut || 
-      this._lastPrimaryRequestParameters.maxEntities !== _lastPrimaryRequestParameters.maxEntities
-    )) {
-      _parametersChanged = true;
-    }
-
-    let _hasEntityIds = ((entityIds && entityIds.length > 0 && _parametersChanged) || 
-    (entityIds && entityIds.length > 0 && _noLastRequestParameters));
-
-    /*console.log(`getNetwork(${entityIds},${maxDegrees},${buildOut},${maxEntities} | ${this.maxEntities}) | ${this._unlimitedMaxEntities}`, 
-    _parametersChanged, _hasEntityIds, entityIds, entityIds.length,
-    (entityIds && entityIds.length > 0 && _parametersChanged),
-    (entityIds && entityIds.length > 0 && _noLastRequestParameters));*/
-
-    this._lastPrimaryRequestParameters = _lastPrimaryRequestParameters;
-    if(
-      entityIds && entityIds.length > 0 && _parametersChanged || 
-      entityIds && entityIds.length > 0 && _noLastRequestParameters) 
-    {
-      if(console.time){
-        try {
-          console.time('graph data')
-        }catch(err){}
-      }
-      this._requestStarted.next(true);
-      this._dataRequested.next(true);
-      return this.engineService.findNetworkByEntityId(
-        entityIds,
-        maxDegrees,
-        buildOut,
-        maxEntities
-        ).pipe(
-          tap(() => {
-            if(console.time){
-              try {
-                console.timeEnd('graph data')
-              }catch(err){}
-            }
-          })
-        ) ;
-    } else if(!(entityIds && entityIds.length > 0) || !entityIds) {
-      throw new Error('entity ids are required to make "findEntityNetwork" call.');
-    } else {
-      console.log('getNetwork() no refresh');
-      throw new Error('parameters have not changed');
-    }
+    return returnObservable;
   }
 
   private getNextLayerForEntities(_entityIds: Array<string | number>, relationSource?: string | number) {
@@ -2156,7 +2026,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
     }
     // evenly space nodes along arc
     var circleCoord = function(node, circle, index, num_nodes, circleDiameter?: number): SVGPoint {
-      // we take alittle bit off the end otherwise itll count the last part of the path
+      // we take a little bit off the end otherwise itll count the last part of the path
       // which goes from the center to the outer circumference of the circle
       var circumference = circle.node().getTotalLength() - (circleDiameter ? circleDiameter * 2 : 0); 
       var pointAtLength = function(l){return circle.node().getPointAtLength(l)};
@@ -2752,7 +2622,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
     this._expandNodeAndRelated = expandNodeAndRelated;
 
     let onExpandCollapseClick     = (event, d) => {
-      // this handler always superceeds any click events etc
+      // this handler always supersedes any click events etc
       // so we stop propagation
       if(event && event.stopPropagation){ event.stopPropagation(); }
 
@@ -2801,7 +2671,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
       let ringsSortedByDiameter   = nodesCircleSchema.sort((csA, csB) => {
         return csB.diameter - csA.diameter;
       });
-      let inintialClusterOffset   = ringsSortedByDiameter && ringsSortedByDiameter.length > 0 ? ringsSortedByDiameter[0].diameter : 400;
+      let initialClusterOffset   = ringsSortedByDiameter && ringsSortedByDiameter.length > 0 ? ringsSortedByDiameter[0].diameter : 400;
       coreNodes
       .sort((_cnA, _cnB) => d3.descending(_cnA.numberRelated, _cnB.numberRelated))
       .each((_n, _j) => {
@@ -2812,7 +2682,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
         })
         if(anyOtherNodeInSamePosition && _j > 0) {
           // reposition node so it's somewhere else
-          _n.x = inintialClusterOffset + (_j * randomIntBetweenRange(coreClusterSpacing, coreClusterSpacing+300));
+          _n.x = initialClusterOffset + (_j * randomIntBetweenRange(coreClusterSpacing, coreClusterSpacing+300));
           _n.y = (!(_j === 0 || _j % 2 === 0)) ? (0 - randomIntBetweenRange(50, 300)) : (0 + randomIntBetweenRange(150, 300));
         }
       });
@@ -2852,7 +2722,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
     attachEventListenersToNodes(this.node, this._tooltip, this.nodeLabel, this);
     // Make the tooltip visible when mousing over links.
     attachEventListenersToLinks(this.link, this.linkLabel, this._tooltip, this);
-    // when we destroy commponent make sure the listeners are detached
+    // when we destroy component make sure the listeners are detached
     this.unsubscribe$.pipe(
       take(1)
     ).subscribe(() => {
@@ -3093,7 +2963,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
     }) : [];
     /** 
      * TODO: I dunno why but nodes that were previously edge nodes
-     * become core nodes on expansion so the bubble dissapears
+     * become core nodes on expansion so the bubble disappears
      * I just need to fix this issue then code cleanup
      */
     let hasCollapsibleRelationships = collapsibleNodes.length > 0 && !(d.isCoreNode || d.isPrimaryEntity);
@@ -3673,7 +3543,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
           dataSourceClasses = resolvedEntity.RECORD_SUMMARY && resolvedEntity.RECORD_SUMMARY.map ? resolvedEntity.RECORD_SUMMARY.map((ds) => { return (ds.DATA_SOURCE && ds.DATA_SOURCE.toLowerCase) ? `sz-node-ds-${ds.DATA_SOURCE.toLowerCase()}`:`sz-node-ds-${ds.DATA_SOURCE}`; }) : undefined;
         }
 
-        // entitities who use this entity as it's source
+        // entities who use this entity as it's source
         // Create Node
         entityIndex.push(entityId);
         const features = resolvedEntity.FEATURES;
@@ -3971,13 +3841,13 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
     if(data && data.NETWORK_RESPONSES && data.NETWORK_RESPONSES.map) {
       // flatten first
       data.NETWORK_RESPONSES.forEach( (networkResponse: SzSdkFindNetworkResponse) => {
-        const entititiesDS = networkResponse.ENTITIES.map( (entity) => {
+        const entitiesDS = networkResponse.ENTITIES.map( (entity) => {
           if(entity.RESOLVED_ENTITY.RECORD_SUMMARY && entity.RESOLVED_ENTITY.RECORD_SUMMARY.map) {
             return entity.RESOLVED_ENTITY.RECORD_SUMMARY.map( (_ds) => _ds.DATA_SOURCE);
           }
           return entity.RESOLVED_ENTITY.RECORD_SUMMARY;
         });
-        entititiesDS.forEach( (element: string[]) => {
+        entitiesDS.forEach( (element: string[]) => {
           if(element && element.forEach) {
             element.forEach( (_dsString: string) => {
               if(_datasources.indexOf(_dsString) === -1) {
@@ -4225,7 +4095,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
   }
   /**
    * Takes the data from a graph request and scans all entities found for relationship match keys.
-   * match keys found are broken in to constituant tokens and classified as either 
+   * match keys found are broken in to constituent tokens and classified as either 
    * "DISCLOSED" or "DERIVED" types. The members of the return value for "DERIVED" or "DISCLOSED" are
    * arrays of the entity ids found in the data that have that match key token present.
    */

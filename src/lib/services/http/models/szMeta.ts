@@ -53,7 +53,7 @@ export interface SzMeta {
      */
     nativeApiBuildDate?: Date;
     /**
-     * The config compatilibility version of the underlying native Senzing API product.
+     * The config compatibility version of the underlying native Senzing API product.
      */
     configCompatibilityVersion?: string;
     /**

@@ -103,7 +103,7 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
      */
     private _expandCardsWhenLessThan: number  = 2;
 
-    // -------------------------------------------- observeables and emitters --------------------------------------------
+    // -------------------------------------------- observables and emitters --------------------------------------------
     /** @internal */
     private _dataChange: Subject<SzSdkHowEntityResults>           = new Subject<SzSdkHowEntityResults>();
     /** when the data has changed this event is emitted */
@@ -200,7 +200,7 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
 
             if(this._data.FINAL_STATE && this._data.FINAL_STATE.VIRTUAL_ENTITIES.length > 0) {
                 // has at least one final states
-                // for each final state get the virual step
+                // for each final state get the virtual step
                 // and populate the components
                 let _finalStatesData = this._data.FINAL_STATE.VIRTUAL_ENTITIES
                 .filter((fStateObj) => {
@@ -442,7 +442,7 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
     /**
      * @internal
      * recursively scan a nodes children and their childrens children to collect
-     * all virtual entity id's that are decendents of this node
+     * all virtual entity id's that are descendants of this node
      */
     /*
     getVirtualEntityIdsForNode(_rStep?: SzResolutionStepNode): string[] {
@@ -704,7 +704,7 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
         } else if(extendedNode.isInterim) {
           // if the node is an interim node and there are no nodes to traverse
           // then it's probably an interim with just one step(CREATE)
-          // then add node as child of iteself
+          // then add node as child of itself
           extendedNode.children   = [(Object.assign({
             id: step.RESULT_VIRTUAL_ENTITY_ID,
             stepType: stepType,
@@ -757,7 +757,7 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
     private getVirtualEntityDataForSteps(resolutionSteps?: SzSdkHowResolutionStep[], finalVirtualEntities?: SzSdkVirtualEntity[]): Observable<Map<string, SzResolvedVirtualEntity>> {
       let _rParamsByVirtualEntityIds: {[key: string]: Array<[string, string | number]>}  = {};
       let _responseSubject      = new Subject<Map<string, SzResolvedVirtualEntity>>();
-      let _retObserveable       = _responseSubject.asObservable();
+      let _retObservable       = _responseSubject.asObservable();
 
       let addParamsByVirtualEntityIdToMap = (virtualEntity: SzSdkVirtualEntity, mapToAddTo: {[key: string]: Array<[string, string | number]>}) => {
         let _recordParamsForVirtualEntity: Array<[string, string | number]> = [];
@@ -826,7 +826,7 @@ export class SzHowEntityGrpcComponent implements OnInit, OnDestroy {
           _responseSubject.next(retVal);
         });
       }
-      return _retObserveable;
+      return _retObservable;
     }
 
     // -------------------------------- debug methods (delete or comment out for release) --------------------------------

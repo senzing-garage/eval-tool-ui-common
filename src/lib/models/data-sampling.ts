@@ -95,7 +95,7 @@ export interface SzSampleSetEntitiesPage {
      */
     pageSize: number;
     /**
-     * The requested sample size representing the number of entities to be randmonly selected from the page of results.
+     * The requested sample size representing the number of entities to be randomly selected from the page of results.
      */
     sampleSize?: number;
     /**
@@ -167,11 +167,11 @@ export interface SzSampleSetEntityTableRow extends SzSdkResolvedEntity, SzSample
      */
     //recordId?: string;
     /**
-     * The optional match key describing why the record merged into the entity to which it belongs.  This may be absent or `null` if this record belongs to a single-record entity or if it was the inital record of the first multi-record entity to which it belonged (even if it later re-resolved into a larger entity).
+     * The optional match key describing why the record merged into the entity to which it belongs.  This may be absent or `null` if this record belongs to a single-record entity or if it was the initial record of the first multi-record entity to which it belonged (even if it later re-resolved into a larger entity).
      */
     //matchKey?: string;
     /**
-     * The optioanl principle identifying the resolution rule that was used to merge the record into the entity to which it belonss.  This may be absent or `null` if this record belongs to a single-record entity or if it was the inital record of the first multi-record entity to which it belonged (even if it later re-resolved into a larger entity).
+     * The optional principle identifying the resolution rule that was used to merge the record into the entity to which it belongs.  This may be absent or `null` if this record belongs to a single-record entity or if it was the initial record of the first multi-record entity to which it belonged (even if it later re-resolved into a larger entity).
      */
     //principle?: string;
 }

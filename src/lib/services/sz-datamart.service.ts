@@ -487,7 +487,7 @@ export class SzStatSampleSet {
             _retSubject.next(results);
         });
         
-        /*let _listOfObserveables = entityIds.map((eId) => {
+        /*let _listOfObservables = entityIds.map((eId) => {
             return this.engineService.    getEntityByEntityId(eId, flags);
             //return this.entityDataService.getEntityByEntityId(eId, detailLevel, undefined, undefined, undefined, false, withRelatedStr)
         })

@@ -26,7 +26,7 @@ export interface SzEntitiesPage {
      */
     pageSize: number;
     /**
-     * The requested sample size representing the number of entities to be randmonly selected from the page of results.
+     * The requested sample size representing the number of entities to be randomly selected from the page of results.
      */
     sampleSize?: number;
     /**

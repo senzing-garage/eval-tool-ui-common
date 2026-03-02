@@ -114,7 +114,7 @@ export class SzDataMartEnvironment {
                         break;
                     default:
                         if((body as File).type === '' && (body as File).name !== '' && (body as File).name.indexOf('.') > 0) {
-                            // has extenstion
+                            // has extension
                             const fExt = (body as File).name.substring( (body as File).name.indexOf('.')+1 ).toUpperCase();
                             switch(fExt) {
                                 case 'JSONL':

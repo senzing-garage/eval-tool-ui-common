@@ -67,7 +67,7 @@ export class SzGraphComponentGrpc implements OnInit, OnDestroy {
   public isOpen: boolean = true;
 
   /**
-   * Observeable stream for the event that occurs when the graph is
+   * Observable stream for the event that occurs when the graph is
    * rendered for the first time.
    * TODO: remove in next 0.0.7 sdk-graph-components release
    */
@@ -302,7 +302,7 @@ export class SzGraphComponentGrpc implements OnInit, OnDestroy {
    * whether or not to show only match key token chips that apply 
    * to relationships between entities that are NOT directly related to 
    * the primary entities. ie if the relationship is only between 
-   * a relatiohship between two entities that are not the primary queried 
+   * a relationship between two entities that are not the primary queried 
    * entity. 
    */
   @Input() public set showExtraneousMatchKeyTokenChips(value: boolean | string) {
@@ -316,7 +316,7 @@ export class SzGraphComponentGrpc implements OnInit, OnDestroy {
    * whether or not to show only match key token chips that apply 
    * to relationships between entities that are NOT directly related to 
    * the primary entities. ie if the relationship is only between 
-   * a relatiohship between two entities that are not the primary queried 
+   * a relationship between two entities that are not the primary queried 
    * entity. 
    */
   public get showExtraneousMatchKeyTokenChips(): boolean {
@@ -467,23 +467,23 @@ export class SzGraphComponentGrpc implements OnInit, OnDestroy {
   /** @internal */
   private _requestNoResults: Subject<boolean> = new Subject<boolean>();
   /**
-   * Observeable stream for the event that occurs when a network
+   * Observable stream for the event that occurs when a network
    * request is initiated
    */
   @Output() public requestStarted: EventEmitter<boolean> = new EventEmitter<boolean>();
   /**
-   * Observeable stream for the event that occurs when a network
+   * Observable stream for the event that occurs when a network
    * request is completed
    */
   @Output() public requestComplete: EventEmitter<boolean> = new EventEmitter<boolean>();
   /**
-   * Observeable stream for the event that occurs when a draw
+   * Observable stream for the event that occurs when a draw
    * operation is completed
    */
   @Output() public renderStarted: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output() public renderComplete: EventEmitter<boolean> = new EventEmitter<boolean>();
   /**
-   * Observeable stream for the event that occurs when a
+   * Observable stream for the event that occurs when a
    * request completed but has no results
    */
   @Output() public requestNoResults: EventEmitter<boolean> = new EventEmitter<boolean>();
@@ -539,7 +539,7 @@ export class SzGraphComponentGrpc implements OnInit, OnDestroy {
     this.entityDblClick.emit(event);
   }
 
-  /** event is emitted when the collection of datasources present in graph dislay change*/
+  /** event is emitted when the collection of datasources present in graph display change*/
   @Output() dataSourcesChange: EventEmitter<any> = new EventEmitter<string[]>();
   /** event is emitted when the graph components data is updated or loaded */
   @Output() dataLoading: EventEmitter<boolean> = new EventEmitter<boolean>();
@@ -547,9 +547,9 @@ export class SzGraphComponentGrpc implements OnInit, OnDestroy {
   @Output() dataLoaded: EventEmitter<SzNetworkGraphCompositeResponse> = new EventEmitter<SzNetworkGraphCompositeResponse>();
   /** event is emitted when the graph components data is updated or loaded */
   @Output() dataUpdated: EventEmitter<SzNetworkGraphCompositeResponse> = new EventEmitter<SzNetworkGraphCompositeResponse>();
-  /** event is emitted when the collection of matchkeys present in graph dislay change */
+  /** event is emitted when the collection of matchkeys present in graph display change */
   @Output() matchKeysChange: EventEmitter<any> = new EventEmitter<string[]>();
-  /** event is emitted when the collection of matchkey tokens present in graph dislay change */
+  /** event is emitted when the collection of matchkey tokens present in graph display change */
   @Output() matchKeyTokensChange: EventEmitter<any> = new EventEmitter<SzMatchKeyTokenComposite[]>();
   /** event is emitted when a graph pre-flight request is performed */
   @Output() preflightRequestComplete: EventEmitter<any> = new EventEmitter<any>();
