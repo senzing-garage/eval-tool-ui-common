@@ -137,7 +137,7 @@ export class SzGrpcEngineService {
 
     public searchByAttributes(attributes: string | Map<any, any> | {[key: string] : any}, flags: BigInt | number = SzEngineFlags.SZ_SEARCH_BY_ATTRIBUTES_DEFAULT_FLAGS, searchProfile: string = ""): Observable<any | SzError> {
         let retVal = new Subject<string | SzError>();
-        let flags: BigInt = SzEngineFlags.SZ_SEARCH_BY_ATTRIBUTES_DEFAULT_FLAGS | 
+        flags = SzEngineFlags.SZ_SEARCH_BY_ATTRIBUTES_DEFAULT_FLAGS |
         SzEngineFlags.SZ_SEARCH_BY_ATTRIBUTES_STRONG | 
         SzEngineFlags.SZ_INCLUDE_FEATURE_SCORES | 
         SzEngineFlags.SZ_INCLUDE_MATCH_KEY_DETAILS | 
