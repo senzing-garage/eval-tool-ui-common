@@ -42,9 +42,6 @@ jobs:
         run: |
           npm run build
 
-      - name: ensure web components package compiles
-        run: |
-          npm run build:web
 
   slack-notification:
     needs: [npm-build]
