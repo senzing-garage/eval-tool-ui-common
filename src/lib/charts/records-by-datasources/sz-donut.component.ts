@@ -146,6 +146,9 @@ export class SzRecordStatsDonutChart implements OnInit, OnDestroy {
    * @returns error object.
    */
   @Output() exception: EventEmitter<Error> = new EventEmitter<Error>();
+  /** emitted once when the component's initial data has loaded (or errored) */
+  @Output() initialized: EventEmitter<boolean> = new EventEmitter<boolean>();
+  private _initialized = false;
 
   @HostBinding("class.show-hidden") get classMatches() {
     return this._showHiddenDataSources;
@@ -289,9 +292,17 @@ export class SzRecordStatsDonutChart implements OnInit, OnDestroy {
       next: (data) => {
         this.initDonut();
         this.renderDonut(data);
+        if (!this._initialized) {
+          this._initialized = true;
+          this.initialized.emit(true);
+        }
       },
       error: (err) => {
         this.exception.next(err);
+        if (!this._initialized) {
+          this._initialized = true;
+          this.initialized.emit(false);
+        }
       }
     });
 
@@ -317,6 +328,10 @@ export class SzRecordStatsDonutChart implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.exception.next(err);
+        if (!this._initialized) {
+          this._initialized = true;
+          this.initialized.emit(false);
+        }
       }
     });
 
@@ -334,6 +349,10 @@ export class SzRecordStatsDonutChart implements OnInit, OnDestroy {
       error: (err) => {
         console.error(`huh? `, err);
         this.exception.next(err);
+        if (!this._initialized) {
+          this._initialized = true;
+          this.initialized.emit(false);
+        }
       }
     });
 

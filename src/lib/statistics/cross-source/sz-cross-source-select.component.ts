@@ -141,6 +141,11 @@ export class SzCrossSourceSelectComponent implements OnInit, AfterViewInit, OnDe
    * @returns error object.
    */
   @Output() exception: EventEmitter<Error> = new EventEmitter<Error>();
+  /** emitted once when the component's initial data has loaded (or errored) */
+  @Output() initialized: EventEmitter<boolean> = new EventEmitter<boolean>();
+  private _initialized = false;
+  private _dataSourcesReceived = false;
+  private _summaryStatsReceived = false;
 
 
   public getDataSourceName(code: string) : string {
@@ -170,13 +175,13 @@ export class SzCrossSourceSelectComponent implements OnInit, AfterViewInit, OnDe
           if(this.dataMartService.summaryStatistics && (this.fromDataSource || this.toDataSource)) {
             this.regenerateDataSourceLists(this._dataSources);
           }
-          //this.dataChanged.next(this._dataSourceCounts);
-          /*if(this._dataSourceCounts && this._dataSources) {
-            this.dataChanged.next(this._dataSourceCounts);
-          }*/
+          this._dataSourcesReceived = true;
+          this._checkInitialized(true);
         },
         error: (err) => {
           this.exception.next(err);
+          this._dataSourcesReceived = true;
+          this._checkInitialized(false);
         }
       });
       // populate initial selections from prefs
@@ -213,6 +218,13 @@ export class SzCrossSourceSelectComponent implements OnInit, AfterViewInit, OnDe
   ngOnDestroy() {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  private _checkInitialized(success: boolean) {
+    if (!this._initialized && this._dataSourcesReceived && this._summaryStatsReceived) {
+      this._initialized = true;
+      this.initialized.emit(success);
+    }
   }
 
   /** proxy handler for when prefs have changed externally */
@@ -272,6 +284,10 @@ export class SzCrossSourceSelectComponent implements OnInit, AfterViewInit, OnDe
   }
   private onSummaryStatsChanged(stats: SzSummaryStats) {
     console.info('onSummaryStatsChanged: ', stats, this.dataMartService);
+    if (stats) {
+      this._summaryStatsReceived = true;
+      this._checkInitialized(true);
+    }
     if(!this.dataMartService.dataSource1) {
       // select a default
       if(this._defaultFromDataSource || this._defaultToDataSource) { 

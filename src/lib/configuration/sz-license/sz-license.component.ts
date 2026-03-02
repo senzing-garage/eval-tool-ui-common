@@ -166,6 +166,11 @@ export class SzLicenseInfoComponent implements OnInit, OnDestroy {
 
   /** when a user clicks the info link inside of a step card this event is emitted*/
   @Output() public upgradeLicense             = new EventEmitter<SzLicenseUpgradeMouseEvent>();
+  /** emitted once when the component's initial data has loaded (or errored) */
+  @Output() initialized: EventEmitter<boolean> = new EventEmitter<boolean>();
+  private _initialized = false;
+  private _countStatsReceived = false;
+  private _licenseReceived = false;
 
   //@Input() format = 'small';
   constructor(
@@ -188,12 +193,22 @@ export class SzLicenseInfoComponent implements OnInit, OnDestroy {
       if(this._countStats.totalRecordCount) {
         this._recordCount = this._countStats.totalRecordCount;
       }
+      this._countStatsReceived = true;
+      this._checkInitialized(true);
     });
     this.productService.getLicense().pipe(
        takeUntil(this.unsubscribe$)
-    ).subscribe((resp: SzProductLicenseResponse) => {
-      this._licenseInfo = resp;
-      console.log(`license info: `, this._licenseInfo);
+    ).subscribe({
+      next: (resp: SzProductLicenseResponse) => {
+        this._licenseInfo = resp;
+        console.log(`license info: `, this._licenseInfo);
+        this._licenseReceived = true;
+        this._checkInitialized(true);
+      },
+      error: () => {
+        this._licenseReceived = true;
+        this._checkInitialized(false);
+      }
     })
     // if "openUpgradeButtonLink" is true then redirect to senzing.com on click
     this.upgradeLicense.pipe(
@@ -213,6 +228,13 @@ export class SzLicenseInfoComponent implements OnInit, OnDestroy {
     ).subscribe(() => {
       this.dmService.getLoadedStatistics().pipe(take(1)).subscribe();
     });
+  }
+
+  private _checkInitialized(success: boolean) {
+    if (!this._initialized && this._countStatsReceived && this._licenseReceived) {
+      this._initialized = true;
+      this.initialized.emit(success);
+    }
   }
 
   public handleUpgradeButtonClicked(event: Event) {

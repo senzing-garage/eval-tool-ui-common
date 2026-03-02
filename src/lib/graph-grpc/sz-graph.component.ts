@@ -554,6 +554,9 @@ export class SzGraphComponentGrpc implements OnInit, OnDestroy {
   /** event is emitted when a graph pre-flight request is performed */
   @Output() preflightRequestComplete: EventEmitter<any> = new EventEmitter<any>();
   @Output() totalRelationshipsCountUpdated: EventEmitter<number> = new EventEmitter<number>();
+  /** emitted once when the component's initial data has loaded (or errored) */
+  @Output() initialized: EventEmitter<boolean> = new EventEmitter<boolean>();
+  private _initialized = false;
 
   private getMatchKeyTokenComposites(data: SzEntityNetworkMatchKeyTokens): Array<SzMatchKeyTokenComposite> {
     let retVal: Array<SzMatchKeyTokenComposite> = [];
@@ -851,12 +854,20 @@ export class SzGraphComponentGrpc implements OnInit, OnDestroy {
       ).subscribe( (args) => {
         this.requestNoResults.emit(args);
         this.noResults.emit(args);
+        if (!this._initialized) {
+          this._initialized = true;
+          this.initialized.emit(true);
+        }
       });
       this.graphNetworkComponent.onDataLoaded.pipe(
         takeUntil(this.unsubscribe$)
       ).subscribe( (args) => {
           //console.log('[STANDALONE GRAPH] onDataLoaded', args);
           this.dataLoaded.emit(args.data);
+          if (!this._initialized) {
+            this._initialized = true;
+            this.initialized.emit(true);
+          }
       });
       this.graphNetworkComponent.onDataRequested.pipe(
         takeUntil(this.unsubscribe$)

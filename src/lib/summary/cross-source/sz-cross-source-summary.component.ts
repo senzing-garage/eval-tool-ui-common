@@ -168,6 +168,9 @@ export class SzCrossSourceSummaryComponent implements OnInit, OnDestroy {
   @Output() summaryDiagramClick: EventEmitter<any> = new EventEmitter();
   /** when a datasource section on one side or both of the venn diagram is clicked this event is emitted */
   @Output() sourceStatisticClicked: EventEmitter<SzCrossSourceSummarySelectionClickEvent> = new EventEmitter();
+  /** emitted once when the component's initial data has loaded (or errored) */
+  @Output() initialized: EventEmitter<boolean> = new EventEmitter<boolean>();
+  private _initialized = false;
 
   /** if singular datasource set css class 'singular' on host */
   @HostBinding("class.singular") get classSingular() {
@@ -245,9 +248,19 @@ export class SzCrossSourceSummaryComponent implements OnInit, OnDestroy {
       take(1),
       takeUntil(this.unsubscribe$),
     ).subscribe({
-      next: this.onCrossSourceDataChanged.bind(this),
+      next: (data) => {
+        this.onCrossSourceDataChanged(data as SzCrossSourceSummaryResponses);
+        if (!this._initialized) {
+          this._initialized = true;
+          this.initialized.emit(true);
+        }
+      },
       error: (err) => {
         console.warn('error: ',err);
+        if (!this._initialized) {
+          this._initialized = true;
+          this.initialized.emit(false);
+        }
       }
     });
   }
