@@ -336,7 +336,7 @@ export class SzEntityRecordCardContentComponentGrpc implements OnInit {
           retVal[0] = true;
         }
         // name and attr data
-        //let nameAndAttrData = SzEntityRecordCardContentComponentGrpc.getNameDataFromEntity(entity).concat(SzEntityRecordCardContentComponentGrpc.getAattributeDataFromEntity(entity));
+        //let nameAndAttrData = SzEntityRecordCardContentComponentGrpc.getNameDataFromEntity(entity).concat(SzEntityRecordCardContentComponentGrpc.getAttributeDataFromEntity(entity));
         if((featuresByType && featuresByType.has('NAME') &&  featuresByType.get('NAME').length > 0)) {
           retVal[1] = true;
         }
@@ -603,7 +603,7 @@ export class SzEntityRecordCardContentComponentGrpc implements OnInit {
   }
   */
   /*
-  public getAattributeDataFromEntity(entity: SzSdkSearchResolvedEntity | SzResumeRelatedEntity): string[] {
+  public getAttributeDataFromEntity(entity: SzSdkSearchResolvedEntity | SzResumeRelatedEntity): string[] {
     let _featuresByType = this.featuresByType;
     if (entity) {
       if ( entity.characteristicData) {
