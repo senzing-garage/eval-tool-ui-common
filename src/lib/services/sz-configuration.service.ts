@@ -1,5 +1,5 @@
 import { Injectable, Output, Input, Inject } from '@angular/core';
-import { Configuration as SzRestConfiguration, ConfigurationParameters as SzRestConfigurationParameters } from '@senzing/rest-api-client-ng';
+import { SzRestConfiguration, SzRestConfigurationParameters } from '../models/sz-rest-configuration';
 import { Subject } from 'rxjs';
 import { SzPrefsService } from './sz-prefs.service';
 

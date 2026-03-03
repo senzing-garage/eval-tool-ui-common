@@ -5,15 +5,7 @@ import { fromEvent, Subject, Subscription } from 'rxjs';
 import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 
-import {
-  SzEntityData,
-  EntityDataService as SzEntityDataService,
-  SzRelatedEntity,
-  SzEntityRecord,
-  SzRelationshipType,
-  SzEntityIdentifier,
-  SzRecordId
-} from '@senzing/rest-api-client-ng';
+import { SzEntityIdentifier, SzRecordId } from '../../models/grpc/engine';
 import { MatDialog } from '@angular/material/dialog';
 
 //import { SzEntityDetailGraphComponent } from './sz-entity-detail-graph/sz-entity-detail-graph.component';

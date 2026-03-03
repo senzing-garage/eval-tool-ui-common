@@ -1,4 +1,4 @@
-import { SzEntityIdentifier } from "@senzing/rest-api-client-ng"
+import { SzEntityIdentifier } from "./grpc/engine"
 
 export enum SzMatchKeyTokenFilterScope {
   CORE,

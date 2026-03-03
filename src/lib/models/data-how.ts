@@ -1,9 +1,3 @@
-import { 
-    SzResolutionStep, 
-    //SzResolvedEntity, 
-    SzVirtualEntity, 
-    //SzVirtualEntityRecord 
-} from '@senzing/rest-api-client-ng';
 import { SzEntityMouseEvent } from './event-basic-event';
 import { SzSdkHowResolutionStep, SzSdkSearchResolvedEntity, SzSdkVirtualEntity, SzSdkVirtualEntityRecord } from './grpc/engine';
 /** when a user clicks a "more info" link on a step card this event 

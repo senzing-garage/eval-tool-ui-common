@@ -1,9 +1,8 @@
 import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { SzEntityRecord, SzAttributeSearchResult, SzDataSourceRecordSummary } from '@senzing/rest-api-client-ng';
 import { SzPrefsService, SzSearchResultsPrefs } from '../../../services/sz-prefs.service';
 import { Subject } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import { SzSdkSearchRecordSummary, SzSdkSearchResult } from '../../../models/grpc/engine';
+import { SzSdkSearchRecordSummary, SzSdkSearchResult, SzEntityRecord } from '../../../models/grpc/engine';
 import { SzEntityMatchPillComponent } from '../../../entity-grpc/sz-entity-match-pill/sz-entity-match-pill.component';
 
 /**

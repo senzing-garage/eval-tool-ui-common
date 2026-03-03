@@ -2,11 +2,8 @@ import { Injectable } from '@angular/core';
 import { forkJoin, Observable, Subject } from 'rxjs';
 import { map, take, takeUntil, tap } from 'rxjs/operators';
 
-import {
-  SzEntityIdentifiers,
-  SzDetailLevel,
-  SzEntityIdentifier
-} from '@senzing/rest-api-client-ng';
+import { SzEntityIdentifiers, SzEntityIdentifier } from '../models/grpc/engine';
+import { SzDetailLevel } from '../models/grpc/enums';
 import { SzEntitySearchParams } from '../models/entity-search';
 import { SzGrpcEngineService } from './grpc/engine.service';
 import { SzGrpcConfigManagerService } from './grpc/configManager.service';

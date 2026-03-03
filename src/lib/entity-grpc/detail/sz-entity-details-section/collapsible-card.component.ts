@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, ViewChild, C
 import { CommonModule } from '@angular/common';
 
 import { SzSectionDataByDataSource, SzEntityDetailSectionData } from '../../../models/entity-detail-section-data';
-import { SzEntityIdentifier, SzRecordId } from '@senzing/rest-api-client-ng';
+import { SzEntityIdentifier, SzRecordId } from '../../../models/grpc/engine';
 import { SzPrefsService } from '../../../services/sz-prefs.service';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';

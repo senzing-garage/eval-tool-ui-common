@@ -5,7 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenu, MatMenuModule } from '@angular/material/menu';
 import { MatSelect, MatSelectChange, MatSelectModule } from '@angular/material/select';
-import { SzBoundType } from '@senzing/rest-api-client-ng';
+import { SzBoundType } from '../../models/grpc/enums';
 import { SzGraphPrefs, SzPrefsService } from '../../services/sz-prefs.service';
 import { take, takeUntil } from 'rxjs/operators';
 import { Observable, Subject } from 'rxjs';

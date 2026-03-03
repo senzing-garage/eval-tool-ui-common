@@ -4,14 +4,13 @@ import { takeUntil } from 'rxjs/operators';
 
 import { SzSearchResultEntityData } from '../../../models/responses/search-results/sz-search-result-entity-data';
 import { SzEntityDetailSectionData } from '../../../models/entity-detail-section-data';
-import { SzEntityRecord, SzEntityFeature } from '@senzing/rest-api-client-ng';
 import { SzPrefsService } from '../../../services/sz-prefs.service';
 import { CommonModule } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { SzResumeEntity } from '../../../models/SzResumeEntity';
 import { getStringEntityFeatures, getUnmappedJsonDataFields } from '../../../common/entity-utils';
 import { SzGrpcConfigManagerService } from '../../../services/grpc/configManager.service';
-import { SzSdkEntityFeature, SzSdkEntityRecord } from '../../../models/grpc/engine';
+import { SzSdkEntityFeature, SzSdkEntityRecord, SzEntityRecord } from '../../../models/grpc/engine';
 
 /**
  * @internal
@@ -311,7 +310,7 @@ export class SzEntityDetailHeaderContentComponentGrpc implements OnDestroy, OnIn
    */
   private isEntityRecord(data: SzSearchResultEntityData | SzEntityDetailSectionData | SzEntityRecord): data is SzEntityRecord {
     if (data) {
-      return (<SzEntityRecord>data).relationshipData !== undefined && (<SzEntityRecord>data).relationshipData.length > 0;
+      return (data as any).relationshipData !== undefined && (data as any).relationshipData.length > 0;
     }
     return false;
   }

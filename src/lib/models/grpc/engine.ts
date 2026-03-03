@@ -226,3 +226,34 @@ export interface SzGraphNetworkResponse extends SzSdkFindNetworkResponse {
     ENTITY_PATHS: SzSdkFindNetworkNetworkPath[]
 }
 */
+
+/** REST-compatible identifier types — camelCase for backward compatibility with existing component logic */
+export interface SzRecordId {
+    src?: string;
+    id?: string;
+}
+export type SzEntityIdentifier = number | SzRecordId | string;
+export type SzFocusRecordId = string | SzRecordId;
+export type SzEntityIdentifiers = Array<number> | Array<SzRecordId> | Array<string> | Array<SzRecordId | string>;
+export type SzRecordIdentifier = SzRecordId | string;
+export type SzRecordIdentifiers = Array<SzRecordId> | Array<string> | Array<SzRecordId | string>;
+
+/**
+ * Backward-compatible type aliases mapping REST type names to gRPC equivalents.
+ * These allow existing component code to compile while migrating from
+ * @senzing/rest-api-client-ng to local gRPC types.
+ */
+export type SzEntityData = SzSdkEntityResponse;
+export type SzEntityResponse = SzSdkEntityResponse;
+export type SzEntityNetworkData = SzSdkFindNetworkResponse;
+export type SzEntityNetworkResponse = SzSdkFindNetworkResponse;
+export type SzRelatedEntity = SzSdkRelatedEntity;
+export type SzResolvedEntity = SzSdkResolvedEntity;
+export type SzEntityRecord = SzSdkEntityRecord;
+export type SzEntityFeature = SzSdkEntityFeature;
+export type SzDataSourceRecordSummary = SzSdkEntityRecordSummary;
+export type SzEntityPath = SzSdkFindNetworkNetworkPath;
+export type SzHowEntityResult = SzSdkHowEntityResults;
+export type SzResolutionStep = SzSdkHowResolutionStep;
+export type SzVirtualEntity = SzSdkVirtualEntity;
+export type SzRelationshipType = 'POSSIBLE_MATCH' | 'POSSIBLE_RELATION' | 'DISCLOSED_RELATION';

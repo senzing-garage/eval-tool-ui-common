@@ -1,16 +1,11 @@
 import { Injectable, Output, EventEmitter } from '@angular/core';
 
-import {
-  EntityDataService,
-  ConfigService,
-  SzResolvedEntity,
-  SzRelatedEntity
-} from '@senzing/rest-api-client-ng';
+import { SzSdkResolvedEntity, SzSdkRelatedEntity } from '../models/grpc/engine';
 
 /** @internal */
 export interface RelationshipHoverEvent {
-  resolvedEntity: SzResolvedEntity,
-  relatedEntities: SzRelatedEntity[]
+  resolvedEntity: SzSdkResolvedEntity,
+  relatedEntities: SzSdkRelatedEntity[]
 }
 
 /**
@@ -28,7 +23,5 @@ export class SzUIEventService {
   @Output() onRelationshipOver: EventEmitter<RelationshipHoverEvent> = new EventEmitter<RelationshipHoverEvent>();
   @Output() onRelationshipOut: EventEmitter<boolean> = new EventEmitter<boolean>();
 
-  constructor(
-    private entityDataService: EntityDataService,
-    private configService: ConfigService) {}
+  constructor() {}
 }

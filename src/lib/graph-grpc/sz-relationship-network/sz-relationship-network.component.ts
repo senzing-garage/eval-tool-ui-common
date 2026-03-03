@@ -3,20 +3,7 @@ import { CommonModule } from '@angular/common';
 import * as d3 from 'd3';
 import { NodeInfo, LinkInfo } from './graph-types';
 
-import { 
-  EntityGraphService, 
-  EntityDataService, 
-  SzEntityNetworkResponse, 
-  SzEntityNetworkData, 
-  SzRelationshipMode,
-  SzFeatureMode, 
-  SzRelatedEntity, 
-  SzEntityData, 
-  SzEntityIdentifier, 
-  SzEntityPath, 
-  SzDetailLevel,
-  SzEntityResponse
-} from '@senzing/rest-api-client-ng';
+import { SzEntityIdentifier, SzEntityResponse, SzEntityNetworkResponse, SzRelatedEntity, SzEntityData, SzEntityNetworkData, SzEntityPath } from '../../models/grpc/engine';
 import { map, tap, first, takeUntil, take, filter } from 'rxjs/operators';
 import { Subject, Observable, BehaviorSubject, forkJoin, timer, of } from 'rxjs';
 import { parseSzIdentifier, parseBool, isValueTypeOfArray, areArrayMembersEqual } from '../../common/utils';
@@ -1557,13 +1544,16 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
     }
   }
 
+  /** @deprecated Dead code — was used with REST-shaped responses (camelCase properties).
+   * gRPC responses use UPPER_CASE properties. Remove once confirmed unused.
+   */
+  /*
   private mergeEntityResponseWithNetworkResponse(entityResp: SzEntityResponse, networkResp: SzEntityNetworkResponse): SzEntityNetworkResponse {
     let entityData  = entityResp.data;
     let networkData = networkResp.data;
 
     let relatedEntitiesById = {};
     if(entityData.relatedEntities && entityData.relatedEntities.forEach) {
-      // create a entityId to object map for network entities augmentation later
       entityData.relatedEntities.forEach((relEntity: SzRelatedEntity) => {
         if(relEntity) {
           relatedEntitiesById[ relEntity.entityId ] = relEntity;
@@ -1573,8 +1563,6 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
     if(networkData && networkData.entities && networkData.entities.forEach) {
       networkData.entities = networkData.entities.map((networkEntity: SzEntityData) => {
         if(networkEntity.resolvedEntity && networkEntity.resolvedEntity.entityId === entityData.resolvedEntity.entityId){
-          // this is the primary entity
-          // SUPERSIZE IT!
           networkEntity.resolvedEntity   = Object.assign(networkEntity.resolvedEntity, entityData.resolvedEntity);
           networkEntity.relatedEntities  = entityData.relatedEntities;
         }
@@ -1583,11 +1571,11 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
         }
         return networkEntity;
       })
-      // update original payload with modified values
       networkResp.data = networkData;
     }
     return networkResp
   }
+  */
 
   
   private getNetworkCompositeGrpc(entityIds: Array<string | number>, maxDegrees: number, buildOut: number, maxEntities: number): Observable<SzNetworkGraphCompositeResponse> {
@@ -3304,17 +3292,17 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
    * the graph as SzEntityNetworkData formatted data
    * @returns 
    */
-  private asEntityNetworkData(): SzEntityNetworkData {
+  private asEntityNetworkData(): any {
     let returnValue: {
-      entities: Array<SzEntityData>
-      entityPaths: Array<SzEntityPath>
+      entities: any[]
+      entityPaths: any[]
     } = {
       entities: [],
       entityPaths: []
     }
 
     this.node.data().forEach((nodeData) => {
-      let existingIndex = returnValue.entities.findIndex((entObj: SzEntityData) => {
+      let existingIndex = returnValue.entities.findIndex((entObj: any) => {
         return entObj && entObj.resolvedEntity && entObj.resolvedEntity.entityId === nodeData.entityId;
       });
       if(existingIndex < 0) {
@@ -3326,7 +3314,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
     })
 
     this.link.data().forEach((linkData) => {
-      let existingIndex = returnValue.entityPaths.findIndex((linkObj: SzEntityPath) => {
+      let existingIndex = returnValue.entityPaths.findIndex((linkObj: any) => {
         let hasSameSource = linkObj && linkObj.startEntityId && linkObj.startEntityId === linkData.sourceEntityId;
         let hasSameTarget = linkObj && linkObj.endEntityId && linkObj.endEntityId === linkData.targetEntityId;
         return hasSameSource && hasSameTarget;
@@ -3967,21 +3955,21 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
     }
     return _matchkeys;
   }
-  public static getMatchKeysFromEntityData(data: SzEntityData[], coreEntityIds?: SzEntityIdentifier[]): {entityId: string|number, value: string, isCoreRelationship: boolean}[] {
+  public static getMatchKeysFromEntityData(data: any[], coreEntityIds?: SzEntityIdentifier[]): {entityId: string|number, value: string, isCoreRelationship: boolean}[] {
     let _matchkeys = [];
     let _entitiesOnDeck   = [];
     if(data && data.map) {
       // first build a array of all entity Ids present
-      _entitiesOnDeck     = data.map((entity: SzEntityData) => {
+      _entitiesOnDeck     = data.map((entity: any) => {
         return entity.resolvedEntity.entityId;
       });
       if(coreEntityIds) {
         coreEntityIds = coreEntityIds.map(parseSzIdentifier);
       }
-      let _entityRelatedMatchKeys = data.map( (entity) => {
+      let _entityRelatedMatchKeys = data.map( (entity: any) => {
         let retVal = [];
         if(entity && entity.relatedEntities && entity.relatedEntities.map) {
-          retVal = entity.relatedEntities.map( (relatedEntity: SzRelatedEntity) => {
+          retVal = entity.relatedEntities.map( (relatedEntity: any) => {
             let isCoreRelationship = coreEntityIds && coreEntityIds.indexOf ? coreEntityIds.indexOf( entity.resolvedEntity.entityId ) > -1 : false;
             return { entityId: relatedEntity.entityId, value: relatedEntity.matchKey, isCoreRelationship: isCoreRelationship, coreEntities: coreEntityIds, relSource: entity.resolvedEntity.entityId};
           });
@@ -4152,7 +4140,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
     });
     return retValue;
   }
-  private getMatchKeyTokensFromEntityPreflightData(derdah: SzEntityData[], focalEntityIds?: SzEntityIdentifier[]) {
+  private getMatchKeyTokensFromEntityPreflightData(derdah: any[], focalEntityIds?: SzEntityIdentifier[]) {
     let retValue: undefined | SzEntityNetworkMatchKeyTokens = {
       DISCLOSED: {},
       DERIVED: {}

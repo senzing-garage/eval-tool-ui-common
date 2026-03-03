@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, Output, OnInit, OnDestroy, ChangeDetectorRef, HostListener } from '@angular/core';
 import { SzSearchResultEntityData } from '../../../models/responses/search-results/sz-search-result-entity-data';
-import { SzResolvedEntity, SzDataSourceRecordSummary } from '@senzing/rest-api-client-ng';
 import { SzPrefsService } from '../../../services/sz-prefs.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';

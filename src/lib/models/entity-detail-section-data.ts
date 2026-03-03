@@ -1,20 +1,20 @@
-import { SzEntityRecord, SzEntityFeature, SzDataSourceRecordSummary, SzRelatedEntity, SzResolvedEntity } from '@senzing/rest-api-client-ng';
+import { SzSdkEntityRecord, SzSdkEntityFeature, SzSdkEntityRecordSummary, SzSdkRelatedEntity, SzSdkResolvedEntity } from './grpc/engine';
 
 export interface SzSectionDataByDataSource {
   'dataSource'?: string;
-  'records'?: SzEntityRecord[] | SzRelatedEntity[]
+  'records'?: SzSdkEntityRecord[] | SzSdkRelatedEntity[]
 }
 
-export interface SzEntityDetailSectionData extends SzResolvedEntity {
+export interface SzEntityDetailSectionData extends SzSdkResolvedEntity {
   'resolutionRuleCode': string;
   'matchLevel': number;
   'refScore': number;
   'matchKey': string;
-  'recordSummaries': SzDataSourceRecordSummary[];
+  'recordSummaries': SzSdkEntityRecordSummary[];
   'identifierData': string[];
-  'records': SzEntityRecord[];
+  'records': SzSdkEntityRecord[];
   'features'?: {
-    [key: string] : SzEntityFeature[]
+    [key: string] : SzSdkEntityFeature[]
   }
   'bestName': string;
   'characteristicData': string[];

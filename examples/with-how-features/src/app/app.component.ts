@@ -3,12 +3,10 @@ import {
   SzSearchComponent,
   SzSearchService,
   SzPrefsService,
-  SzHowEntityResult,
-  SzResolutionStep
+  SzSdkHowEntityResults,
+  SzSdkHowResolutionStep,
+  SzSdkVirtualEntity
 } from '@senzing/sdk-components-ng';
-import { 
-  SzVirtualEntity 
-} from '@senzing/rest-api-client-ng';
 import { Overlay } from '@angular/cdk/overlay';
 
 @Component({
@@ -25,7 +23,7 @@ export class AppComponent {
   //public currentlySelectedEntityId: number = 200003;
   public currentlySelectedEntityId: number = 200002;
 
-  private howResult: SzHowEntityResult;  
+  private howResult: SzSdkHowEntityResults;
   @ViewChild('howGraph') howGraph: SzSearchComponent;
 
   constructor(
@@ -37,18 +35,18 @@ export class AppComponent {
   ngAfterViewInit() {
   }
 
-  public onDataChange(data: SzHowEntityResult) {
+  public onDataChange(data: SzSdkHowEntityResults) {
     console.log('onDataChange: ',data);
     this.howResult = data;
   }
 
-  public get resolutionStepsByVirtualId(): {[key: string]: SzResolutionStep} {
+  public get resolutionStepsByVirtualId(): {[key: string]: SzSdkHowResolutionStep} {
     if(this.howResult) {
       return this.howResult.resolutionSteps;
     }
     return undefined;
   }
-  public get finalCardsData(): SzVirtualEntity[] {
+  public get finalCardsData(): SzSdkVirtualEntity[] {
     if(this.howResult) {
       return this.howResult.finalStates;
     }

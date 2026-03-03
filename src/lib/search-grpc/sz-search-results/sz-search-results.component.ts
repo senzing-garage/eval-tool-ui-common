@@ -1,17 +1,12 @@
 import { Component, EventEmitter, Input, OnInit, Output, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, TitleCasePipe } from '@angular/common';
 import { SzEntitySearchParams } from '../../models/entity-search';
-import {
-  EntityDataService,
-  SzAttributeSearchResult,
-  SzAttributeSearchResultType,
-  SzEntityIdentifier
-} from '@senzing/rest-api-client-ng';
+import { SzEntityIdentifier } from '../../models/grpc/engine';
 import { SzPrefsService, SzSearchResultsPrefs } from '../../services/sz-prefs.service';
 import { Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
-import { SzWhyEntitiesDialog } from '../../why/sz-why-entities.component';
+import { SzWhyEntitiesGrpcDialog } from '../../why-grpc/sz-why-entities-grpc.component';
 import { SzAlertMessageDialog } from '../../shared/alert-dialog/sz-alert-dialog.component';
 import { parseBool } from '../../common/utils';
 import { howClickEvent } from '../../models/data-how';
@@ -300,7 +295,7 @@ export class SzSearchResultsGrpcComponent implements OnInit, OnDestroy {
 
         this.whyButtonClick.emit(selectedEntityIds);
         if(this._openWhyComparisonModalOnClick) {
-        this.dialog.open(SzWhyEntitiesDialog, {
+        this.dialog.open(SzWhyEntitiesGrpcDialog, {
             panelClass: 'why-entities-dialog-panel',
             minWidth: 800,
             height: 'var(--sz-why-dialog-default-height)',

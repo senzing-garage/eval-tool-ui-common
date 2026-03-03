@@ -3,8 +3,8 @@ import { SzPrefsService } from '../../../services/sz-prefs.service';
 import { SzGraphComponentGrpc } from '../../../graph-grpc/sz-graph.component';
 import { filter, fromEvent, Subject, Subscription, take, takeUntil } from 'rxjs';
 import { TemplatePortal } from '@angular/cdk/portal';
-import { SzEntityIdentifier } from '@senzing/rest-api-client-ng';
-import { SzWhyEntitiesDialog } from '../../../why/sz-why-entities.component';
+import { SzEntityIdentifier } from '../../../models/grpc/engine';
+import { SzWhyEntitiesGrpcDialog } from '../../../why-grpc/sz-why-entities-grpc.component';
 import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { MatDialog } from '@angular/material/dialog';
 import { SzMatchKeyTokenFilterScope } from '../../../models/graph';
@@ -240,7 +240,7 @@ export class SzStandaloneGraphComponent extends SzGraphComponentGrpc implements 
   public openWhyReportForGraphRelationship(event: any) {
     if(event && event.sourceEntityId && event.targetEntityId) {
       this.closeGraphContextMenu();
-      this.dialog.open(SzWhyEntitiesDialog, {
+      this.dialog.open(SzWhyEntitiesGrpcDialog, {
         panelClass: 'why-entities-dialog-panel',
         minWidth: 800,
         height: 'var(--sz-why-dialog-default-height)',
