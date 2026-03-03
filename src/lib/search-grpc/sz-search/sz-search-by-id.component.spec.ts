@@ -1,7 +1,7 @@
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SzSearchByIdGrpcComponent } from './sz-search-by-id.component';
-import { SenzingSdkModule } from 'src/lib/sdk.module';
+import { MOCK_TEST_PROVIDERS } from 'src/lib/testing/mock-grpc-environment';
 
 
 describe('SzSearchByIdComponent', () => {
@@ -10,7 +10,8 @@ describe('SzSearchByIdComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [SenzingSdkModule.forRoot()]
+      imports: [SzSearchByIdGrpcComponent],
+      providers: [...MOCK_TEST_PROVIDERS]
     })
     .compileComponents();
   }));

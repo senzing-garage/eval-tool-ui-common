@@ -1,7 +1,7 @@
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SzGraphComponentGrpc } from './sz-graph.component';
-import { SenzingSdkModule } from 'src/lib/sdk.module';
+import { MOCK_TEST_PROVIDERS } from 'src/lib/testing/mock-grpc-environment';
 
 describe('SzGraphComponent', () => {
   let component: SzGraphComponentGrpc;
@@ -18,7 +18,8 @@ describe('SzGraphComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [SenzingSdkModule.forRoot()]
+      imports: [SzGraphComponentGrpc],
+      providers: [...MOCK_TEST_PROVIDERS]
     })
     .compileComponents();
 

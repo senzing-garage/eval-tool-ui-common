@@ -1,7 +1,7 @@
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SzGraphFilterComponent } from './sz-graph-filter.component';
-import { SenzingSdkModule } from 'src/lib/sdk.module';
+import { MOCK_TEST_PROVIDERS } from 'src/lib/testing/mock-grpc-environment';
 
 describe('SzGraphFilterComponent', () => {
   let component: SzGraphFilterComponent;
@@ -9,7 +9,8 @@ describe('SzGraphFilterComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [SenzingSdkModule.forRoot()]
+      imports: [SzGraphFilterComponent],
+      providers: [...MOCK_TEST_PROVIDERS]
     })
     .compileComponents();
   }));

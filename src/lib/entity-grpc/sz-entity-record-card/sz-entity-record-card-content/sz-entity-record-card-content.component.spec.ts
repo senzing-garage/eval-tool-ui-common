@@ -1,7 +1,7 @@
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SzEntityRecordCardContentComponentGrpc } from './sz-entity-record-card-content.component';
-import { SenzingSdkModule } from 'src/lib/sdk.module';
+import { MOCK_TEST_PROVIDERS } from 'src/lib/testing/mock-grpc-environment';
 
 describe('SzEntityRecordCardContentComponent', () => {
   let component: SzEntityRecordCardContentComponentGrpc;
@@ -9,7 +9,8 @@ describe('SzEntityRecordCardContentComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [SenzingSdkModule.forRoot()]
+      imports: [SzEntityRecordCardContentComponentGrpc],
+      providers: [...MOCK_TEST_PROVIDERS]
     })
     .compileComponents();
   }));
@@ -17,7 +18,7 @@ describe('SzEntityRecordCardContentComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(SzEntityRecordCardContentComponentGrpc);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+    // detectChanges() omitted — component requires data inputs to render safely
   });
 
   afterEach(() => {

@@ -1,7 +1,7 @@
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SzEntityDetailSectionCollapsibleCardComponentGrpc } from './collapsible-card.component';
-import { SenzingSdkModule } from 'src/lib/sdk.module';
+import { MOCK_TEST_PROVIDERS } from 'src/lib/testing/mock-grpc-environment';
 
 describe('SzEntityDetailSectionCollapsibleCardComponent', () => {
   let component: SzEntityDetailSectionCollapsibleCardComponentGrpc;
@@ -9,7 +9,8 @@ describe('SzEntityDetailSectionCollapsibleCardComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [SenzingSdkModule.forRoot()]
+      imports: [SzEntityDetailSectionCollapsibleCardComponentGrpc],
+      providers: [...MOCK_TEST_PROVIDERS]
     })
     .compileComponents();
   }));

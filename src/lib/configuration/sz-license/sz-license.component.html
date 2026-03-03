@@ -1,5 +1,8 @@
 <ul class="license-messages">
-    <li *ngIf="!limitInvalid">
+    <li *ngIf="!limitInvalid && unlimitedLicense">
+        Your license has unlimited records.
+    </li>
+    <li *ngIf="!limitInvalid && !unlimitedLicense">
         <ng-template #evalLicenseUsage [ngIf]="trialLicense" [ngIfElse]="licenseUsage">
             Using {{licenseLimitRatio | percent:'1.0-0'}} of your {{recordLimit | SzShortNumber}} record evaluation license.
         </ng-template>
@@ -25,7 +28,7 @@
         ><span class="warning-prefix">WARNING:</span
         > <span class="warning-message">Your subscription expiration date is invalid.</span
     ></li>
-    <li *ngIf="!limitInvalid && approachingLimit"
+    <li *ngIf="!limitInvalid && !unlimitedLicense && approachingLimit"
       ><span class="material-icons warning-prefix">warning</span
         ><span class="warning-prefix">WARNING:</span
         > <span class="warning-message">You are near your licensed record limit.</span

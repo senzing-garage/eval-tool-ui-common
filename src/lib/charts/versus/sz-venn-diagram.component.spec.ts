@@ -1,10 +1,10 @@
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SzVennDiagramsComponent } from './sz-venn-diagram.component';
-import { SenzingSdkModule } from '../../sdk.module';
 
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { MockTestDataInterceptor } from 'src/lib/interceptors/mock-test-data.interceptor.service';
+import { MOCK_TEST_PROVIDERS } from 'src/lib/testing/mock-grpc-environment';
 
 describe('SzVennDiagramsComponent', () => {
   let component: SzVennDiagramsComponent;
@@ -12,9 +12,8 @@ describe('SzVennDiagramsComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [SenzingSdkModule.forRoot()],
-      providers: [
-        {
+      imports: [SzVennDiagramsComponent],
+      providers: [...MOCK_TEST_PROVIDERS, {
           provide: HTTP_INTERCEPTORS,
           useClass: MockTestDataInterceptor,
           multi: true

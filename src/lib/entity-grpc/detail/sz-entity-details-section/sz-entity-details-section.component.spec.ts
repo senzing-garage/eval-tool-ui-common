@@ -1,7 +1,7 @@
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SzEntityDetailsSectionComponentGrpc } from './sz-entity-details-section.component';
-import { SenzingSdkModule } from 'src/lib/sdk.module';
+import { MOCK_TEST_PROVIDERS } from 'src/lib/testing/mock-grpc-environment';
 
 describe('SzEntityDetailsSectionComponent', () => {
   let component: SzEntityDetailsSectionComponentGrpc;
@@ -9,7 +9,8 @@ describe('SzEntityDetailsSectionComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [SenzingSdkModule.forRoot()]
+      imports: [SzEntityDetailsSectionComponentGrpc],
+      providers: [...MOCK_TEST_PROVIDERS]
     })
     .compileComponents();
   }));
