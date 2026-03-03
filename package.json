@@ -80,7 +80,6 @@
     "@angular/platform-browser": "^19.2.18",
     "@angular/platform-browser-dynamic": "^19.2.18",
     "@angular/router": "^19.2.18",
-    "@senzing/rest-api-client-ng": "^8.0.0",
     "@senzing/sz-sdk-typescript-grpc": "./packages/@senzing/sz-sdk-typescript-grpc/senzing-sz-sdk-typescript-grpc-4.0.0-beta.4.0.tgz",
     "@senzing/sz-sdk-typescript-grpc-web": "./packages/@senzing/sz-sdk-typescript-grpc-web/senzing-sz-sdk-typescript-grpc-web-4.0.0-beta.4.0.tgz",
     "d3": "^7.8.4",

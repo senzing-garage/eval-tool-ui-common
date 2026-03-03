@@ -3,7 +3,6 @@
  */
 
 export * from './lib/sdk.module';
-export * from '@senzing/rest-api-client-ng';
 
 /** utilities */
 export * from './lib/common/utils';
@@ -101,12 +100,6 @@ export { SzShortNumberPipe } from './lib/pipes/shortnumber.pipe'
 export { SzDecimalPercentPipe } from './lib/pipes/decimalpercent.pipe'
 export { SzOrderedMapEntries } from './lib/pipes/mapentries.pipe';
 
-/** why */
-export { SzWhyEntityComponent } from './lib/why/sz-why-entity.component';
-export { SzWhyEntitiesComparisonComponent } from './lib/why/sz-why-entities.component';
-export { SzWhyEntityDialog } from './lib/why/sz-why-entity.component';
-export { SzWhyEntitiesDialog } from './lib/why/sz-why-entities.component';
-
 /** why gRPC */
 export { SzWhyRecordGrpcComponent, SzWhyRecordGrpcDialog } from './lib/why-grpc/sz-why-record-grpc.component';
 export { SzWhyEntitiesGrpcComponent, SzWhyEntitiesGrpcDialog } from './lib/why-grpc/sz-why-entities-grpc.component';
@@ -153,58 +146,7 @@ export { SzGrpcEngineService }  from './lib/services/grpc/engine.service';
 export { SzGrpcProductService }  from './lib/services/grpc/product.service';
 export { SzStatisticsService } from './lib/services/statistics.service';
 
-/** export some members of rest client to ease type use */
-export {
-  Configuration as SzRestConfiguration,
-  ConfigurationParameters as SzRestConfigurationParameters,
-
-  SzAttributeClass,
-  SzAttributeNecessity,
-  SzAttributeSearchResponse,
-  SzAttributeSearchResponseData,
-  SzAttributeSearchResult,
-  SzAttributeSearchResultType,
-  SzAttributeType,
-  SzAttributeTypeResponse,
-  SzAttributeTypeResponseData,
-  SzAttributeTypesResponse,
-  SzAttributeTypesResponseData,
-
-  SzDataSourceRecordSummary,
-  SzDataSourcesResponse,
-  SzDataSourcesResponseData,
-
-  SzEntityData,
-  SzEntityFeature,
-  SzEntityIdentifier,
-  SzEntityIdentifiers,
-  SzEntityNetworkData,
-  SzEntityNetworkResponse,
-  SzEntityPath,
-  SzEntityPathResponse,
-  SzEntityPathData,
-  SzEntityRecord,
-  SzEntityResponse,
-
-  SzError,
-  SzErrorResponse,
-
-  SzLicenseInfo,
-  SzLicenseResponse,
-  SzLicenseResponseData,
-  SzLoadRecordResponse,
-  SzLoadRecordResponseData,
-
-  SzRecordId,
-  SzRecordResponse,
-  SzRecordResponseData,
-
-  SzRelatedEntity,
-  SzRelationshipType,
-  SzResolvedEntity,
-  SzResponseWithRawData,
-
-  SzVersionInfo,
-  SzVersionResponse
-
-} from '@senzing/rest-api-client-ng';
+/** local configuration types (replaces REST client Configuration) */
+export { SzRestConfiguration, SzRestConfigurationParameters } from './lib/models/sz-rest-configuration';
+/** local enum types */
+export * from './lib/models/grpc/enums';

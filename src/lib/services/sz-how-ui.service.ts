@@ -1,12 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject, take, tap } from 'rxjs';
 import { v4 as uuidv4} from 'uuid';
-import {
-  EntityDataService as SzEntityDataService,
-  SzEntityIdentifier,
-  SzResolutionStep,
-  SzHowEntityResponse
-} from '@senzing/rest-api-client-ng';
+import { SzEntityIdentifier } from '../models/grpc/engine';
 //import { SzConfigDataService } from '../services/sz-config-data.service';
 import { SzPrefsService } from './sz-prefs.service';
 import { SzResolutionStepDisplayType, SzResolutionStepListItemType, SzResolutionStepNode } from '../models/data-how';

@@ -5,7 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenu, MatMenuModule } from '@angular/material/menu';
 import { MatSelect, MatSelectChange, MatSelectModule } from '@angular/material/select';
-import { SzBoundType } from '@senzing/rest-api-client-ng';
+import { SzBoundType } from '../../models/grpc/enums';
 import { SzGraphPrefs, SzPrefsService } from '../../services/sz-prefs.service';
 import { take, takeUntil } from 'rxjs/operators';
 import { Observable, Subject } from 'rxjs';
@@ -499,7 +499,7 @@ export class SzCrossSourcePagingComponent implements OnDestroy {
         // we just need to tell the datamart to grab the current page we're
         // on that we don't have data for yet.
         console.log(`goPreviousPage: pageIndex = ${this.pageIndex}`);
-        this.dataMartService.sampleSetBoundType  = this.pageIndex > 0 ? SzBoundType.EXCLUSIVELOWER : SzBoundType.INCLUSIVELOWER;
+        this.dataMartService.sampleSetBoundType  = this.pageIndex > 0 ? SzBoundType.EXCLUSIVE_LOWER : SzBoundType.INCLUSIVE_LOWER;
         this.dataMartService.sampleSetPage = this.pageIndex;
 
         /*this.selectedPage.emit({from: this.firstRecord,
@@ -521,7 +521,7 @@ export class SzCrossSourcePagingComponent implements OnDestroy {
         // we just need to tell the datamart to grab the current page we're
         // on that we don't have data for yet.
         console.log(`goNextPage: pageIndex = ${this.pageIndex}`);
-        this.dataMartService.sampleSetBoundType  = this.pageIndex > 0 ? SzBoundType.EXCLUSIVELOWER : SzBoundType.INCLUSIVELOWER;
+        this.dataMartService.sampleSetBoundType  = this.pageIndex > 0 ? SzBoundType.EXCLUSIVE_LOWER : SzBoundType.INCLUSIVE_LOWER;
         this.dataMartService.sampleSetPage = this.pageIndex;
 
         /*this.selectedPage.emit({from: this.firstRecord,

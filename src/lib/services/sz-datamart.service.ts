@@ -71,7 +71,7 @@ export class SzStatSampleSet {
     private _requestParameters: SzStatSampleSetParameters = {
         pageSize: 1000,
         bound: "0",
-        boundType: SzBoundType.EXCLUSIVELOWER,
+        boundType: SzBoundType.EXCLUSIVE_LOWER,
         statType: SzCrossSourceSummaryCategoryType.MATCHES
     }
 
@@ -95,13 +95,13 @@ export class SzStatSampleSet {
                 console.warn(`!!! changing to last page(${_lastPage}) w/ ${_lastPageSize} results`);
                 this._currentPage   = _lastPage - 1;  // the paging we use is "0" index based
                 this._requestParameters.pageSize = _lastPageSize; // manually set pageSize to skip over result clearing
-                this.boundType      = SzBoundType.INCLUSIVEUPPER;
+                this.boundType      = SzBoundType.INCLUSIVE_UPPER;
                 if(!this._doNotFetchOnParameterChange) this.getSampleDataFromParameters();
             } else if(value === undefined || value === '0' || value === '0:0') {
                 // first page
                 this._currentPage   = 0;
                 this._requestParameters.pageSize = this.prefs.dataMart.samplePageSize; // grab pagesize off of prefs value;
-                this.boundType      = SzBoundType.INCLUSIVELOWER;
+                this.boundType      = SzBoundType.INCLUSIVE_LOWER;
                 console.warn(`!!! changing to page 1: (${this.pageSize})`);
                 if(!this._doNotFetchOnParameterChange) this.getSampleDataFromParameters();
             } else if(!this._doNotFetchOnParameterChange) {
@@ -214,10 +214,10 @@ export class SzStatSampleSet {
 
                 if(this._isRelationsResponse && this._relationPages.has(_pageToFindIndex)) {
                     // grab the "pageMaximumValue" value off of target page -1
-                    _boundType          = SzBoundType.EXCLUSIVELOWER;
+                    _boundType          = SzBoundType.EXCLUSIVE_LOWER;
                     _boundValue         =  this._relationPages.get(_pageToFindIndex).pageMaximumValue;
                 } else if(this._entityPages.has(value)) {
-                    _boundType          = SzBoundType.EXCLUSIVELOWER;
+                    _boundType          = SzBoundType.EXCLUSIVE_LOWER;
                     _boundValue         =  this._entityPages.get(_pageToFindIndex).pageMaximumValue;
 
                 } else if([_cPageParams.pageIndex - 1, _cPageParams.pageIndex + 1].includes(value)) {
@@ -226,10 +226,10 @@ export class SzStatSampleSet {
                     _pageSize   = _cPageParams.bound === 'max:max' ? this.prefs.dataMart.samplePageSize : _cPageParams.pageSize;
                     if(isPrev) {
                         // go prev
-                        _boundType  = SzBoundType.EXCLUSIVEUPPER;
+                        _boundType  = SzBoundType.EXCLUSIVE_UPPER;
                         _boundValue = _cPageParams.pageMinimumValue;
                     } else {
-                        _boundType  = SzBoundType.EXCLUSIVELOWER;
+                        _boundType  = SzBoundType.EXCLUSIVE_LOWER;
                         _boundValue = _cPageParams.pageMaximumValue;
                     }
                 }

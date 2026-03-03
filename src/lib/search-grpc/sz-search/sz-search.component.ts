@@ -7,14 +7,7 @@ import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 import { MatDialog } from '@angular/material/dialog';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 
-import {
-  //ConfigService,
-  Configuration as SzRestConfiguration,
-  ConfigurationParameters as SzRestConfigurationParameters,
-  //SzAttributeSearchResult,
-  //SzAttributeType,
-  //SzAttributeTypesResponse
-} from '@senzing/rest-api-client-ng';
+import { SzRestConfiguration, SzRestConfigurationParameters } from '../../models/sz-rest-configuration';
 
 import { SzEntitySearchParams } from '../../models/entity-search';
 import { SzSearchService } from '../../services/sz-search.service';

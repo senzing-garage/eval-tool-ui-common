@@ -1,7 +1,6 @@
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subject, interval, filter, take, takeUntil } from 'rxjs';
-//import { SzLoadedStats } from '@senzing/rest-api-client-ng';
 
 import { parseBool, parseNumber } from '../../common/utils';
 //import { SzAdminService } from '../../services/sz-admin.service';

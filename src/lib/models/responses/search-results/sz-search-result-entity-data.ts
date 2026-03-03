@@ -1,5 +1,5 @@
 import { SzRawDataMatches } from './raw-data-matches';
-import { SzResolvedEntity, SzRelatedEntity } from '@senzing/rest-api-client-ng';
+import { SzSdkResolvedEntity as SzResolvedEntity, SzSdkRelatedEntity as SzRelatedEntity } from '../../grpc/engine';
 
 export interface SzSearchResultEntityData {
   // required

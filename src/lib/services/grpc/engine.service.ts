@@ -70,6 +70,8 @@ export class SzGrpcEngineService {
         if(this.szEnvironment && this.szEnvironment.engine) {
           this.szEnvironment?.engine?.getEntityByEntityId(entityId, flags).then((resp) => {
             retVal.next(JSON.parse(resp as string));
+          }).catch((err) => {
+            retVal.error(err);
           })
         }
         return retVal.asObservable();
@@ -160,6 +162,8 @@ export class SzGrpcEngineService {
       if(this.szEnvironment && this.szEnvironment.engine) {
         this.szEnvironment?.engine?.getEntityByRecordId(dataSourceCode, recordId, flags).then((resp) => {
           retVal.next(JSON.parse(resp as string));
+        }).catch((err) => {
+          retVal.error(err);
         })
       }
       return retVal.asObservable();

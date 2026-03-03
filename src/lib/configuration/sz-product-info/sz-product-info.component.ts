@@ -3,7 +3,7 @@ import { CommonModule } from "@angular/common";
 import { SzGrpcWebEnvironment, SzGrpcWebEnvironmentOptions } from "@senzing/sz-sdk-typescript-grpc-web";
 import { Subject, take } from "rxjs";
 import { SzGrpcProductService } from "../../services/grpc/product.service";
-import { Configuration as SzRestConfiguration } from "@senzing/rest-api-client-ng";
+import { SzRestConfiguration } from "../../models/sz-rest-configuration";
 
 @Component({
     selector: 'sz-product-info',

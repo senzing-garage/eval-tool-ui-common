@@ -6,7 +6,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatRadioModule } from '@angular/material/radio';
 import { Subject, take, takeUntil, tap } from 'rxjs';
-//import { SzEntityData } from '@senzing/rest-api-client-ng';
 import { SzCrossSourceCount, SzCrossSourceSummaryCategoryType } from '../../models/stats';
 import { SzDataMartService } from '../../services/sz-datamart.service';
 import { isNotNull } from '../../common/utils';

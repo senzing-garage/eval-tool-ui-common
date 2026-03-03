@@ -6,15 +6,7 @@ import { Subject, BehaviorSubject } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';
 import { howClickEvent } from '../../../models/data-how';
 
-import {
-  SzEntityData,
-  SzRelatedEntity,
-  SzEntityRecord,
-  SzRelationshipType,
-  SzEntityFeature,
-  SzResolvedEntity,
-  SzEntityIdentifier
-} from '@senzing/rest-api-client-ng';
+import { SzEntityIdentifier } from '../../../models/grpc/engine';
 
 import { SzRelationshipNetworkComponent } from '../../../graph-grpc/sz-relationship-network/sz-relationship-network.component';
 import { bestEntityName } from '../../../common/entity-utils';
@@ -25,7 +17,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { SzEntityDetailSectionSummaryComponentGrpc } from './summary.component';
 import { SzEntityDetailHeaderContentComponentGrpc } from './content.component';
 import { SzRelatedEntityMatchLevel, SzResumeEntity, SzResumeRelatedEntity } from '../../../models/SzResumeEntity';
-import { SzSdkEntityFeature, SzSdkEntityRecord } from '../../../models/grpc/engine';
+import { SzSdkEntityFeature, SzSdkEntityRecord, SzEntityFeature } from '../../../models/grpc/engine';
 
 /**
  * @internal

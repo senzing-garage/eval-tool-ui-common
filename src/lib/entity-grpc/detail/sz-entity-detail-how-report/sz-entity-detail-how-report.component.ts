@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, ViewChild, ChangeDetectorRef, ElementRef, HostBinding } from '@angular/core';
 import { SzSectionDataByDataSource, SzEntityDetailSectionData } from '../../../models/entity-detail-section-data';
-import { SzEntityIdentifier, SzEntityRecord, SzHowEntityResult, SzRecordId } from '@senzing/rest-api-client-ng';
+import { SzEntityIdentifier, SzRecordId } from '../../../models/grpc/engine';
+import { SzSdkHowEntityResults } from '../../../models/grpc/engine';
 import { SzPrefsService } from '../../../services/sz-prefs.service';
 import { take, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
@@ -119,10 +120,10 @@ export class SzEntityDetailHowReportComponent implements OnDestroy, OnInit {
     this.isOpen = false;
   }
 
-  onDataChange(howData: SzHowEntityResult) {
+  onDataChange(howData: SzSdkHowEntityResults) {
     console.log(`@senzing/eval-tool-ui-common/sz-entity-detail-section-how-report/onDataChange: `, howData);
-    if(howData && howData.resolutionSteps && Object.keys(howData.resolutionSteps).length) {
-        this._stepCount = Object.keys(howData.resolutionSteps).length;
+    if(howData && howData.RESOLUTION_STEPS && howData.RESOLUTION_STEPS.length) {
+        this._stepCount = howData.RESOLUTION_STEPS.length;
     }
   }
 

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, Inject, Input, Output, EventEmitter } from '@angular/core';
-import { Configuration as SzRestConfiguration } from '@senzing/rest-api-client-ng';
+import { SzRestConfiguration } from '../../../models/sz-rest-configuration';
 
 /**
  * A special object that abstracts away the model management and eventing

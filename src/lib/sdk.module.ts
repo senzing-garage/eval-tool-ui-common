@@ -7,11 +7,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { LayoutModule } from '@angular/cdk/layout';
 import { NgxJsonViewerModule } from 'ngx-json-viewer';
 
-import {
-  ApiModule,
-  Configuration as SzRestConfiguration,
-  ConfigurationParameters as SzRestConfigurationParameters
-} from '@senzing/rest-api-client-ng';
+import { SzRestConfiguration, SzRestConfigurationParameters } from './models/sz-rest-configuration';
 import { SzSdkMaterialModule } from './sdk.material.module';
 
 /** services */
@@ -92,12 +88,8 @@ import { SzPreferencesComponent } from './configuration/sz-preferences/sz-prefer
 //import { SzSearchResultCardComponent } from '../../deprecated/search/sz-search-result-card/sz-search-result-card.component';
 //import { SzSearchResultCardContentComponent } from '../../deprecated/search/sz-search-result-card/sz-search-result-card-content/sz-search-result-card-content.component';
 //import { SzSearchResultCardHeaderComponent } from '../../deprecated/search/sz-search-result-card/sz-search-result-card-header/sz-search-result-card-header.component';
-// why related
-import { SzWhyEntityComponent } from './why/sz-why-entity.component';
-import { SzWhyEntitiesComparisonComponent } from './why/sz-why-entities.component';
-import { SzWhyEntityDialog } from './why/sz-why-entity.component';
-import { SzWhyEntitiesDialog } from './why/sz-why-entities.component';
-import { SzWhyReportBaseComponent } from './why/sz-why-report-base.component';
+// why related — legacy REST-based components moved to deprecated/
+// Use why-grpc/ components instead
 // how related
 //import { SzHowEntityComponent } from './how/sz-how-entity.component';
 //import { SzHowFinalEntityCardComponent } from './how/cards/sz-how-final-entity-card.component';
@@ -238,11 +230,6 @@ const SzGrpcEnvInjector = new InjectionToken<SzGrpcWebEnvironment>("SzGrpcWebEnv
         SzTooltipComponent,
         SzTooltipDirective,
         //SzVennDiagramsComponent,
-        SzWhyEntitiesComparisonComponent,
-        SzWhyEntityComponent,
-        SzWhyEntitiesDialog,
-        SzWhyEntityDialog,
-        SzWhyReportBaseComponent
     ],
     exports: [
         SzAlertMessageDialog,
@@ -286,10 +273,6 @@ const SzGrpcEnvInjector = new InjectionToken<SzGrpcWebEnvironment>("SzGrpcWebEnv
         //SzSearchResultCardComponent,
         //SzStandaloneGraphComponent,
         //SzVennDiagramsComponent,
-        SzWhyEntitiesComparisonComponent,
-        SzWhyEntityComponent,
-        SzWhyEntitiesDialog,
-        SzWhyEntityDialog,
         SzPreferencesComponent
     ], imports: [
         CommonModule,
@@ -298,7 +281,6 @@ const SzGrpcEnvInjector = new InjectionToken<SzGrpcWebEnvironment>("SzGrpcWebEnv
         ReactiveFormsModule,
         LayoutModule,
         NgxJsonViewerModule,
-        ApiModule,
         SzSdkMaterialModule], providers: [
         //SzConfigDataService,
         SzConfigurationService,
@@ -317,8 +299,8 @@ const SzGrpcEnvInjector = new InjectionToken<SzGrpcWebEnvironment>("SzGrpcWebEnv
     ] })
 export class SenzingSdkModule {
   /**
-   * initialize the SenzingSdkModule with an optional factory method that returns a {@link https://senzing.github.io/rest-api-client-ng/classes/Configuration.html|SzRestConfiguration} instance.
-   * @see {@link https://senzing.github.io/rest-api-client-ng/classes/Configuration.html|SzRestConfiguration}
+   * initialize the SenzingSdkModule with an optional factory method that returns a SzRestConfiguration instance.
+   * @see SzRestConfiguration
    * @example
    export function SzRestConfigurationFactory() {
       return new SzRestConfiguration({ basePath: \"myapiserverhostname.com:8080\", withCredentials: true });
