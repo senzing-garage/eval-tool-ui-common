@@ -1,6 +1,6 @@
 import { Provider, EnvironmentProviders } from '@angular/core';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
-import { Configuration as SzRestConfiguration } from '@senzing/rest-api-client-ng';
+import { SzRestConfiguration } from '../models/sz-rest-configuration';
 import { SzDataMartEnvironment } from '../services/http/sz-datamart-environment';
 
 /**
