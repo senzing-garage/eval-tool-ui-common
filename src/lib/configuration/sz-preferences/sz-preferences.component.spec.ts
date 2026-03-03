@@ -4,6 +4,7 @@ import { By } from '@angular/platform-browser';
 import { SzSdkPrefsModel, SzPrefsService } from '../../services/sz-prefs.service';
 import { SzPreferencesComponent } from './sz-preferences.component';
 import { SenzingSdkModule } from '../../sdk.module';
+import { MOCK_TEST_PROVIDERS } from 'src/lib/testing/mock-grpc-environment';
 
 describe('SzPreferencesComponent', () => {
   let component: SzPreferencesComponent;
@@ -11,7 +12,8 @@ describe('SzPreferencesComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [SenzingSdkModule.forRoot()]
+      imports: [SenzingSdkModule.forRoot()],
+      providers: [...MOCK_TEST_PROVIDERS]
     })
     .compileComponents();
   }));

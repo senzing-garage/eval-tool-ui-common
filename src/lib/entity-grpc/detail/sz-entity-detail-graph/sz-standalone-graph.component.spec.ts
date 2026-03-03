@@ -1,7 +1,7 @@
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SzStandaloneGraphComponent } from './sz-standalone-graph.component';
-import { SenzingSdkModule } from 'src/lib/sdk.module';
+import { MOCK_TEST_PROVIDERS } from 'src/lib/testing/mock-grpc-environment';
 
 describe('SzStandaloneGraphComponent', () => {
   let component: SzStandaloneGraphComponent;
@@ -18,7 +18,8 @@ describe('SzStandaloneGraphComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [SenzingSdkModule.forRoot()]
+      imports: [SzStandaloneGraphComponent],
+      providers: [...MOCK_TEST_PROVIDERS]
     })
     .compileComponents();
 
