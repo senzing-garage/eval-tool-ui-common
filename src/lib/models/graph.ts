@@ -1,4 +1,4 @@
-import { SzEntityIdentifier } from "@senzing/rest-api-client-ng"
+import { SzEntityIdentifier, SzSdkRelatedEntity, SzSdkResolvedEntity } from "./grpc/engine"
 
 export enum SzMatchKeyTokenFilterScope {
   CORE,
@@ -58,7 +58,20 @@ export interface SzEntityNetworkMatchKeyTokens {
   }
 }
 
-/*export interface SzNetworkGraphInputs {
-  data;
-  showLinkLabels: boolean;
-}*/
+/** Entity wrapper used by the graph's internal camelCase data model (e.g. asEntityNetworkData). */
+export interface SzGraphEntityWrapper {
+  resolvedEntity: SzSdkResolvedEntity;
+  relatedEntities: SzSdkRelatedEntity[];
+}
+
+/** Path between two entities in the graph's internal data model. */
+export interface SzGraphEntityPath {
+  startEntityId: number;
+  endEntityId: number;
+}
+
+/** Return type of SzRelationshipNetworkComponent.asEntityNetworkData(). */
+export interface SzGraphEntityNetworkData {
+  entities: SzGraphEntityWrapper[];
+  entityPaths: SzGraphEntityPath[];
+}

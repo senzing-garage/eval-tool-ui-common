@@ -583,8 +583,8 @@ export class SzSearchByIdGrpcComponent implements OnInit, OnDestroy {
           this.searchEnd.emit(totalResults);
         },
         error:(err)=> {
-          //this.requestEnd.emit( err );
-          this.exception.next( err );
+          this.searchEnd.emit(0);
+          this.exception.emit( err );
         }
       });
 

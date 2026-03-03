@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Inpu
 import { SzEntityDetailSectionData } from '../../../models/entity-detail-section-data';
 import { Subject, BehaviorSubject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { SzRelatedEntity, SzEntityRecord, SzAttributeSearchResult, SzEntityIdentifier } from '@senzing/rest-api-client-ng';
+import { SzEntityIdentifier, SzEntityRecord } from '../../../models/grpc/engine';
 import { SzPrefsService } from '../../../services/sz-prefs.service';
 import { howClickEvent } from '../../../models/data-how';
 import { SzSdkSearchResult } from '../../../models/grpc/engine';

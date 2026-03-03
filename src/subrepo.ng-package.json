@@ -9,7 +9,6 @@
     "./lib/scss/**/*"
   ],
   "allowedNonPeerDependencies": [
-    "@senzing/rest-api-client-ng",
     "@angular/material",
     "ngx-json-viewer",
     "d3",

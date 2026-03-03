@@ -6,7 +6,6 @@ import { Observable, Subject } from 'rxjs';
 import * as d3 from 'd3-selection';
 import * as d3Shape from 'd3-shape';
 
-import { SzDataSourcesResponseData } from '@senzing/rest-api-client-ng';
 import { isValueTypeOfArray, parseBool, parseNumber, parseSzIdentifier, sortDataSourcesByIndex } from '../../common/utils';
 import { SzRecordCountDataSource, SzStatCountsForDataSources } from '../../models/stats';
 import { SzDataMartService } from '../../services/sz-datamart.service';

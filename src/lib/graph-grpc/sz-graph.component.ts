@@ -2,7 +2,7 @@ import { Component, HostBinding, Input, ViewChild, Output, OnInit, OnDestroy, Ev
 import { SzGraphPrefs, SzPrefsService } from '../services/sz-prefs.service';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
-import { SzEntityData, SzEntityIdentifier, SzEntityNetworkData } from '@senzing/rest-api-client-ng';
+import { SzEntityIdentifier, SzResolvedEntity, SzRelatedEntity } from '../models/grpc/engine';
 import { SzGraphControlComponent } from './sz-graph-control.component';
 import { SzGraphNodeFilterPair, SzEntityNetworkMatchKeyTokens, SzMatchKeyTokenComposite, SzMatchKeyTokenFilterScope } from '../models/graph';
 import { SzNetworkGraphCompositeResponse, SzNetworkGraphInputs } from '../models/SzNetworkGraph';

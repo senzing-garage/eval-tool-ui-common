@@ -1,11 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import {
-  SzEntityRecord
-} from '@senzing/rest-api-client-ng';
 import { SzEntityRecordCardContentComponentGrpc } from '../entity-grpc/sz-entity-record-card/sz-entity-record-card-content/sz-entity-record-card-content.component';
 import { NgxJsonViewerModule } from 'ngx-json-viewer';
-import { SzSdkEntityRecord } from '../models/grpc/engine';
+import { SzSdkEntityRecord, SzEntityRecord } from '../models/grpc/engine';
 
 /**
  * A component for displaying the result(s) of the sz-search-by-id component
@@ -47,7 +44,7 @@ export class SzEntityRecordViewerComponent {
   private _record: SzSdkEntityRecord;
   /** set the record to display */
   @Input() public set record(value: SzSdkEntityRecord | string) {
-    if((value as SzEntityRecord).recordId) {
+    if(('recordId' in (value as object)) || ('RECORD_ID' in (value as object))) {
       this._record = (value as SzSdkEntityRecord);
     } else {
       // assume string

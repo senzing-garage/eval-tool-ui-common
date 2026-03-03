@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { Observable, Subject, forkJoin, of } from 'rxjs';
 import { skipWhile, take, takeUntil } from 'rxjs/operators';
 
-//import { SzCrossSourceSummary, SzMatchCounts, SzRelationCounts } from '@senzing/rest-api-client-ng';
 import { SzPrefsService } from '../../services/sz-prefs.service';
 import { SzCrossSourceCount, SzCrossSourceSummaryCategoryType, SzCrossSourceSummaryResponses, SzCrossSourceSummarySelectionClickEvent } from '../../models/stats';
 import { SzDataMartService } from '../../services/sz-datamart.service';

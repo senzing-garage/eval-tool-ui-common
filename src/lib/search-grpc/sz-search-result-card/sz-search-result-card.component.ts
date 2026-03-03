@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output, ViewChild, OnDestroy } 
 import { SzEntityDetailSectionData } from '../../models/entity-detail-section-data';
 import { BreakpointObserver, Breakpoints, BreakpointState } from '@angular/cdk/layout';
 import { Subject, BehaviorSubject } from 'rxjs';
-import { SzAttributeSearchResult, SzEntityIdentifier } from '@senzing/rest-api-client-ng';
+import { SzEntityIdentifier } from '../../models/grpc/engine';
 import { howClickEvent } from '../../models/data-how';
 import { SzSdkSearchResolvedEntity, SzSdkSearchResult } from '../../models/grpc/engine';
 import { CommonModule } from '@angular/common';

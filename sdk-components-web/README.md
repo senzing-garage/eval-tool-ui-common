@@ -3,7 +3,7 @@
 ## Overview
 
 This project is for the senzing sdk web components. It provides web component versions built
-off of the components found in [@senzing/sz-sdk-components-grpc-web]. The components themselves leverage the [rest-api-client-ng package] which itself is generated from the [OAS specification].
+off of the components found in [@senzing/sz-sdk-components-grpc-web].
 
 The idea is to provide a framework agnostic option of those same components.
 
@@ -140,8 +140,6 @@ All examples can be rendered in a _Live_ edit state by checking out the main sdk
 [here]: https://css-tricks.com/difference-between-types-of-css-variables/
 [npm build]: https://github.com/senzing-garage/sz-sdk-components-grpc-web/actions/workflows/npm-build.yaml/badge.svg
 [npm version]: https://badge.fury.io/js/%40senzing%2Fsdk-components-web.svg
-[OAS specification]: https://github.com/senzing-garage/senzing-rest-api-specification
-[rest-api-client-ng package]: https://www.npmjs.com/package/@senzing/rest-api-client-ng
 [See documentation]: https://senzing.github.io/sz-sdk-components-grpc-web/
 [Senzing REST API Sever]: https://github.com/senzing-garage/senzing-api-server/
 [this article]: https://developers.google.com/web/updates/2016/02/css-variables-why-should-you-care
