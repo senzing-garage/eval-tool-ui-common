@@ -308,15 +308,6 @@ export class SzEntityDetailHeaderContentComponentGrpc implements OnDestroy, OnIn
   /**
    * @deprecated
    */
-  private isEntityRecord(data: SzSearchResultEntityData | SzEntityDetailSectionData | SzEntityRecord): data is SzEntityRecord {
-    if (data) {
-      return (data as any).relationshipData !== undefined && (data as any).relationshipData.length > 0;
-    }
-    return false;
-  }
-  /**
-   * @deprecated
-   */
   private isEntityDetailData(data: SzSearchResultEntityData | SzEntityDetailSectionData | SzEntityRecord): data is SzEntityDetailSectionData {
     if (data) {
       return (<SzEntityDetailSectionData>data).matchLevel !== undefined;

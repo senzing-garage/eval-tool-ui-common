@@ -44,7 +44,7 @@ export class SzEntityRecordViewerComponent {
   private _record: SzSdkEntityRecord;
   /** set the record to display */
   @Input() public set record(value: SzSdkEntityRecord | string) {
-    if((value as any).recordId || (value as SzSdkEntityRecord).RECORD_ID) {
+    if(('recordId' in (value as object)) || ('RECORD_ID' in (value as object))) {
       this._record = (value as SzSdkEntityRecord);
     } else {
       // assume string
