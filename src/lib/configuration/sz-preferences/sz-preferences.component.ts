@@ -1,5 +1,5 @@
 import { Component, Input, Output, OnInit, OnDestroy, EventEmitter } from '@angular/core';
-import { Configuration as SzRestConfiguration } from '@senzing/rest-api-client-ng';
+import { SzRestConfiguration } from '../../models/sz-rest-configuration';
 import { Subject } from 'rxjs';
 import { SzDataSourcesService } from '../../services/sz-datasources.service';
 import { SzSdkPrefsModel, SzPrefsService } from '../../services/sz-prefs.service';

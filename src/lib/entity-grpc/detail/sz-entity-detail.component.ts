@@ -5,15 +5,7 @@ import { fromEvent, Subject, Subscription } from 'rxjs';
 import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 
-import {
-  SzEntityData,
-  EntityDataService as SzEntityDataService,
-  SzRelatedEntity,
-  SzEntityRecord,
-  SzRelationshipType,
-  SzEntityIdentifier,
-  SzRecordId
-} from '@senzing/rest-api-client-ng';
+import { SzEntityIdentifier, SzRecordId } from '../../models/grpc/engine';
 import { MatDialog } from '@angular/material/dialog';
 
 //import { SzEntityDetailGraphComponent } from './sz-entity-detail-graph/sz-entity-detail-graph.component';
@@ -1048,19 +1040,21 @@ export class SzEntityDetailGrpcComponent implements OnInit, OnDestroy, AfterView
   }
 
   public onCompareEntitiesForWhyNot(entityIds: any) {
-    //console.log('SzEntityDetailComponent.onCompareEntitiesForWhyNot: ', entityIds, this._openWhyComparisonModalOnClick);
-    if(entityIds && entityIds.length > 0 && entityIds.push){
-      entityIds.push(this.entity.ENTITY_ID);
+    // Normalize to number[] — incoming values may be SzResumeRelatedEntity objects
+    let numericIds: number[] = [];
+    if(entityIds && entityIds.length > 0) {
+      numericIds = entityIds.map((id: any) => typeof id === 'number' ? id : id?.ENTITY_ID).filter(Boolean);
     }
+    numericIds.push(this.entity.ENTITY_ID);
 
-    this.relatedEntitiesWhyNotButtonClick.emit(entityIds);
+    this.relatedEntitiesWhyNotButtonClick.emit(numericIds);
     if(this._openWhyComparisonModalOnClick) {
       this.dialog.open(SzWhyEntitiesGrpcDialog, {
         panelClass: 'why-entities-dialog-panel',
         minWidth: 800,
         height: 'var(--sz-why-dialog-default-height)',
         data: {
-          entities: entityIds,
+          entities: numericIds,
           showOkButton: false,
           okButtonText: 'Close'
         }

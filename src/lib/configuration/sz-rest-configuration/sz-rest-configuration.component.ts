@@ -1,5 +1,5 @@
 import { Component, Input, Output } from '@angular/core';
-import { Configuration as SzRestConfiguration } from '@senzing/rest-api-client-ng';
+import { SzRestConfiguration } from '../../models/sz-rest-configuration';
 import { Subject } from 'rxjs';
 import { SzConfigurationService } from '../../services/sz-configuration.service';
 

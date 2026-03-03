@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, ViewChildren, QueryList, OnDestroy } from '@angular/core';
-import { SzRelatedEntity, SzEntityRecord, SzRecordId, SzEntityIdentifier } from '@senzing/rest-api-client-ng';
+import { SzRecordId, SzEntityIdentifier } from '../../../models/grpc/engine';
 import { SzEntityDetailSectionCollapsibleCardComponentGrpc } from './collapsible-card.component';
 import { Subject } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';
@@ -10,7 +10,7 @@ import { SzDataSourceRecordsSelection, SzWhySelectionMode, SzWhySelectionModeBeh
 import { CommonModule, KeyValue } from '@angular/common';
 import { SzEntityDetailSectionHeaderComponentGrpc } from './header.component';
 import { SzRelatedEntityMatchLevel, SzResumeRecordsByDataSource, SzResumeRelatedEntitiesByMatchKey, SzResumeRelatedEntity } from '../../../../lib/models/SzResumeEntity';
-import { SzSdkEntityRecord } from '../../../models/grpc/engine';
+import { SzSdkEntityRecord, SzRelatedEntity } from '../../../models/grpc/engine';
 import { SzGrpcConfigManagerService } from '../../../services/grpc/configManager.service';
 
 /**

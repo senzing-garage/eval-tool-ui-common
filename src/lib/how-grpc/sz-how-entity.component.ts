@@ -1,15 +1,6 @@
 import { Component, OnInit, Input, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { 
-    //EntityDataService as SzEntityDataService, 
-    SzEntityIdentifier, SzFeatureMode, 
-    //SzHowEntityResponse, 
-    //SzHowEntityResult,
-    SzRecordIdentifier, SzRecordIdentifiers, 
-    //SzResolutionStep, SzResolvedEntity, 
-    //SzVirtualEntity, SzVirtualEntityRecord, 
-    //SzVirtualEntityResponse 
-} from '@senzing/rest-api-client-ng';
+import { SzEntityIdentifier, SzRecordIdentifier, SzRecordIdentifiers } from '../models/grpc/engine';
 import { SzHowUIService } from '../services/sz-how-ui.service';
 import { 
   SzVirtualEntityRecordsClickEvent, 

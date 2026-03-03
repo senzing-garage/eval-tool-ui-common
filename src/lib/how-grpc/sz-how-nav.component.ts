@@ -1,11 +1,6 @@
 import { Component, OnInit, Input, OnDestroy, HostBinding } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { DataSource } from '@angular/cdk/collections';
-import { 
-    //EntityDataService as SzEntityDataService, 
-    //SzResolutionStep, SzVirtualEntityRecord, 
-    //SzFeatureScore 
-} from '@senzing/rest-api-client-ng';
 import { SzResolutionStepDisplayType, SzResolvedVirtualEntity } from '../models/data-how';
 import { parseBool } from '../common/utils';
 import { filter, Subject, takeUntil } from 'rxjs';

@@ -1,13 +1,5 @@
 import { Injectable, Output, EventEmitter } from '@angular/core';
 
-/*import {
-  EntityDataService,
-  ConfigService,
-  SzResolvedEntity,
-  SzRelatedEntity,
-  SzDataSourcesResponse,
-  SzDataSourcesResponseData
-} from '@senzing/rest-api-client-ng';*/
 import { Observable, Subject } from 'rxjs';
 import { takeUntil, take, tap } from 'rxjs/operators';
 import { SzGrpcConfigManagerService } from './grpc/configManager.service';
