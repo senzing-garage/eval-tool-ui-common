@@ -1040,19 +1040,21 @@ export class SzEntityDetailGrpcComponent implements OnInit, OnDestroy, AfterView
   }
 
   public onCompareEntitiesForWhyNot(entityIds: any) {
-    //console.log('SzEntityDetailComponent.onCompareEntitiesForWhyNot: ', entityIds, this._openWhyComparisonModalOnClick);
-    if(entityIds && entityIds.length > 0 && entityIds.push){
-      entityIds.push(this.entity.ENTITY_ID);
+    // Normalize to number[] — incoming values may be SzResumeRelatedEntity objects
+    let numericIds: number[] = [];
+    if(entityIds && entityIds.length > 0) {
+      numericIds = entityIds.map((id: any) => typeof id === 'number' ? id : id?.ENTITY_ID).filter(Boolean);
     }
+    numericIds.push(this.entity.ENTITY_ID);
 
-    this.relatedEntitiesWhyNotButtonClick.emit(entityIds);
+    this.relatedEntitiesWhyNotButtonClick.emit(numericIds);
     if(this._openWhyComparisonModalOnClick) {
       this.dialog.open(SzWhyEntitiesGrpcDialog, {
         panelClass: 'why-entities-dialog-panel',
         minWidth: 800,
         height: 'var(--sz-why-dialog-default-height)',
         data: {
-          entities: entityIds,
+          entities: numericIds,
           showOkButton: false,
           okButtonText: 'Close'
         }
