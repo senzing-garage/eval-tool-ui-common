@@ -15,35 +15,60 @@ export class SzGrpcEngineService {
     /** subscription to notify subscribers to unbind */
     public unsubscribe$ = new Subject<void>();
     
-    public addRecords(recordsAsJson: Array<{[key: string]: any}>) {
-        let retVal      = new Subject();
-        let requests    = [];
-        let ignoredRecs = [];
-        let errors      = [];
-        recordsAsJson.forEach((record)=>{
-            let dsCode      = record['DATA_SOURCE'];
-            let recordId    = record['RECORD_ID'];
-            if(isNotNull(dsCode)) {
-                let _p = new Promise((resolve, reject)=>{
-                    try{
-                        this.addRecord(dsCode, recordId, record).then((result)=>{
-                            resolve(result);
-                        }).catch((err)=>{
-                            errors.push(err);
-                        })
-                    } catch(err) {
-                        errors.push(err);
-                    }
-                })
-                requests.push( _p );
-            } else {
-                ignoredRecs.push(record);
+    public addRecords(recordsAsJson: Array<{[key: string]: any}>, batchSize: number = 100) {
+        let retVal      = new Subject<{results: any[], errors: any[], errorCount: number, requestCount: number}>();
+        let allResults  = [];
+        let errors: {dataSource: string, recordId: string | number, message: string, error: any}[] = [];
+        let requestCount = 0;
+
+        // Split records into valid (have DATA_SOURCE) and ignored
+        const validRecords = recordsAsJson.filter(r => isNotNull(r['DATA_SOURCE']));
+        requestCount = validRecords.length;
+
+        // Process in batches to avoid overwhelming the gRPC server
+        const processBatches = async () => {
+            for (let i = 0; i < validRecords.length; i += batchSize) {
+                const batch = validRecords.slice(i, i + batchSize);
+                const batchPromises = batch.map((record) => {
+                    let dsCode   = record['DATA_SOURCE'];
+                    let recordId = record['RECORD_ID'];
+                    return new Promise<any>((resolve) => {
+                        try {
+                            this.addRecord(dsCode, recordId, record).then((result) => {
+                                resolve(result);
+                            }).catch((err) => {
+                                errors.push({
+                                    dataSource: dsCode,
+                                    recordId: recordId,
+                                    message: err?.message || String(err),
+                                    error: err
+                                });
+                                resolve(null);
+                            });
+                        } catch(err) {
+                            errors.push({
+                                dataSource: dsCode,
+                                recordId: recordId,
+                                message: err?.message || String(err),
+                                error: err
+                            });
+                            resolve(null);
+                        }
+                    });
+                });
+                const batchResults = await Promise.all(batchPromises);
+                allResults.push(...batchResults);
+                console.log(`SzGrpcEngineService.addRecords batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(validRecords.length / batchSize)}: ${batchResults.filter(r => r !== null).length}/${batch.length} succeeded`);
             }
-        });
-        Promise.all(requests).then((p)=> {
-            console.log(`SzGrpcEngineService.addRecords: `, p, errors);
-            retVal.next(p)
-        })
+            console.log(`SzGrpcEngineService.addRecords complete: ${requestCount - errors.length}/${requestCount} succeeded, ${errors.length} errors`);
+            retVal.next({
+                results: allResults,
+                errors: errors,
+                errorCount: errors.length,
+                requestCount: requestCount
+            });
+        };
+        processBatches();
         return retVal.asObservable();
     }
 
