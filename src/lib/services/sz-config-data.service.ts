@@ -14,6 +14,7 @@ export class SzConfigDataService {
     constructor() {}
 
     getOrderedFeatures(pullFromCacheIfAvailable?: boolean): Observable<string[]> | undefined {
+        console.warn('SzConfigDataService.getOrderedFeatures() is deprecated. Use SzGrpcConfigManagerService instead.');
         return undefined;
     }
 }

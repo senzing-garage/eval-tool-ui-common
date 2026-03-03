@@ -1544,40 +1544,6 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
     }
   }
 
-  /** @deprecated Dead code — was used with REST-shaped responses (camelCase properties).
-   * gRPC responses use UPPER_CASE properties. Remove once confirmed unused.
-   */
-  /*
-  private mergeEntityResponseWithNetworkResponse(entityResp: SzEntityResponse, networkResp: SzEntityNetworkResponse): SzEntityNetworkResponse {
-    let entityData  = entityResp.data;
-    let networkData = networkResp.data;
-
-    let relatedEntitiesById = {};
-    if(entityData.relatedEntities && entityData.relatedEntities.forEach) {
-      entityData.relatedEntities.forEach((relEntity: SzRelatedEntity) => {
-        if(relEntity) {
-          relatedEntitiesById[ relEntity.entityId ] = relEntity;
-        }
-      });
-    }
-    if(networkData && networkData.entities && networkData.entities.forEach) {
-      networkData.entities = networkData.entities.map((networkEntity: SzEntityData) => {
-        if(networkEntity.resolvedEntity && networkEntity.resolvedEntity.entityId === entityData.resolvedEntity.entityId){
-          networkEntity.resolvedEntity   = Object.assign(networkEntity.resolvedEntity, entityData.resolvedEntity);
-          networkEntity.relatedEntities  = entityData.relatedEntities;
-        }
-        if(relatedEntitiesById[ networkEntity.resolvedEntity.entityId ] !== undefined) {
-          networkEntity.resolvedEntity = Object.assign(networkEntity.resolvedEntity, relatedEntitiesById[ networkEntity.resolvedEntity.entityId ]);
-        }
-        return networkEntity;
-      })
-      networkResp.data = networkData;
-    }
-    return networkResp
-  }
-  */
-
-  
   private getNetworkCompositeGrpc(entityIds: Array<string | number>, maxDegrees: number, buildOut: number, maxEntities: number): Observable<SzNetworkGraphCompositeResponse> {
     console.log(`!!!!!!!!!!!!!!!!! getNetworkCompositeGrpc !!!!!!!!!!!!!!!!!`);
     let returnSubject     = new Subject<SzNetworkGraphCompositeResponse>();
@@ -3326,10 +3292,6 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
     return returnValue
   }
 
-  /*
-  private mergeEntityResponseWithNetworkResponse(): SzEntityNetworkResponse {
-    SzEntityResponse | SzEntityNetworkResponse
-  }*/
 
   /**
    * primary data model shaper.

@@ -10,14 +10,14 @@ export type SzFeatureMode = 'NONE' | 'REPRESENTATIVE' | 'WITH_DUPLICATES' | 'ATT
 export const SzFeatureMode = {
     NONE: 'NONE' as SzFeatureMode,
     REPRESENTATIVE: 'REPRESENTATIVE' as SzFeatureMode,
-    WITHDUPLICATES: 'WITH_DUPLICATES' as SzFeatureMode,
+    WITH_DUPLICATES: 'WITH_DUPLICATES' as SzFeatureMode,
     ATTRIBUTED: 'ATTRIBUTED' as SzFeatureMode,
 };
 
 export type SzBoundType = 'INCLUSIVE_LOWER' | 'EXCLUSIVE_LOWER' | 'INCLUSIVE_UPPER' | 'EXCLUSIVE_UPPER';
 export const SzBoundType = {
-    INCLUSIVELOWER: 'INCLUSIVE_LOWER' as SzBoundType,
-    EXCLUSIVELOWER: 'EXCLUSIVE_LOWER' as SzBoundType,
-    INCLUSIVEUPPER: 'INCLUSIVE_UPPER' as SzBoundType,
-    EXCLUSIVEUPPER: 'EXCLUSIVE_UPPER' as SzBoundType,
+    INCLUSIVE_LOWER: 'INCLUSIVE_LOWER' as SzBoundType,
+    EXCLUSIVE_LOWER: 'EXCLUSIVE_LOWER' as SzBoundType,
+    INCLUSIVE_UPPER: 'INCLUSIVE_UPPER' as SzBoundType,
+    EXCLUSIVE_UPPER: 'EXCLUSIVE_UPPER' as SzBoundType,
 };

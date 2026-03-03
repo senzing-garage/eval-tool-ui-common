@@ -499,7 +499,7 @@ export class SzCrossSourcePagingComponent implements OnDestroy {
         // we just need to tell the datamart to grab the current page we're
         // on that we don't have data for yet.
         console.log(`goPreviousPage: pageIndex = ${this.pageIndex}`);
-        this.dataMartService.sampleSetBoundType  = this.pageIndex > 0 ? SzBoundType.EXCLUSIVELOWER : SzBoundType.INCLUSIVELOWER;
+        this.dataMartService.sampleSetBoundType  = this.pageIndex > 0 ? SzBoundType.EXCLUSIVE_LOWER : SzBoundType.INCLUSIVE_LOWER;
         this.dataMartService.sampleSetPage = this.pageIndex;
 
         /*this.selectedPage.emit({from: this.firstRecord,
@@ -521,7 +521,7 @@ export class SzCrossSourcePagingComponent implements OnDestroy {
         // we just need to tell the datamart to grab the current page we're
         // on that we don't have data for yet.
         console.log(`goNextPage: pageIndex = ${this.pageIndex}`);
-        this.dataMartService.sampleSetBoundType  = this.pageIndex > 0 ? SzBoundType.EXCLUSIVELOWER : SzBoundType.INCLUSIVELOWER;
+        this.dataMartService.sampleSetBoundType  = this.pageIndex > 0 ? SzBoundType.EXCLUSIVE_LOWER : SzBoundType.INCLUSIVE_LOWER;
         this.dataMartService.sampleSetPage = this.pageIndex;
 
         /*this.selectedPage.emit({from: this.firstRecord,

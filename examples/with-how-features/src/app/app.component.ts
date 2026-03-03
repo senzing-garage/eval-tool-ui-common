@@ -40,15 +40,15 @@ export class AppComponent {
     this.howResult = data;
   }
 
-  public get resolutionStepsByVirtualId(): {[key: string]: SzSdkHowResolutionStep} {
+  public get resolutionStepsByVirtualId(): SzSdkHowResolutionStep[] {
     if(this.howResult) {
-      return this.howResult.resolutionSteps;
+      return this.howResult.RESOLUTION_STEPS;
     }
     return undefined;
   }
   public get finalCardsData(): SzSdkVirtualEntity[] {
     if(this.howResult) {
-      return this.howResult.finalStates;
+      return this.howResult.FINAL_STATE?.VIRTUAL_ENTITIES;
     }
     return undefined;
   }

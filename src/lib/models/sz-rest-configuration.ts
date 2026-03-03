@@ -98,10 +98,11 @@ export class SzRestConfiguration {
 
     public removeAdditionalRequestHeader(header: {[key: string]: string} | string) {
         if(header){
-            let keyToRemove = (header as string);
-            if( (header as string).indexOf ){
+            let keyToRemove: string;
+            if(typeof header === 'string') {
+                keyToRemove = header;
             } else {
-                let keys = Object.keys(header as {[key: string]: string});
+                let keys = Object.keys(header);
                 if(keys && keys.length > 0){
                     keyToRemove = keys[0];
                 }
@@ -110,8 +111,8 @@ export class SzRestConfiguration {
                 let alreadyExistsAtIndex = this._additionalHeaders.findIndex((eheader: {[key: string]: string}) => {
                     return eheader['key'] === keyToRemove;
                 })
-                if(alreadyExistsAtIndex && this._additionalHeaders[ alreadyExistsAtIndex ]) {
-                    this._additionalHeaders = this._additionalHeaders.splice(alreadyExistsAtIndex, 1);
+                if(alreadyExistsAtIndex !== -1) {
+                    this._additionalHeaders.splice(alreadyExistsAtIndex, 1);
                 }
             }
         }
