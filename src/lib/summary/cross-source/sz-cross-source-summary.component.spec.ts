@@ -3,7 +3,7 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { MockTestDataInterceptor } from '../../interceptors/mock-test-data.interceptor.service';
 
 import { SzCrossSourceSummaryComponent } from './sz-cross-source-summary.component';
-import { SenzingSdkModule } from '../../sdk.module';
+import { MOCK_TEST_PROVIDERS } from 'src/lib/testing/mock-grpc-environment';
 
 describe('SzCrossSourceSummaryComponent', () => {
   let component: SzCrossSourceSummaryComponent;
@@ -11,9 +11,8 @@ describe('SzCrossSourceSummaryComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [SenzingSdkModule.forRoot()],
-      providers: [
-        {
+      imports: [SzCrossSourceSummaryComponent],
+      providers: [...MOCK_TEST_PROVIDERS, {
           provide: HTTP_INTERCEPTORS,
           useClass: MockTestDataInterceptor,
           multi: true

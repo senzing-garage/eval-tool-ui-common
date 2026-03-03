@@ -1,7 +1,7 @@
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SzPrefDictComponent } from './sz-pref-dict.component';
-import { SenzingSdkModule } from 'src/lib/sdk.module';
+import { MOCK_TEST_PROVIDERS } from 'src/lib/testing/mock-grpc-environment';
 
 describe('SzConfigurationAboutComponent', () => {
   let component: SzPrefDictComponent;
@@ -9,7 +9,8 @@ describe('SzConfigurationAboutComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [SenzingSdkModule.forRoot()]
+      imports: [SzPrefDictComponent],
+      providers: [...MOCK_TEST_PROVIDERS]
     })
     .compileComponents();
   }));

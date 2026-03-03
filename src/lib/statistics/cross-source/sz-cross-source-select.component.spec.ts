@@ -3,7 +3,7 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { MockTestDataInterceptor } from '../../interceptors/mock-test-data.interceptor.service';
 
 import { SzCrossSourceSelectComponent } from './sz-cross-source-select.component';
-import { SenzingSdkModule } from '../../sdk.module';
+import { MOCK_TEST_PROVIDERS } from 'src/lib/testing/mock-grpc-environment';
 
 describe('SzCrossSourceSelectComponent', () => {
   let component: SzCrossSourceSelectComponent;
@@ -11,9 +11,8 @@ describe('SzCrossSourceSelectComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [SenzingSdkModule.forRoot()],
-      providers: [
-        {
+      imports: [SzCrossSourceSelectComponent],
+      providers: [...MOCK_TEST_PROVIDERS, {
           provide: HTTP_INTERCEPTORS,
           useClass: MockTestDataInterceptor,
           multi: true
@@ -24,7 +23,7 @@ describe('SzCrossSourceSelectComponent', () => {
 
     fixture = TestBed.createComponent(SzCrossSourceSelectComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+    // detectChanges() omitted — component makes HTTP calls during init
   }));
 
   afterEach(() => {
