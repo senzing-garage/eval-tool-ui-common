@@ -241,7 +241,7 @@ export type SzRecordIdentifiers = Array<SzRecordId> | Array<string> | Array<SzRe
 /**
  * Backward-compatible type aliases mapping REST type names to gRPC equivalents.
  * These allow existing component code to compile while migrating from
- * @senzing/rest-api-client-ng to local gRPC types.
+ * the REST API client to local gRPC types.
  */
 export type SzEntityData = SzSdkEntityResponse;
 export type SzEntityResponse = SzSdkEntityResponse;

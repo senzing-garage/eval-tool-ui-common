@@ -7,8 +7,6 @@ import { SzMatchKeyTokenFilterScope } from '../models/graph';
 import { SzCrossSourceSummaryCategoryType, SzCrossSourceSummaryCategoryTypeToMatchLevel } from '../models/stats';
 import { areArrayMembersEqual } from '../common/utils';
 
-//import { Configuration as SzRestConfiguration, ConfigurationParameters as SzRestConfigurationParameters } from '@senzing/rest-api-client-ng';
-
 /**
  * preferences bus base class. provides common methods for
  * publishing and responding to value changes. bulk-set and get.

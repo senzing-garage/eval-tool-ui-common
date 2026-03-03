@@ -5,7 +5,6 @@ import { Observable, Subject } from 'rxjs';
 import { camelToKebabCase, underscoresToDashes, getMapKeyByValue, parseBool } from '../../common/utils';
 import { SzDataMartService } from '../../services/sz-datamart.service';
 import { SzCrossSourceSummaryCategoryType, SzCrossSourceSummarySelectionEvent, SzCrossSourceSummarySelectionClickEvent, SzStatsSampleTableLoadingEvent, SzCrossSourceSummaryCategoryTypeToMatchLevel } from '../../models/stats';
-//import { SzEntitiesPage, SzEntityData, SzEntityIdentifier, SzSourceSummary } from '@senzing/rest-api-client-ng';
 import { SzDataTableCellEvent } from '../../models/stats';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
@@ -13,11 +12,7 @@ import { SzCrossSourceResultsDataTable } from '../../statistics/cross-source/sz-
 import { SzCrossSourceSelectComponent } from '../../statistics/cross-source/sz-cross-source-select.component';
 import { SzCrossSourceSummaryComponent } from '../../summary/cross-source/sz-cross-source-summary.component';
 import { MatButtonModule } from '@angular/material/button';
-//import { SzEntitiesPage, SzEntityData, SzEntityIdentifier, SzSourceSummary } from '@senzing/rest-api-client-ng';
-//import { SzEntitiesPage } from '../../models/statistics/szEntitiesPage';
-//import { SzEntityData } from '../../models/statistics/szE';
 import { SzEntityData } from '../../services/http/models/szEntityData';
-//import { SzSourceSummary } from '../../models/statistics/szSourceSummary';
 import { SzEntityIdentifier } from '../../services/http/models/szEntityIdentifier';
 import { SzSampleSetEntity, SzSampleSetRelation } from '../../models/data-sampling';
 
