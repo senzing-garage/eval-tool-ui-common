@@ -2241,10 +2241,15 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
         .attr('class', 'sz-graph-link-label-text');
 
         // stagger label positions along links to reduce overlap at crossings
-        let labelOffset = [35, 50, 65][i % 3] + '%';
+        // use a hash of the link id to distribute offsets more evenly
+        let linkHash = 0;
+        let linkId = d.id || '';
+        for (let c = 0; c < linkId.length; c++) { linkHash = ((linkHash << 5) - linkHash + linkId.charCodeAt(c)) | 0; }
+        let offsets = [30, 45, 55, 70];
+        let baseLabelOffset = offsets[Math.abs(linkHash) % offsets.length];
         let _newLabelsText = _newLabels.append('textPath')
           .attr('class', (_d: any) => _d.isCoreLink ? 'sz-graph-core-link-text' : 'sz-graph-link-text')
-          .attr('startOffset', labelOffset)
+          .attr('startOffset', baseLabelOffset + '%')
           .attr('xlink:href', (_d: any) => '#' + d.id) // This lets SVG know which label goes with which line
           .text((mkToken) => {
             return mkToken as string;
