@@ -71,6 +71,7 @@
         height: 100vh;
         z-index: 1000;
         border-left: 2px dotted #0000003f;
+        pointer-events: none;
     }
 
     &.column-resizing {
