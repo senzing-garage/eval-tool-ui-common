@@ -1888,6 +1888,42 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
       
       lnk.attr('d', this.onLinkEntityPositionChange.bind(this));
     }
+    // adjust link label offsets based on node positions so labels shift
+    // away from nodes that are above (whose name labels hang below the icon)
+    let updateLinkLabelOffsets = () => {
+      if (!this.linkLabel || !this.node) return;
+      // build a map of entityId -> {x, y} from current node positions
+      let nodePositions: { [id: number]: { x: number, y: number } } = {};
+      this.node.each((_d: any) => {
+        if (_d.entityId !== undefined && _d.x !== undefined && _d.y !== undefined) {
+          nodePositions[_d.entityId] = { x: _d.x, y: _d.y };
+        }
+      });
+      this.linkLabel.each(function(d: any) {
+        let srcPos = nodePositions[d.sourceEntityId];
+        let tgtPos = nodePositions[d.targetEntityId];
+        if (!srcPos || !tgtPos) return;
+        // path is drawn left-to-right: 0% = left node, 100% = right node
+        let leftPos = srcPos.x <= tgtPos.x ? srcPos : tgtPos;
+        let rightPos = srcPos.x <= tgtPos.x ? tgtPos : srcPos;
+        let yDiff = leftPos.y - rightPos.y;
+        // only adjust when there's a meaningful vertical difference
+        if (Math.abs(yDiff) < 20) return;
+        // select all textPath elements within this label group
+        d3.select(this).selectAll('textPath').each(function() {
+          let tp = d3.select(this);
+          let currentOffset = parseInt(tp.attr('startOffset'), 10) || 50;
+          if (leftPos.y < rightPos.y) {
+            // left node is higher — push label toward right (away from left node's name label)
+            currentOffset = Math.min(currentOffset + 12, 72);
+          } else {
+            // right node is higher — push label toward left (away from right node's name label)
+            currentOffset = Math.max(currentOffset - 12, 28);
+          }
+          tp.attr('startOffset', currentOffset + '%');
+        });
+      });
+    }
     let attachEventListenersToNodes   = (_nodes, _tooltip, _labels?, _scope?: any) => {
       _scope  = _scope ? _scope : this;
       // Make the tooltip visible when mousing over nodes. 
@@ -2241,11 +2277,11 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
         .attr('class', 'sz-graph-link-label-text');
 
         // stagger label positions along links to reduce overlap at crossings
-        // use a hash of the link id to distribute offsets more evenly
+        // use a hash of the link id to distribute offsets in the center band
         let linkHash = 0;
         let linkId = d.id || '';
         for (let c = 0; c < linkId.length; c++) { linkHash = ((linkHash << 5) - linkHash + linkId.charCodeAt(c)) | 0; }
-        let offsets = [30, 45, 55, 70];
+        let offsets = [38, 46, 54, 62];
         let baseLabelOffset = offsets[Math.abs(linkHash) % offsets.length];
         let _newLabelsText = _newLabels.append('textPath')
           .attr('class', (_d: any) => _d.isCoreLink ? 'sz-graph-core-link-text' : 'sz-graph-link-text')
@@ -2698,6 +2734,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
           this._applyImportedPositionsToNodes(newNodes);
           // redraw any existing or new link relationships
           updateLinksForNodes(newNodes);
+          updateLinkLabelOffsets();
 
           this.onDataUpdated.emit(this.asEntityNetworkData());
           this.expandCollapseToggle(d);
@@ -2781,6 +2818,8 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
       applyPositionToNodes(coreNodes);
       // update initial relationship link lines
       updateLinksForNodes(this.node);
+      // adjust label offsets now that node positions are known
+      updateLinkLabelOffsets();
 
       //console.log('coreNodes: ', coreNodes.data(), nodesCircleSchema, ringsSortedByDiameter);
       //console.log('total width of nodes: ', widthOfNodes, circleDiameter);
