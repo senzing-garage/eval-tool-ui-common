@@ -1773,6 +1773,58 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
     }
   }
 
+  /** zoom and translate so all nodes fit within the SVG container */
+  public zoomToFit(padding = 60) {
+    if (!this.svgZoom || !this.node || !this.svgElement) {
+      this.center();
+      return;
+    }
+
+    // collect bounding box from all node positions
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    let nodeCount = 0;
+    this.node.each((_d: any) => {
+      if (_d.x !== undefined && _d.y !== undefined) {
+        minX = Math.min(minX, _d.x);
+        minY = Math.min(minY, _d.y);
+        maxX = Math.max(maxX, _d.x);
+        maxY = Math.max(maxY, _d.y);
+        nodeCount++;
+      }
+    });
+
+    if (nodeCount < 2) {
+      this.center();
+      return;
+    }
+
+    // add padding around the bounding box
+    minX -= padding;
+    minY -= padding;
+    maxX += padding;
+    maxY += padding;
+
+    const nodesWidth = maxX - minX;
+    const nodesHeight = maxY - minY;
+    const nodesCenterX = (minX + maxX) / 2;
+    const nodesCenterY = (minY + maxY) / 2;
+
+    const dims = this.svgElement.getBoundingClientRect();
+    const viewWidth = dims.width;
+    const viewHeight = dims.height;
+
+    // scale to fit, clamped to zoom limits
+    let scale = Math.min(viewWidth / nodesWidth, viewHeight / nodesHeight);
+    scale = Math.max(this._scaleMin, Math.min(scale, 1.5));
+
+    // translate so the center of the nodes is at the center of the viewport
+    const translateX = (viewWidth / 2) - (nodesCenterX * scale);
+    const translateY = (viewHeight / 2) - (nodesCenterY * scale);
+
+    const _t = d3.zoomIdentity.translate(translateX, translateY).scale(scale);
+    this.svg.call(this._zoom.transform, _t);
+  }
+
   /** render svg elements from graph data */
   addSvg(gdata: SzNetworkGraphInputs, parentSelection = d3.select("body")) {
     if(!this.svgElement) {
@@ -1997,14 +2049,28 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
       let ringCalcComplete  = false;
       let ringIndex         = 1;
 
+      let totalNodeCount = _nodes && _nodes.size ? _nodes.size() : 0;
+
       while(!ringCalcComplete) {
         // for each circle start with the base diameter
         // and add +2 entityGlyph widths/heights to diameter
         let _circDiameter       = minimumRingDiameter + (((ringSpacing*2) * ringIndex));
         let _circCircumference  = Math.PI * _circDiameter;
-        // now create a selection that has just the nodes that 
+        // now create a selection that has just the nodes that
         // should be drawn on the circles path
         let _itemsThatWillFitOnPath = Math.floor(_circCircumference / avgItemWidth);
+
+        // if this is the first ring and all nodes fit, shrink the diameter
+        // proportionally so we don't waste space
+        if (ringIndex === 1 && totalNodeCount > 0 && totalNodeCount < _itemsThatWillFitOnPath) {
+          let ratio = totalNodeCount / _itemsThatWillFitOnPath;
+          // use the ratio but keep a minimum so nodes aren't crammed together
+          // minimum diameter of 200 ensures match key labels on links have enough space
+          let scaledDiameter = Math.max(_circDiameter * Math.max(ratio, 0.35), 175);
+          _circDiameter = scaledDiameter;
+          _circCircumference = Math.PI * _circDiameter;
+          _itemsThatWillFitOnPath = Math.floor(_circCircumference / avgItemWidth);
+        }
         let _nodesToPosition = _nodes
         .filter((_n, _j) => {
           return _j >= lastPluckedIndex && _j < (lastPluckedIndex + _itemsThatWillFitOnPath);
@@ -2649,7 +2715,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
       //console.log('total width of nodes: ', widthOfNodes, circleDiameter);
       //console.log('nodes: ', this.node.data());
 
-      this.center();
+      this.zoomToFit();
     }
 
     if(this.link) {
@@ -3483,8 +3549,14 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
           });
         } else if ( primaryEntities.indexOf( resolvedEntity.ENTITY_ID ) > -1 ) {
           relColorClasses.push('graph-node-rel-primary');
-        } else {
-          //console.warn('no related ent rels for #'+ resolvedEntity.entityId +'.', entNode.relatedEntities, relatedEntRels);
+        } else if (relatedEntities && relatedEntities.length) {
+          // no relationship to primary entity found — use the best match level
+          // from any relationship (e.g. expanded edge nodes relate to the focal node)
+          relatedEntities.forEach((relEnt: SzSdkRelatedEntity) => {
+            if(relEnt.MATCH_LEVEL_CODE == SzSdkSearchMatchLevel.DISCLOSED) { relColorClasses.push('graph-node-rel-disclosed'); }
+            if(relEnt.MATCH_LEVEL_CODE == SzSdkSearchMatchLevel.POSSIBLE_MATCH) { relColorClasses.push('graph-node-rel-pmatch'); }
+            if(relEnt.MATCH_LEVEL_CODE == SzSdkSearchMatchLevel.POSSIBLY_RELATED) { relColorClasses.push('graph-node-rel-prel'); }
+          });
         }
         if(resolvedEntity.RECORD_SUMMARY && resolvedEntity.RECORD_SUMMARY.map) {
           dataSourceClasses = resolvedEntity.RECORD_SUMMARY && resolvedEntity.RECORD_SUMMARY.map ? resolvedEntity.RECORD_SUMMARY.map((ds) => { return (ds.DATA_SOURCE && ds.DATA_SOURCE.toLowerCase) ? `sz-node-ds-${ds.DATA_SOURCE.toLowerCase()}`:`sz-node-ds-${ds.DATA_SOURCE}`; }) : undefined;
