@@ -1773,6 +1773,58 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
     }
   }
 
+  /** zoom and translate so all nodes fit within the SVG container */
+  public zoomToFit(padding = 60) {
+    if (!this.svgZoom || !this.node || !this.svgElement) {
+      this.center();
+      return;
+    }
+
+    // collect bounding box from all node positions
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    let nodeCount = 0;
+    this.node.each((_d: any) => {
+      if (_d.x !== undefined && _d.y !== undefined) {
+        minX = Math.min(minX, _d.x);
+        minY = Math.min(minY, _d.y);
+        maxX = Math.max(maxX, _d.x);
+        maxY = Math.max(maxY, _d.y);
+        nodeCount++;
+      }
+    });
+
+    if (nodeCount < 2) {
+      this.center();
+      return;
+    }
+
+    // add padding around the bounding box
+    minX -= padding;
+    minY -= padding;
+    maxX += padding;
+    maxY += padding;
+
+    const nodesWidth = maxX - minX;
+    const nodesHeight = maxY - minY;
+    const nodesCenterX = (minX + maxX) / 2;
+    const nodesCenterY = (minY + maxY) / 2;
+
+    const dims = this.svgElement.getBoundingClientRect();
+    const viewWidth = dims.width;
+    const viewHeight = dims.height;
+
+    // scale to fit, clamped to zoom limits
+    let scale = Math.min(viewWidth / nodesWidth, viewHeight / nodesHeight);
+    scale = Math.max(this._scaleMin, Math.min(scale, 1.5));
+
+    // translate so the center of the nodes is at the center of the viewport
+    const translateX = (viewWidth / 2) - (nodesCenterX * scale);
+    const translateY = (viewHeight / 2) - (nodesCenterY * scale);
+
+    const _t = d3.zoomIdentity.translate(translateX, translateY).scale(scale);
+    this.svg.call(this._zoom.transform, _t);
+  }
+
   /** render svg elements from graph data */
   addSvg(gdata: SzNetworkGraphInputs, parentSelection = d3.select("body")) {
     if(!this.svgElement) {
@@ -1835,6 +1887,42 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
         });
       
       lnk.attr('d', this.onLinkEntityPositionChange.bind(this));
+    }
+    // adjust link label offsets based on node positions so labels shift
+    // away from nodes that are above (whose name labels hang below the icon)
+    let updateLinkLabelOffsets = () => {
+      if (!this.linkLabel || !this.node) return;
+      // build a map of entityId -> {x, y} from current node positions
+      let nodePositions: { [id: number]: { x: number, y: number } } = {};
+      this.node.each((_d: any) => {
+        if (_d.entityId !== undefined && _d.x !== undefined && _d.y !== undefined) {
+          nodePositions[_d.entityId] = { x: _d.x, y: _d.y };
+        }
+      });
+      this.linkLabel.each(function(d: any) {
+        let srcPos = nodePositions[d.sourceEntityId];
+        let tgtPos = nodePositions[d.targetEntityId];
+        if (!srcPos || !tgtPos) return;
+        // path is drawn left-to-right: 0% = left node, 100% = right node
+        let leftPos = srcPos.x <= tgtPos.x ? srcPos : tgtPos;
+        let rightPos = srcPos.x <= tgtPos.x ? tgtPos : srcPos;
+        let yDiff = leftPos.y - rightPos.y;
+        // only adjust when there's a meaningful vertical difference
+        if (Math.abs(yDiff) < 20) return;
+        // select all textPath elements within this label group
+        d3.select(this).selectAll('textPath').each(function() {
+          let tp = d3.select(this);
+          let currentOffset = parseInt(tp.attr('startOffset'), 10) || 50;
+          if (leftPos.y < rightPos.y) {
+            // left node is higher — push label toward right (away from left node's name label)
+            currentOffset = Math.min(currentOffset + 12, 72);
+          } else {
+            // right node is higher — push label toward left (away from right node's name label)
+            currentOffset = Math.max(currentOffset - 12, 28);
+          }
+          tp.attr('startOffset', currentOffset + '%');
+        });
+      });
     }
     let attachEventListenersToNodes   = (_nodes, _tooltip, _labels?, _scope?: any) => {
       _scope  = _scope ? _scope : this;
@@ -1997,14 +2085,28 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
       let ringCalcComplete  = false;
       let ringIndex         = 1;
 
+      let totalNodeCount = _nodes && _nodes.size ? _nodes.size() : 0;
+
       while(!ringCalcComplete) {
         // for each circle start with the base diameter
         // and add +2 entityGlyph widths/heights to diameter
         let _circDiameter       = minimumRingDiameter + (((ringSpacing*2) * ringIndex));
         let _circCircumference  = Math.PI * _circDiameter;
-        // now create a selection that has just the nodes that 
+        // now create a selection that has just the nodes that
         // should be drawn on the circles path
         let _itemsThatWillFitOnPath = Math.floor(_circCircumference / avgItemWidth);
+
+        // if this is the first ring and all nodes fit, shrink the diameter
+        // proportionally so we don't waste space
+        if (ringIndex === 1 && totalNodeCount > 0 && totalNodeCount < _itemsThatWillFitOnPath) {
+          let ratio = totalNodeCount / _itemsThatWillFitOnPath;
+          // use the ratio but keep a minimum so nodes aren't crammed together
+          // minimum diameter of 200 ensures match key labels on links have enough space
+          let scaledDiameter = Math.max(_circDiameter * Math.max(ratio, 0.35), 175);
+          _circDiameter = scaledDiameter;
+          _circCircumference = Math.PI * _circDiameter;
+          _itemsThatWillFitOnPath = Math.floor(_circCircumference / avgItemWidth);
+        }
         let _nodesToPosition = _nodes
         .filter((_n, _j) => {
           return _j >= lastPluckedIndex && _j < (lastPluckedIndex + _itemsThatWillFitOnPath);
@@ -2056,6 +2158,70 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
       applyPositionToNodes(_nodes);
       //console.log('Ring Calculation: ', circlesToDraw, optimalRingMinimumDiameter, _nodes.size());
       return circlesToDraw;
+    }
+    // places new nodes in a fan/arc radiating outward from center, away from existing nodes
+    let drawNodesAsDirectionalFan = (
+      _nodes: d3.Selection<SVGElement, any, any, any>,
+      parentX: number,
+      parentY: number,
+      existingNodes: d3.Selection<SVGElement, any, any, any>
+    ) => {
+      let nodeCount = _nodes && _nodes.size ? _nodes.size() : 0;
+      if (nodeCount === 0) return;
+
+      // calculate the outward angle from graph center (0,0) to the parent node
+      let outwardAngle = Math.atan2(parentY, parentX);
+      // if parent is at center, default to pointing down
+      if (Math.abs(parentX) < 1 && Math.abs(parentY) < 1) {
+        outwardAngle = Math.PI / 2;
+      }
+
+      // collect existing node positions for collision avoidance
+      let existingPositions: { x: number; y: number }[] = [];
+      if (existingNodes) {
+        existingNodes.each((_d: any) => {
+          if (_d.x !== undefined && _d.y !== undefined) {
+            existingPositions.push({ x: _d.x, y: _d.y });
+          }
+        });
+      }
+
+      // fan spread: wider with more nodes, max 180 degrees (pi radians)
+      let fanSpread = Math.min(Math.PI, (nodeCount - 1) * 0.5 + 0.6);
+      let startAngle = outwardAngle - fanSpread / 2;
+      let angleStep = nodeCount > 1 ? fanSpread / (nodeCount - 1) : 0;
+
+      // distance from parent — enough for match key labels
+      let radius = 175;
+      let nodeCollisionRadius = 50; // approximate node width/height
+
+      _nodes.each((_n: any, _j: number) => {
+        let angle = startAngle + (_j * angleStep);
+        let candidateX = parentX + radius * Math.cos(angle);
+        let candidateY = parentY + radius * Math.sin(angle);
+
+        // nudge outward if overlapping an existing node
+        let attempts = 0;
+        while (attempts < 5) {
+          let hasOverlap = existingPositions.some((pos) => {
+            let dx = candidateX - pos.x;
+            let dy = candidateY - pos.y;
+            return Math.sqrt(dx * dx + dy * dy) < nodeCollisionRadius;
+          });
+          if (!hasOverlap) break;
+          // push further outward along the same angle
+          candidateX += 40 * Math.cos(angle);
+          candidateY += 40 * Math.sin(angle);
+          attempts++;
+        }
+
+        _n.x = candidateX;
+        _n.y = candidateY;
+        _n.position = { x: candidateX, y: candidateY };
+        existingPositions.push({ x: candidateX, y: candidateY });
+      });
+
+      applyPositionToNodes(_nodes);
     }
     // -------------------------------------- end utility functions --------------------------------------
 
@@ -2110,9 +2276,16 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
         .attr('text-anchor', 'middle')
         .attr('class', 'sz-graph-link-label-text');
 
+        // stagger label positions along links to reduce overlap at crossings
+        // use a hash of the link id to distribute offsets in the center band
+        let linkHash = 0;
+        let linkId = d.id || '';
+        for (let c = 0; c < linkId.length; c++) { linkHash = ((linkHash << 5) - linkHash + linkId.charCodeAt(c)) | 0; }
+        let offsets = [38, 46, 54, 62];
+        let baseLabelOffset = offsets[Math.abs(linkHash) % offsets.length];
         let _newLabelsText = _newLabels.append('textPath')
           .attr('class', (_d: any) => _d.isCoreLink ? 'sz-graph-core-link-text' : 'sz-graph-link-text')
-          .attr('startOffset', '50%')
+          .attr('startOffset', baseLabelOffset + '%')
           .attr('xlink:href', (_d: any) => '#' + d.id) // This lets SVG know which label goes with which line
           .text((mkToken) => {
             return mkToken as string;
@@ -2555,12 +2728,13 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
           //console.log('getNextLayerForEntity: links', this.linkedByNodeIndexMap, this.link.data());
           //console.log('getNextLayerForEntity: nodes', result.nodes, d.relatedEntities, newNodes.data());
 
-          // set x/y positions of new nodes close to origin
-          drawNodesInRings(newNodes, undefined, d.x, d.y)
+          // set x/y positions of new nodes fanning outward from parent
+          drawNodesAsDirectionalFan(newNodes, d.x, d.y, this.node)
           // override with saved import positions if available
           this._applyImportedPositionsToNodes(newNodes);
           // redraw any existing or new link relationships
           updateLinksForNodes(newNodes);
+          updateLinkLabelOffsets();
 
           this.onDataUpdated.emit(this.asEntityNetworkData());
           this.expandCollapseToggle(d);
@@ -2644,12 +2818,14 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
       applyPositionToNodes(coreNodes);
       // update initial relationship link lines
       updateLinksForNodes(this.node);
+      // adjust label offsets now that node positions are known
+      updateLinkLabelOffsets();
 
       //console.log('coreNodes: ', coreNodes.data(), nodesCircleSchema, ringsSortedByDiameter);
       //console.log('total width of nodes: ', widthOfNodes, circleDiameter);
       //console.log('nodes: ', this.node.data());
 
-      this.center();
+      this.zoomToFit();
     }
 
     if(this.link) {
@@ -3483,8 +3659,14 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
           });
         } else if ( primaryEntities.indexOf( resolvedEntity.ENTITY_ID ) > -1 ) {
           relColorClasses.push('graph-node-rel-primary');
-        } else {
-          //console.warn('no related ent rels for #'+ resolvedEntity.entityId +'.', entNode.relatedEntities, relatedEntRels);
+        } else if (relatedEntities && relatedEntities.length) {
+          // no relationship to primary entity found — use the best match level
+          // from any relationship (e.g. expanded edge nodes relate to the focal node)
+          relatedEntities.forEach((relEnt: SzSdkRelatedEntity) => {
+            if(relEnt.MATCH_LEVEL_CODE == SzSdkSearchMatchLevel.DISCLOSED) { relColorClasses.push('graph-node-rel-disclosed'); }
+            if(relEnt.MATCH_LEVEL_CODE == SzSdkSearchMatchLevel.POSSIBLE_MATCH) { relColorClasses.push('graph-node-rel-pmatch'); }
+            if(relEnt.MATCH_LEVEL_CODE == SzSdkSearchMatchLevel.POSSIBLY_RELATED) { relColorClasses.push('graph-node-rel-prel'); }
+          });
         }
         if(resolvedEntity.RECORD_SUMMARY && resolvedEntity.RECORD_SUMMARY.map) {
           dataSourceClasses = resolvedEntity.RECORD_SUMMARY && resolvedEntity.RECORD_SUMMARY.map ? resolvedEntity.RECORD_SUMMARY.map((ds) => { return (ds.DATA_SOURCE && ds.DATA_SOURCE.toLowerCase) ? `sz-node-ds-${ds.DATA_SOURCE.toLowerCase()}`:`sz-node-ds-${ds.DATA_SOURCE}`; }) : undefined;
