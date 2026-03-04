@@ -2123,6 +2123,70 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
       //console.log('Ring Calculation: ', circlesToDraw, optimalRingMinimumDiameter, _nodes.size());
       return circlesToDraw;
     }
+    // places new nodes in a fan/arc radiating outward from center, away from existing nodes
+    let drawNodesAsDirectionalFan = (
+      _nodes: d3.Selection<SVGElement, any, any, any>,
+      parentX: number,
+      parentY: number,
+      existingNodes: d3.Selection<SVGElement, any, any, any>
+    ) => {
+      let nodeCount = _nodes && _nodes.size ? _nodes.size() : 0;
+      if (nodeCount === 0) return;
+
+      // calculate the outward angle from graph center (0,0) to the parent node
+      let outwardAngle = Math.atan2(parentY, parentX);
+      // if parent is at center, default to pointing down
+      if (Math.abs(parentX) < 1 && Math.abs(parentY) < 1) {
+        outwardAngle = Math.PI / 2;
+      }
+
+      // collect existing node positions for collision avoidance
+      let existingPositions: { x: number; y: number }[] = [];
+      if (existingNodes) {
+        existingNodes.each((_d: any) => {
+          if (_d.x !== undefined && _d.y !== undefined) {
+            existingPositions.push({ x: _d.x, y: _d.y });
+          }
+        });
+      }
+
+      // fan spread: wider with more nodes, max 180 degrees (pi radians)
+      let fanSpread = Math.min(Math.PI, (nodeCount - 1) * 0.5 + 0.6);
+      let startAngle = outwardAngle - fanSpread / 2;
+      let angleStep = nodeCount > 1 ? fanSpread / (nodeCount - 1) : 0;
+
+      // distance from parent — enough for match key labels
+      let radius = 175;
+      let nodeCollisionRadius = 50; // approximate node width/height
+
+      _nodes.each((_n: any, _j: number) => {
+        let angle = startAngle + (_j * angleStep);
+        let candidateX = parentX + radius * Math.cos(angle);
+        let candidateY = parentY + radius * Math.sin(angle);
+
+        // nudge outward if overlapping an existing node
+        let attempts = 0;
+        while (attempts < 5) {
+          let hasOverlap = existingPositions.some((pos) => {
+            let dx = candidateX - pos.x;
+            let dy = candidateY - pos.y;
+            return Math.sqrt(dx * dx + dy * dy) < nodeCollisionRadius;
+          });
+          if (!hasOverlap) break;
+          // push further outward along the same angle
+          candidateX += 40 * Math.cos(angle);
+          candidateY += 40 * Math.sin(angle);
+          attempts++;
+        }
+
+        _n.x = candidateX;
+        _n.y = candidateY;
+        _n.position = { x: candidateX, y: candidateY };
+        existingPositions.push({ x: candidateX, y: candidateY });
+      });
+
+      applyPositionToNodes(_nodes);
+    }
     // -------------------------------------- end utility functions --------------------------------------
 
     let getMatchKeyLabel = (_linkData) => {
@@ -2621,8 +2685,8 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
           //console.log('getNextLayerForEntity: links', this.linkedByNodeIndexMap, this.link.data());
           //console.log('getNextLayerForEntity: nodes', result.nodes, d.relatedEntities, newNodes.data());
 
-          // set x/y positions of new nodes close to origin
-          drawNodesInRings(newNodes, undefined, d.x, d.y)
+          // set x/y positions of new nodes fanning outward from parent
+          drawNodesAsDirectionalFan(newNodes, d.x, d.y, this.node)
           // override with saved import positions if available
           this._applyImportedPositionsToNodes(newNodes);
           // redraw any existing or new link relationships
