@@ -119,7 +119,8 @@
     "@angular-devkit/build-angular": {
       "jest": "$jest",
       "jest-environment-jsdom": "$jest-environment-jsdom"
-    }
+    },
+    "@noble/hashes": "^2.0.0"
   },
   "optionalDependencies": {
     "@fontsource/material-icons": "^4.2.4",
