@@ -266,11 +266,7 @@ export class SzCrossSourceStatistics implements OnInit, AfterViewInit, OnDestroy
 
       this._title = this._getTitleFromEvent(evt);
       this.cd.detectChanges();
-      this.getNewSampleSet(evt).subscribe((obs)=>{
-        // initialized
-        //console.log('initialized new sample set: ', evt, obs);
-        this.dataMartService.onSampleResultChange.subscribe();
-      })
+      this.getNewSampleSet(evt).subscribe();
     }
   }
   /** when user clicks a source stat, change it in the service */
@@ -351,12 +347,7 @@ export class SzCrossSourceStatistics implements OnInit, AfterViewInit, OnDestroy
 
     // get new sample set
     console.log(`\t\tgetting new sample set: `, evt);
-    this.getNewSampleSet(evt).subscribe((obs)=>{
-      // initialized
-      //console.log('initialized new sample set: ', obs, _parametersEvt);
-      this.dataMartService.onSampleRequest.subscribe();
-      this.dataMartService.onSampleResultChange.subscribe();
-    })
+    this.getNewSampleSet(evt).subscribe();
   }
 
   /** since data can be any format we have to use loose typing */
