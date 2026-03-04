@@ -5,7 +5,19 @@
     "outDir": "../out-tsc/spec",
     "types": [
       "jest"
-    ]
+    ],
+    "paths": {
+      "@angular/core/*": ["node_modules/@angular/core/types/*.d.ts"],
+      "@angular/common/*": ["node_modules/@angular/common/types/*.d.ts"],
+      "@angular/common/http/testing": ["node_modules/@angular/common/types/http-testing.d.ts"],
+      "@angular/common/http/*": ["node_modules/@angular/common/types/http/*.d.ts"],
+      "@angular/platform-browser/*": ["node_modules/@angular/platform-browser/types/*.d.ts"],
+      "@angular/platform-browser-dynamic/*": ["node_modules/@angular/platform-browser-dynamic/types/*.d.ts"],
+      "@angular/material/*": ["node_modules/@angular/material/types/*.d.ts"],
+      "@angular/cdk/*": ["node_modules/@angular/cdk/types/*.d.ts"],
+      "@angular/forms/*": ["node_modules/@angular/forms/types/*.d.ts"],
+      "@angular/router/*": ["node_modules/@angular/router/types/*.d.ts"]
+    }
   },
   "include": [
     "**/*.spec.ts",

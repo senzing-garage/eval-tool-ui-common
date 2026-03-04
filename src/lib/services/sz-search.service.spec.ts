@@ -11,7 +11,7 @@ describe('SzSearchService', () => {
   }));
 
   it('should be created', () => {
-    const service: SzSearchService = TestBed.get(SzSearchService);
+    const service: SzSearchService = TestBed.inject(SzSearchService);
     expect(service).toBeTruthy();
   });
 });

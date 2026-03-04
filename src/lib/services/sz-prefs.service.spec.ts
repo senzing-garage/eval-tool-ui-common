@@ -76,8 +76,8 @@ describe('SzPrefsService', () => {
 });
 
     injector = getTestBed();
-    service = injector.get(SzPrefsService);
-    httpMock = injector.get(HttpTestingController);
+    service = injector.inject(SzPrefsService);
+    httpMock = injector.inject(HttpTestingController);
   });
 
   afterEach(() => {
