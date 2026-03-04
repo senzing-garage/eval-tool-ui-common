@@ -198,6 +198,9 @@ body {
   /* how related */
   --sz-how-step-card-base-z-index: 500;
 
+  /* cross source summary */
+  --sz-cross-source-summary-margin: 0;
+  --sz-cross-source-summary-width: 100%;
   /* charts */
     /* record stats donut */
     --sz-donut-chart-graph-align-items: center;
