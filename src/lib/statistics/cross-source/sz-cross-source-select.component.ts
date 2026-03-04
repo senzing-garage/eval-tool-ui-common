@@ -562,14 +562,33 @@ export class SzCrossSourceSelectComponent implements OnInit, AfterViewInit, OnDe
     });
   }
 
-  public setToDataSource(dataSource: string | SzSdkDataSource) {
+  public setToDataSource(dataSource: string | SzSdkDataSource | undefined) {
     setTimeout(() => {
-      if (this.dataSources && SzCrossSourceSelectComponent.dataSourcesInclude(dataSource, this.dataSources)) {
+      if (!dataSource) {
+        // Clear the "vs" selection (set to same as fromDataSource, which means "none")
+        this.toDataSource = this.fromDataSource;
+        this.stepFromNone = true;
+        console.log(`to datasource cleared: ${this.toDataSource}`);
+        // Trigger a refresh so the view updates to single-source mode
+        this.defaultSourcesSelected.emit({
+          matchLevel: this.dataMartService.sampleMatchLevel,
+          statType: this.dataMartService.sampleStatType,
+          dataSource1: this.fromDataSource
+        });
+      } else if (this.dataSources && SzCrossSourceSelectComponent.dataSourcesInclude(dataSource, this.dataSources)) {
         this.toDataSource = dataSource;
         this.stepFromNone = (this.toDataSource === this.fromDataSource);
         console.log(`to datasource: ${dataSource}|${this.toDataSource}`);
-        //this.currentProjectService.setAttribute(TO_DATA_SOURCE_KEY, dataSource);
-        //this.onSummaryDataChanged();
+        // Trigger a refresh so the view updates with the new "vs" datasource
+        let evt: SzCrossSourceSummarySelectionEvent = {
+          matchLevel: this.dataMartService.sampleMatchLevel,
+          statType: this.dataMartService.sampleStatType,
+          dataSource1: this.fromDataSource
+        };
+        if (this.toDataSource !== this.fromDataSource) {
+          evt.dataSource2 = this.toDataSource as string;
+        }
+        this.defaultSourcesSelected.emit(evt);
       } else {
         console.warn(`to datasource failure: "${dataSource}"|"${this.toDataSource}"`, this.dataSources);
       }
