@@ -746,8 +746,15 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
     public isDataSourceSelected(dataSource: string, dataSourceName?: string) {
       // check if there is only "1" datasource, if row specifies to only match the second one and it's null flip it over to the first
       dataSourceName = dataSourceName && dataSourceName === 'sampleDataSource2' &&  this.dataMartService.sampleDataSource2 === undefined ? 'sampleDataSource1' : dataSourceName;
-      let _dataSourcesToMatch = this.dataMartService.sampleMatchLevel === SzCrossSourceSummaryCategoryTypeToMatchLevel.MATCHES ? [this.dataMartService.sampleDataSource1, this.dataMartService.sampleDataSource2] : this.dataMartService && this.dataMartService.sampleDataSource1 ? [this.dataMartService.sampleDataSource1] :  this.dataMartService && this.dataMartService.sampleDataSource2 ? [this.dataMartService.sampleDataSource2] : [];
-      let retVal = (dataSource !== undefined && 
+      let _dataSourcesToMatch: string[];
+      if(this.dataMartService.sampleMatchLevel === SzCrossSourceSummaryCategoryTypeToMatchLevel.MATCHES) {
+        _dataSourcesToMatch = [this.dataMartService.sampleDataSource1, this.dataMartService.sampleDataSource2];
+      } else if(dataSourceName === 'sampleDataSource2') {
+        _dataSourcesToMatch = this.dataMartService.sampleDataSource2 !== undefined ? [this.dataMartService.sampleDataSource2] : [this.dataMartService.sampleDataSource1];
+      } else {
+        _dataSourcesToMatch = this.dataMartService.sampleDataSource1 ? [this.dataMartService.sampleDataSource1] : this.dataMartService.sampleDataSource2 ? [this.dataMartService.sampleDataSource2] : [];
+      }
+      let retVal = (dataSource !== undefined &&
         _dataSourcesToMatch
         .indexOf(dataSource) > -1) ? true : false;
       //console.log(`isDataSourceSelected("${dataSource}","${dataSourceName}"): [${_dataSourcesToMatch.join(',')}].indexOf("${dataSource} > -1 ?")`, retVal);
@@ -1088,10 +1095,27 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
         this._hasLoadedOnce = true;
       }
       this.resetRenderingIndexes();
+      // deduplicate bidirectional relations for types where the venn shows entityCount
+      // (matches and ambiguous matches). Other types use relationCount which already
+      // accounts for both directions, so no dedup needed.
+      if(data && data.length > 0 && (data[0] as SzSampleSetRelation).relatedEntity) {
+        const statType = this.dataMartService.sampleStatType;
+        if(statType === SzCrossSourceSummaryCategoryType.MATCHES || statType === SzCrossSourceSummaryCategoryType.AMBIGUOUS_MATCHES) {
+          const seenEntityIds = new Set<number>();
+          data = (data as SzSampleSetRelation[]).filter((item: SzSampleSetRelation) => {
+            const entityId = item.entity?.ENTITY_ID;
+            if(entityId !== undefined) {
+              if(seenEntityIds.has(entityId)) return false;
+              seenEntityIds.add(entityId);
+            }
+            return true;
+          });
+        }
+      }
       // flatten/normalize data so we can display it
       let transformed: SzSampleSetEntityTableItem[] = data.map((item: SzSampleSetEntity | SzSampleSetRelation) => {
         // is it a relation or a entity
-        let isRelation = (item as SzSampleSetRelation).entity ? false : true;
+        let isRelation = (item as SzSampleSetRelation).relatedEntity ? true : false;
         if(isRelation) {
           // base item is relation's entity
           let baseItem  = (item as SzSampleSetRelation).entity as SzDataTableEntity;
@@ -1130,7 +1154,27 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
           }) : undefined;
 
           let _relRows = relItem.RECORDS && relItem.RECORDS.map ? relItem.RECORDS.map((rec: SzSdkEntityRecord) => {
-            let retVal: SzSampleSetRelationTableRow      = Object.assign({DATA_TYPE: SzSampleSetTableRowType.RELATED_RECORD}, rec);
+            let retVal = Object.assign({
+              ENTITY_ID: relItem.ENTITY_ID,
+              ENTITY_NAME: relItem.ENTITY_NAME,
+              DATA_TYPE: SzSampleSetTableRowType.RELATED_RECORD
+            }, rec) as SzSampleSetRelationTableRow;
+            if(rec.FEATURES && Object.keys(rec.FEATURES).length > 0) {
+              let _featuresAsStrings = getStringRecordFeatures(rec.FEATURES, true, this.configManager.fTypeToAttrClassMap, true, true);
+              if(_featuresAsStrings.has('ATTRIBUTE'))      retVal.ATTRIBUTE_DATA      = _featuresAsStrings.get('ATTRIBUTE');
+              if(_featuresAsStrings.has('ADDRESS'))        retVal.ADDRESS_DATA        = _featuresAsStrings.get('ADDRESS');
+              if(_featuresAsStrings.has('IDENTIFIER'))     retVal.IDENTIFIER_DATA     = _featuresAsStrings.get('IDENTIFIER');
+              if(_featuresAsStrings.has('NAME'))           retVal.NAME_DATA           = _featuresAsStrings.get('NAME');
+              if(_featuresAsStrings.has('PHONE'))          retVal.PHONE_DATA          = _featuresAsStrings.get('PHONE');
+              if(_featuresAsStrings.has('DOB'))            retVal.DOB_DATA            = _featuresAsStrings.get('DOB_DATA');
+              if(_featuresAsStrings.has('RELATIONSHIP'))   retVal.RELATIONSHIP_DATA   = _featuresAsStrings.get('RELATIONSHIP');
+              if(_featuresAsStrings.has('OTHER'))          retVal.OTHER_DATA          = _featuresAsStrings.get('OTHER');
+            }
+            const _unmapped = getUnmappedJsonDataFields(rec);
+            if (_unmapped.length > 0) {
+              const existing = retVal.OTHER_DATA || [];
+              retVal.OTHER_DATA = existing.concat(_unmapped.map(f => `${f.key}: ${f.value}`));
+            }
             return retVal;
           }) : undefined;
 
