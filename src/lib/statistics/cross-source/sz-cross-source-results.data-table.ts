@@ -1139,7 +1139,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
               if(_featuresAsStrings.has('IDENTIFIER'))     retVal.IDENTIFIER_DATA     = _featuresAsStrings.get('IDENTIFIER');
               if(_featuresAsStrings.has('NAME'))           retVal.NAME_DATA           = _featuresAsStrings.get('NAME');
               if(_featuresAsStrings.has('PHONE'))          retVal.PHONE_DATA          = _featuresAsStrings.get('PHONE');
-              if(_featuresAsStrings.has('DOB'))            retVal.DOB_DATA            = _featuresAsStrings.get('DOB_DATA');
+              if(_featuresAsStrings.has('DOB'))            retVal.DOB_DATA            = _featuresAsStrings.get('DOB');
               if(_featuresAsStrings.has('RELATIONSHIP'))   retVal.RELATIONSHIP_DATA   = _featuresAsStrings.get('RELATIONSHIP');
 
               if(_featuresAsStrings.has('OTHER'))          retVal.OTHER_DATA          = _featuresAsStrings.get('OTHER');
@@ -1166,7 +1166,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
               if(_featuresAsStrings.has('IDENTIFIER'))     retVal.IDENTIFIER_DATA     = _featuresAsStrings.get('IDENTIFIER');
               if(_featuresAsStrings.has('NAME'))           retVal.NAME_DATA           = _featuresAsStrings.get('NAME');
               if(_featuresAsStrings.has('PHONE'))          retVal.PHONE_DATA          = _featuresAsStrings.get('PHONE');
-              if(_featuresAsStrings.has('DOB'))            retVal.DOB_DATA            = _featuresAsStrings.get('DOB_DATA');
+              if(_featuresAsStrings.has('DOB'))            retVal.DOB_DATA            = _featuresAsStrings.get('DOB');
               if(_featuresAsStrings.has('RELATIONSHIP'))   retVal.RELATIONSHIP_DATA   = _featuresAsStrings.get('RELATIONSHIP');
               if(_featuresAsStrings.has('OTHER'))          retVal.OTHER_DATA          = _featuresAsStrings.get('OTHER');
             }
@@ -1210,7 +1210,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
               if(_featuresAsStrings.has('IDENTIFIER'))     retVal.IDENTIFIER_DATA     = _featuresAsStrings.get('IDENTIFIER');
               if(_featuresAsStrings.has('NAME'))           retVal.NAME_DATA           = _featuresAsStrings.get('NAME');
               if(_featuresAsStrings.has('PHONE'))          retVal.PHONE_DATA          = _featuresAsStrings.get('PHONE');
-              if(_featuresAsStrings.has('DOB'))            retVal.DOB_DATA            = _featuresAsStrings.get('DOB_DATA');
+              if(_featuresAsStrings.has('DOB'))            retVal.DOB_DATA            = _featuresAsStrings.get('DOB');
               if(_featuresAsStrings.has('RELATIONSHIP'))   retVal.RELATIONSHIP_DATA   = _featuresAsStrings.get('RELATIONSHIP');
 
               if(_featuresAsStrings.has('OTHER'))          retVal.OTHER_DATA          = _featuresAsStrings.get('OTHER');
