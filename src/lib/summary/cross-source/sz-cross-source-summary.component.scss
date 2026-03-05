@@ -1,8 +1,9 @@
 @use "../../scss/colors";
 
 :host {
-    width: 100%;
+    width: var(--sz-cross-source-summary-width, 100%);
     display: block;
+    margin: var(--sz-cross-source-summary-margin, 0);
     .cols {
         width: 100%;
         display: flex;

@@ -1312,8 +1312,9 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
         if(this._resizeMinWidth > 0) {
           if((left - this._resizeCellClientXOffset) > this._resizeMinWidth) {
             this._resizeElement.style.left  = (left - this._resizeCellClientXOffset) +'px';
-            if(this.resizeIndicatorRef) {
-              this.resizeIndicatorRef.nativeElement.style.left = left+'px';
+            if(this.resizeIndicatorRef && this.tableRef) {
+              const tableLeft = this.tableRef.nativeElement.getBoundingClientRect().left;
+              this.resizeIndicatorRef.nativeElement.style.left = (left - tableLeft) +'px';
               //this._colSizes.set(this._resizeColName, this._resizeElement.style.left);
             }
           }
@@ -1330,7 +1331,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
         // this is a resize handle
         this._resizeElement = (event.target as HTMLElement);
         if(this._resizeElement && this._resizeElement.parentElement) {
-          this._resizeCellClientXOffset   = this._resizeElement.parentElement.offsetLeft;
+          this._resizeCellClientXOffset   = this._resizeElement.parentElement.getBoundingClientRect().left;
           this._resizeCellClientYOffset   = this._resizeElement.parentElement.offsetTop;
           this._resizeColName             = this._resizeElement.parentElement.getAttribute('data-field-name');
           this._resizeElement.parentElement.classList.add('is-dragging');
@@ -1347,6 +1348,36 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
           //console.log(`\tparent offset: ${this._resizeCellClientXOffset}`, this._resizeElement.parentElement.getClientRects());
         }
         this._isResizing    = true;
+        // listen on document so dragging outside the header still
+        // tracks the cursor and disengages on mouseup
+        this._documentMouseUpListener = this._onDocumentMouseUp.bind(this);
+        this._documentMouseMoveListener = this._onDocumentMouseMove.bind(this);
+        document.addEventListener('mouseup', this._documentMouseUpListener);
+        document.addEventListener('mousemove', this._documentMouseMoveListener);
+      }
+    }
+    /** @internal */
+    private _documentMouseUpListener: ((e: MouseEvent) => void) | null = null;
+    /** @internal */
+    private _documentMouseMoveListener: ((e: MouseEvent) => void) | null = null;
+    /** @internal */
+    private _onDocumentMouseUp(event: MouseEvent) {
+      if(this._isResizing) {
+        this.onHeaderMouseUp(event);
+      }
+      if(this._documentMouseUpListener) {
+        document.removeEventListener('mouseup', this._documentMouseUpListener);
+        this._documentMouseUpListener = null;
+      }
+      if(this._documentMouseMoveListener) {
+        document.removeEventListener('mousemove', this._documentMouseMoveListener);
+        this._documentMouseMoveListener = null;
+      }
+    }
+    /** @internal */
+    private _onDocumentMouseMove(event: MouseEvent) {
+      if(this._isResizing) {
+        this._setResizeIndicatorPosition(event.clientX);
       }
     }
     /** exactly what it sounds like
