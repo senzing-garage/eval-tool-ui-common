@@ -9,6 +9,7 @@ const config: Config = {
     '<rootDir>/e2e/',
     '<rootDir>/node_modules/',
   ],
+  resolver: '<rootDir>/jest-resolver.js',
   moduleNameMapper: {
     '^src/(.*)$': '<rootDir>/src/$1',
   },

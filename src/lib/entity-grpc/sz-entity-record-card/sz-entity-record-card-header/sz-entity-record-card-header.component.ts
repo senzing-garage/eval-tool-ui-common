@@ -38,7 +38,7 @@ export class SzEntityRecordCardHeaderComponentGrpc implements OnInit, OnDestroy 
   public entityRecordClick: EventEmitter<number> = new EventEmitter<number>();
 
   /** listen for click even on entire header */
-  @HostListener('click', ['$event.target']) public onHeaderNameClick(event: MouseEvent) {
+  @HostListener('click', ['$event']) public onHeaderNameClick(event: MouseEvent) {
     if(this.entityDetailsId) { this.onEntityDetailLinkClick( this.entityDetailsId ); }
   }
 
