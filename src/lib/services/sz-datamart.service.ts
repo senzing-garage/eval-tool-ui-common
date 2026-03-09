@@ -675,7 +675,10 @@ export class SzStatSampleSet {
                                         ERRULE_CODE: _record.principle
                                     }
                                 })
-                            }
+                            },
+                            matchKey: _relation.matchKey,
+                            matchType: _relation.matchType,
+                            principle: _relation.principle
                         }
                         
                         return _retValue;
