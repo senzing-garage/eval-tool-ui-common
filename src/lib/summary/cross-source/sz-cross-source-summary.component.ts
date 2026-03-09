@@ -68,9 +68,8 @@ export class SzCrossSourceSummaryComponent implements OnInit, OnDestroy {
   public get singular() : boolean {
     let onlyHasOneDataSource = (this.dataMartService.dataSources && this.dataMartService.dataSources.length === 1);
     let hasOneDsSelected     = ((this.dataMartService.dataSource1 !== undefined && this.dataMartService.dataSource2 === undefined) || (this.dataMartService.dataSource1 === undefined && this.dataMartService.dataSource2 !== undefined));
-    let ds1NotEqds2 = (this.dataMartService.dataSource1 !== this.dataMartService.dataSource2);
-    //console.log(`singular: `, onlyHasOneDataSource || (hasOneDsSelected && ds1NotEqds2));
-    return onlyHasOneDataSource || (hasOneDsSelected && ds1NotEqds2);
+    let ds1EqDs2 = (this.dataMartService.dataSource1 !== undefined && this.dataMartService.dataSource1 === this.dataMartService.dataSource2);
+    return onlyHasOneDataSource || hasOneDsSelected || ds1EqDs2;
   }
   public get hasData() :  boolean {
     return this._fromDataSourceSummaryData || this._toDataSourceSummaryData || this._crossSourceSummaryData ? true : false;
