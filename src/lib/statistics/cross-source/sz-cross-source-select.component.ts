@@ -161,37 +161,28 @@ export class SzCrossSourceSelectComponent implements OnInit, AfterViewInit, OnDe
     private dataMartService: SzDataMartService,
     private dataSourcesService: SzDataSourcesService) {}
   ngOnInit() {
-    // get data sources
-    this.getDataSources().pipe(
-        takeUntil(this.unsubscribe$),
-        take(1)
-      ).subscribe({
-        next: (dataSources: SzSdkDataSource[])=>{
-          this._dataSources = dataSources;
-          console.log(`got datasources: `, this._dataSources);
-          if(this.dataMartService.summaryStatistics && (this.fromDataSource || this.toDataSource)) {
-            this.regenerateDataSourceLists(this._dataSources);
-          }
-          this._dataSourcesReceived = true;
-          this._checkInitialized(true);
-        },
-        error: (err) => {
-          this.exception.next(err);
-          this._dataSourcesReceived = true;
-          this._checkInitialized(false);
-        }
-      });
       // populate initial selections from prefs
       this.prefs.dataMart.prefsChanged.pipe(
         takeUntil(this.unsubscribe$)
       ).subscribe(this.onPrefsChange.bind(this));
-      
+
       this.dataMartService.onCountStats.pipe(
         takeUntil(this.unsubscribe$)
       ).subscribe(this.onLoadedStatsChanged.bind(this));
       this.dataMartService.onSummaryStats.pipe(
         takeUntil(this.unsubscribe$),
         tap((stats: SzSummaryStats) => {
+          // Derive data sources from summary stats (not gRPC config)
+          if (stats && stats.sourceSummaries) {
+            this._dataSources = stats.sourceSummaries.map(ss => ({
+              DSRC_CODE: ss.dataSource,
+              DSRC_ID: 0
+            } as SzSdkDataSource));
+            if (!this._dataSourcesReceived) {
+              this._dataSourcesReceived = true;
+              this._checkInitialized(true);
+            }
+          }
           if(this._dataSources && (this.fromDataSource || this.toDataSource)) {
             this.regenerateDataSourceLists(this._dataSources);
           }
