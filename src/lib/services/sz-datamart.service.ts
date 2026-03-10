@@ -902,7 +902,7 @@ export class SzDataMartService {
     /** @internal */
     private _matchKeyCounts: SzCrossSourceCount[];
     /** @internal */
-    private _onlyShowLoadedSummaryStatistics                = false;
+    private _onlyShowLoadedSummaryStatistics                = true;
     /** @internal */
     private _sampleSet: SzStatSampleSet;
     /** @internal */
