@@ -486,21 +486,6 @@ export class SzStatSampleSet {
         ).subscribe((results: SzSdkResolvedEntity[])=>{
             _retSubject.next(results);
         });
-        
-        /*let _listOfObservables = entityIds.map((eId) => {
-            return this.engineService.    getEntityByEntityId(eId, flags);
-            //return this.entityDataService.getEntityByEntityId(eId, detailLevel, undefined, undefined, undefined, false, withRelatedStr)
-        })
-
-        forkJoin(_listOfObservables).pipe(
-        map((res: SzEntityResponse[]) => {
-            return res.map((res: SzEntityResponse) => (res.data as SzEntityData))
-        })
-        )
-        .subscribe((results: SzEntityData[]) => {
-            console.warn('@senzing/sdk/services/sz-datamart[getEntitiesByIds RESULT: ', results);
-            _retSubject.next(results);
-        })*/
 
         return _retVal;
     }
