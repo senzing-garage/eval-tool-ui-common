@@ -36,8 +36,7 @@
     <li *ngIf="!expirationInvalid && expiringSoon"
       ><span class="material-icons warning-prefix">warning</span
         ><span class="warning-prefix">WARNING:</span
-        >
-        <span class="warning-message" *ngIf="expired">
+        > <span class="warning-message" *ngIf="expired">
             <ng-template #trialLicenseExpired [ngIf]="trialLicense" [ngIfElse]="licenseExpired">
                 Your free trial has expired!
             </ng-template>
@@ -53,7 +52,7 @@
                 Your subscription will expire in {{licenseDays}} day.
             </ng-template>
         </span>
-    ></li>
+    </li>
 </ul>
 <div class="buttons" *ngIf="showUpgradeButton">
     <div [ngSwitch]="upgradeType">
