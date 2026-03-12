@@ -1,11 +1,7 @@
 <div class="data-select-wrapper">
     <div class="dsrc-select from-dsrc">
       <div class="legend"><label>A</label></div>
-      <mat-menu #fromSourceMenu="matMenu" #fromDataSourcePulldown class="sz-css-versus-menu data-source-menu" [overlapTrigger]="false">
-        <div class="heading"
-          ><label class="dsrc-name">Name</label
-          ><label class="versus-connections">Versus Connections</label
-        ></div>
+      <mat-menu #fromSourceMenu="matMenu" #fromDataSourcePulldown class="sz-css-versus-menu data-source-menu" [overlapTrigger]="false" yPosition="below">
         <button mat-menu-item *ngFor="let ds of fromDataSources"
             [disabled]="ds.name === fromDataSource"
             [class.selected]="ds.name === fromDataSource"
@@ -15,11 +11,11 @@
           ><span class="connection-count" *ngIf="ds.connectionCount > 0">{{ds.connectionCount}}</span
         ></button>
       </mat-menu>
-      <button #displayFromDS 
-        class="dsrc-select from-dsrc" 
+      <button #displayFromDS
+        class="dsrc-select from-dsrc"
         *ngIf="fromDataSources.length > 1"
         [matMenuTriggerFor]="fromSourceMenu"
-        (onResize)="onPulldownMenuSizeChange(displayFromDS, $event)"
+        (menuOpened)="onMenuOpened(displayFromDS)"
         ><span class="material-icons">more_vert</span
         ><label>{{ fromDataSource }}</label
       ></button>
@@ -41,11 +37,7 @@
     <div class="dsrc-versus" *ngIf="dataSources.length > 1">vs.</div>
     <div class="dsrc-select to-dsrc" *ngIf="dataSources.length > 1">
       <div class="legend"><label>B</label></div>
-      <mat-menu #toSourceMenu="matMenu" class="sz-css-versus-menu data-source-menu" [overlapTrigger]="false">
-        <div class="heading"
-          ><label class="dsrc-name">Name</label
-          ><label class="versus-connections">Versus Connections</label
-        ></div>
+      <mat-menu #toSourceMenu="matMenu" class="sz-css-versus-menu data-source-menu" [overlapTrigger]="false" yPosition="below">
         <button mat-menu-item
             [disabled]="fromDataSource === toDataSource"
             [class.selected]="fromDataSource === toDataSource"
@@ -67,7 +59,7 @@
       </mat-menu>
       <button #displayToDS class="dsrc-select to-dsrc"
               [matMenuTriggerFor]="toSourceMenu"
-              (onResize)="onPulldownMenuSizeChange(displayToDS, $event)"
+              (menuOpened)="onMenuOpened(displayToDS)"
         ><span class="material-icons">more_vert</span
         ><label>{{
           fromDataSource === toDataSource

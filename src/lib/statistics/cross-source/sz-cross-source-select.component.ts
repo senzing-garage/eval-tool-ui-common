@@ -256,6 +256,30 @@ export class SzCrossSourceSelectComponent implements OnInit, AfterViewInit, OnDe
     }
   }
 
+  /** Set the overlay panel width to match the selector container and align below it */
+  public onMenuOpened(triggerButton: HTMLElement) {
+    const container = triggerButton?.closest('.dsrc-select') as HTMLElement;
+    if (!container) return;
+    const width = container.clientWidth;
+    // The mat-menu panel is rendered in a CDK overlay; find it by class
+    setTimeout(() => {
+      const panel = document.querySelector('.data-source-menu') as HTMLElement;
+      if (panel) {
+        panel.style.minWidth = width + 'px';
+        // Nudge the overlay pane down so it aligns with the bottom of the button
+        const overlayPane = panel.closest('.cdk-overlay-pane') as HTMLElement;
+        if (overlayPane) {
+          const containerRect = container.getBoundingClientRect();
+          const paneRect = overlayPane.getBoundingClientRect();
+          const gap = containerRect.bottom - paneRect.top;
+          if (gap > -4) {
+            overlayPane.style.marginTop = (gap + 4) + 'px';
+          }
+        }
+      }
+    });
+  }
+
   private onLoadedStatsChanged(stats) {
     console.info('on Count Stats: ', stats);
   }
@@ -330,8 +354,9 @@ export class SzCrossSourceSelectComponent implements OnInit, AfterViewInit, OnDe
           });
           if(crossSourcesWithStats && crossSourcesWithStats.length > 0) {
             console.log(`found datasource with stats "${crossSourcesWithStats[0].dataSource}"`, crossSourcesWithStats);
-            // grab the first one
+            // grab the first one for both A and B (B shows as "[ NONE ]" when equal to A)
             this.dataMartService.dataSource1 = crossSourcesWithStats[0].dataSource;
+            this.dataMartService.dataSource2 = crossSourcesWithStats[0].dataSource;
             
             // auto populate data table without user click from this event emitter
             // emitter always broadcasts but it's up to subscriber to actually initialize new 
@@ -462,68 +487,40 @@ export class SzCrossSourceSelectComponent implements OnInit, AfterViewInit, OnDe
     return _retVal;
   }
 
-  stepFromDataSource(backwards: boolean) : void
-  {
-    const fromDS = this.fromDataSource;
+  stepFromDataSource(backwards: boolean): void {
     const sources = this.dataSources;
-    if (sources && sources.length === 1) {
+    if (!sources || sources.length === 0) return;
+    if (sources.length === 1) {
       this.setFromDataSource(sources[0]);
       return;
     }
 
-    if (!fromDS && sources && sources.length > 0) {
-      this.setFromDataSource(sources[0]);
-      return;
-    }
+    let index = sources.findIndex(ds => ds.DSRC_CODE === this.fromDataSource);
+    if (index < 0) index = 0;
 
-    let index = sources.findIndex((_ds)=>{
-      _ds.DSRC_CODE === fromDS;
-    }) + (backwards ? -1 : 1);
-    const length = sources.length;
+    index += backwards ? -1 : 1;
+    if (index < 0) index = sources.length - 1;
+    if (index >= sources.length) index = 0;
 
-    if (index < 0) {
-      index = length + (index%length);
-    } else if (index >= length) {
-      index = index % length;
-    }
-
-    if (this.stepFromNone) {
-      this.setBothDataSources(sources[index]);
-    } else {
-      this.setFromDataSource(sources[index]);
-    }
+    this.setFromDataSource(sources[index]);
   }
 
-  stepToDataSource(backwards: boolean) : void
-  {
+  stepToDataSource(backwards: boolean): void {
     const sources = this.dataSources;
-    if (sources && sources.length === 1) {
+    if (!sources || sources.length === 0) return;
+    if (sources.length === 1) {
       this.setToDataSource(sources[0]);
       return;
     }
 
-    let index = 0;
-    const length = sources.length;
+    let index = sources.findIndex(ds => ds.DSRC_CODE === this.toDataSource);
+    if (index < 0) index = 0;
 
-    if (!this.toDataSource && sources && sources.length > 0) {
-      if (backwards) {
-        index = sources.length-1;
-      } else {
-        index = 0;
-      }
-    } else {
-      index = sources.findIndex((_ds)=>{
-        _ds.DSRC_CODE === this.toDataSource;
-      }) + (backwards ? -1 : 1);
-    }
+    index += backwards ? -1 : 1;
+    if (index < 0) index = sources.length - 1;
+    if (index >= sources.length) index = 0;
 
-    if (index < 0) {
-      index = length + (index % length);
-    } else if (index >= length) {
-      index = index % length;
-    }
     this.setToDataSource(sources[index]);
-    this.stepFromNone = sources[index].DSRC_CODE === this.fromDataSource;
   }
 
   private setBothDataSources(dataSource: SzSdkDataSource) {
