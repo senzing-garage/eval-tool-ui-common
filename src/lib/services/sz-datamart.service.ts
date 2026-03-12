@@ -683,6 +683,7 @@ export class SzStatSampleSet {
                 this._entityPages.set(this._currentPage, _dataPage);
                 let _currentPageEntities   = _dataPage.entities;
                 if(!_dataPage || (_dataPage && _dataPage.totalEntityCount === 0)) {
+                    this._loading.next(false);
                     this._onNoResults.next(true);
                     return;
                 }
@@ -757,6 +758,7 @@ export class SzStatSampleSet {
                 let _currentPageRelations  = _dataPage.relations;
                 // no results
                 if(!_dataPage || (_dataPage && _dataPage.totalRelationCount === 0)) {
+                    this._loading.next(false);
                     this._onNoResults.next(true);
                     return;
                 }
@@ -1327,7 +1329,7 @@ export class SzDataMartService {
             principle: principle,
             pageSize: pageSize
         }, this.prefs, this.statsService, this.engineService);
-        
+
         if(unfilteredCount) {
             this._sampleSet.unfilteredCount = unfilteredCount;
             console.warn(`SET unfilteredCount to "${unfilteredCount}"`);
@@ -1336,6 +1338,7 @@ export class SzDataMartService {
         }
 
         this._onSampleResultChange$ = this._sampleSet.onDataUpdated.pipe(
+            filter((res) => res !== undefined),
             tap((res) => {
                 // bubble up sample set evt to service scope
                 if(res && res.length === 0) {

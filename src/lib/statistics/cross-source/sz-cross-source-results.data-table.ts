@@ -164,7 +164,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
       ]],
       [2,[
         'ENTITY_ID',
-        /*'ERRULE_CODE',*/
+        'ERRULE_CODE',
         'MATCH_KEY',
         'relatedEntityId',
         'DATA_SOURCE',
@@ -179,7 +179,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
       ]],
       [3,[
         'ENTITY_ID',
-        /*'ERRULE_CODE',*/
+        'ERRULE_CODE',
         'MATCH_KEY',
         'relatedEntityId',
         'DATA_SOURCE',
@@ -1133,14 +1133,17 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
      */
     private onSampleMatchLevelChange(matchLevel: number) {
       if(this._matchLevelToColumnsMap.has(matchLevel)) {
-        this._selectableColumns   = this._matchLevelToColumnsMap.get(matchLevel);
-        this.generateSelectableColumnsMap();
+        this._selectableColumns   = [...this._matchLevelToColumnsMap.get(matchLevel)];
       } else {
         // we still need columns so...
         console.warn(`NO column map for MATCH LEVEL ${matchLevel}`);
-        this._selectableColumns = this._matchLevelToColumnsMap.get(1);
-        this.generateSelectableColumnsMap();
+        this._selectableColumns = [...this._matchLevelToColumnsMap.get(1)];
       }
+      // Disclosed relations always have ERRULE_CODE="DISCLOSED" — no need for the column
+      if (this.dataMartService.sampleStatType === SzCrossSourceSummaryCategoryType.DISCLOSED_RELATIONS) {
+        this._selectableColumns = this._selectableColumns.filter(c => c !== 'ERRULE_CODE');
+      }
+      this.generateSelectableColumnsMap();
       // refresh the cols list so that grid column style is correct
       let _colsForMatchLevel    = new Map<string, string>([...this._cols].filter((_col)=>{
         return this._selectableColumns.includes(_col[0]);
@@ -1151,6 +1154,18 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
     /** when new sample set data has changed the data is transformed, indexes reset,
      * and counts generated. */
     private onSampleSetDataChange(data: SzSampleSetRelation[] | SzSampleSetEntity[] | undefined) {
+      // Re-evaluate columns now that stat type is finalized
+      // (onSampleMatchLevelChange may fire before stat type is updated)
+      if (this.dataMartService.sampleStatType === SzCrossSourceSummaryCategoryType.DISCLOSED_RELATIONS) {
+        if (this._selectableColumns.includes('ERRULE_CODE')) {
+          this._selectableColumns = this._selectableColumns.filter(c => c !== 'ERRULE_CODE');
+          this.generateSelectableColumnsMap();
+          let _colsForMatchLevel = new Map<string, string>([...this._cols].filter((_col) => {
+            return this._selectableColumns.includes(_col[0]);
+          }));
+          this._selectedColumns = _colsForMatchLevel;
+        }
+      }
       if(data === undefined) {
         this.data = [];
         this._noData = true;
@@ -1216,6 +1231,14 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
             }
             return retVal;
           }) : undefined;
+          // Sort entity rows: selected data source records first, ECL records last
+          if (_entRows) {
+            _entRows.sort((a, b) => {
+              const aSelected = this.isDataSourceSelected(a.DATA_SOURCE, 'sampleDataSource1') ? 0 : 1;
+              const bSelected = this.isDataSourceSelected(b.DATA_SOURCE, 'sampleDataSource1') ? 0 : 1;
+              return aSelected - bSelected;
+            });
+          }
 
           let _relRows = relItem.RECORDS && relItem.RECORDS.map ? relItem.RECORDS.map((rec: SzSdkEntityRecord) => {
             let retVal = Object.assign({
@@ -1241,14 +1264,22 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
             }
             return retVal;
           }) : undefined;
+          // Sort related entity rows: selected data source records first, ECL records last
+          if (_relRows) {
+            _relRows.sort((a, b) => {
+              const aSelected = this.isDataSourceSelected(a.DATA_SOURCE, 'sampleDataSource2') ? 0 : 1;
+              const bSelected = this.isDataSourceSelected(b.DATA_SOURCE, 'sampleDataSource2') ? 0 : 1;
+              return aSelected - bSelected;
+            });
+          }
 
           // mash them up in to one object
           return Object.assign(baseItem, {
             relatedEntity: Object.assign(
-              (item as SzSampleSetRelation).relatedEntity, 
+              (item as SzSampleSetRelation).relatedEntity,
               {
-                rows: _relRows, 
-                relatedEntityId:  (item as SzSampleSetRelation).entity.ENTITY_ID,
+                rows: _relRows,
+                relatedEntityId:  (item as SzSampleSetRelation).relatedEntity.ENTITY_ID,
                 relatedMatchKey:  (item as SzSampleSetRelation).matchKey,
                 relatedMatchType: (item as SzSampleSetRelation).matchType
               }
@@ -1287,6 +1318,14 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
             }
             return retVal;
           }) : undefined;
+          // Sort entity rows: selected data source records first, ECL records last
+          if (rows) {
+            rows.sort((a, b) => {
+              const aSelected = this.isDataSourceSelected(a.DATA_SOURCE, 'sampleDataSource1') ? 0 : 1;
+              const bSelected = this.isDataSourceSelected(b.DATA_SOURCE, 'sampleDataSource1') ? 0 : 1;
+              return aSelected - bSelected;
+            });
+          }
 
           // mash them up in to one object
           return Object.assign(baseItem, {relatedEntities: (item as SzSampleSetEntity).relatedEntities, rows: rows});
@@ -1341,6 +1380,45 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
       this.data     = transformed;
       this._loading.next({inflight: false, source: 'SzCrossSourceResultsDataTable.onSampleSetDataChange'});
       this.cd.markForCheck();
+      this.autoExpandFilteredRowGroups();
+    }
+    /**
+     * When a match key or ER code filter is active (match level 1 only), auto-expand
+     * row groups whose hidden records contain a matching MATCH_KEY or ERRULE_CODE.
+     * This runs after the DOM renders via setTimeout so the tbody elements exist.
+     * @internal
+     */
+    private autoExpandFilteredRowGroups() {
+      const matchKey = this.dataMartService.sampleSetMatchKey;
+      const principle = this.dataMartService.sampleSetPrinciple;
+      // Only applies to match level 1 (Duplicates & Matches)
+      if (this.matchLevel !== 1 || (!matchKey && !principle)) {
+        return;
+      }
+      setTimeout(() => {
+        if (!this.tableRef || !this.data) { return; }
+        const rowGroups = this.tableRef.nativeElement.querySelectorAll('tbody.row-group');
+        rowGroups.forEach((rowGroupEl: HTMLElement, groupIndex: number) => {
+          // Skip if already expanded
+          if (rowGroupEl.classList.contains('expanded')) { return; }
+          const item = this.data[groupIndex];
+          if (!item || !item.rows) { return; }
+          // Determine which data sources are selected (visible)
+          const selectedSources = [this.dataMartService.sampleDataSource1, this.dataMartService.sampleDataSource2];
+          // Check hidden records (those not in selected data sources)
+          const hasMatchingHiddenRecord = item.rows.some((row) => {
+            const isVisible = row.DATA_SOURCE !== undefined && selectedSources.indexOf(row.DATA_SOURCE) > -1;
+            if (isVisible) { return false; }
+            if (matchKey && row['MATCH_KEY'] === matchKey) { return true; }
+            if (principle && row['ERRULE_CODE'] === principle) { return true; }
+            return false;
+          });
+          if (hasMatchingHiddenRecord) {
+            rowGroupEl.classList.add('expanded');
+          }
+        });
+        this.cd.markForCheck();
+      }, 0);
     }
     /** when a new sample set is being generated this handler is called and triggers a loading even that can be listed for. */
     private onSampleSetRequest(source: string, isInProgress: boolean | undefined) {

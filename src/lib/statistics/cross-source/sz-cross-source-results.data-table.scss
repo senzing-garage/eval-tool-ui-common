@@ -519,6 +519,17 @@
                         background-color: var(--sz-sample-table-related-row-background-color) !important;
                     }
                 }
+                /* For relationship ECL rows, don't blue-shade columns before DATA_SOURCE
+                * (Entity ID, ER Code, Match Key, Related Entity ID).
+                * Only applies to relationship tables — Duplicates/Matches keeps blue on all
+                * columns except Entity ID (already handled above). */
+                .row-related-record.data-source-not-selected {
+                    .sz-dt-errule-code-cell,
+                    .sz-dt-match-key-cell,
+                    .sz-dt-related-entity-id-cell {
+                        background-color: var(--sz-sample-table-related-row-background-color) !important;
+                    }
+                }
                 &.expanded {
                     :nth-child(1 of .data-source-selected) {
                         border-top: none;
@@ -747,6 +758,14 @@
             .row-related-entity, .row-related-record {
                 td {
                     background-color: var(--sz-sample-table-related-row-background-color);
+                }
+            }
+            /* For relationship ECL entity rows, don't blue-shade columns before DATA_SOURCE */
+            tbody.row-group .row-entity-record.data-source-not-selected {
+                .sz-dt-errule-code-cell,
+                .sz-dt-match-key-cell,
+                .sz-dt-related-entity-id-cell {
+                    background-color: var(--sz-sample-table-entity-row-background-color) !important;
                 }
             }
         }

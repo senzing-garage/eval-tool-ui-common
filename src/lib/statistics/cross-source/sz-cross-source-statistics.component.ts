@@ -221,9 +221,19 @@ export class SzCrossSourceStatistics implements OnInit, AfterViewInit, OnDestroy
     this.dataMartService.onSampleResultChange.pipe(
       takeUntil(this.unsubscribe$)
     ).subscribe((data) => {
-      //console.log(`new sample set data ready... `, data);
+      console.warn(`🟡 onSampleResultChange:`, data ? `array(${data.length})` : 'undefined/null');
       this._isLoading = false;
+      this._loading.next(false);
       this._showTable = true;
+    });
+    this.dataMartService.onSampleNoResults.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((noResults) => {
+      console.warn(`🔴 onSampleNoResults:`, noResults);
+      this._isLoading = false;
+      this._loading.next(false);
+      this._showTable = true;
+      this.cd.detectChanges();
     });
   }
   ngAfterViewInit() {}
@@ -237,47 +247,24 @@ export class SzCrossSourceStatistics implements OnInit, AfterViewInit, OnDestroy
     this.unsubscribe$.complete();
   }
   onDefaultSourcesSelected(evt: SzCrossSourceSummarySelectionEvent) {
-    console.log(`onDefaultToSourceSelected: `, evt);
     if(evt) {
-      this._isLoading = true;
-      if(evt.dataSource1) {
-        this.dataMartService.sampleDataSource1  = evt.dataSource1;
+      // Ensure statType and matchLevel are set (dropdown events don't include them)
+      if (!evt.statType) {
+        evt.statType = this.dataMartService.sampleStatType
+          || this.prefs.dataMart.sampleStatType
+          || SzCrossSourceSummaryCategoryType.MATCHES;
       }
-      if(evt.dataSource2) {
-        this.dataMartService.sampleDataSource2  = evt.dataSource2;
+      if (!evt.matchLevel) {
+        evt.matchLevel = this.dataMartService.sampleMatchLevel
+          || SzCrossSourceSummaryCategoryTypeToMatchLevel[evt.statType];
       }
-      this.dataMartService.sampleMatchLevel   = evt.matchLevel;
-      this.dataMartService.sampleStatType     = evt.statType as SzCrossSourceSummaryCategoryType;
-      // get filter counts
-      this.dataMartService.getCrossSourceStatistics(
-        this.dataMartService.dataSource1 ? this.dataMartService.dataSource1 : (this.dataMartService.dataSource2 ? this.dataMartService.dataSource2 : undefined),
-        this.dataMartService.dataSource1 && this.dataMartService.dataSource2 && this.dataMartService.dataSource1 !== this.dataMartService.dataSource2 ? this.dataMartService.dataSource2 : undefined,
-        '*', '*'
-      ).pipe(
-        takeUntil(this.unsubscribe$),
-        take(1)
-      ).subscribe((matchKeyCounts) => {
-        let _statTypeData = this.dataMartService.getCrossSourceStatisticsByStatTypeFromData(this.dataMartService.sampleStatType, matchKeyCounts);
-        if(_statTypeData){
-          this.dataMartService.matchKeyCounts = _statTypeData
-        }
-        //console.log('default match key counts: ', _statTypeData, matchKeyCounts);
-      })
-
-      this._title = this._getTitleFromEvent(evt);
-      this.cd.detectChanges();
-      this.getNewSampleSet(evt).subscribe({
-        error: (err) => {
-          console.error('getNewSampleSet error (default sources): ', err);
-          this._isLoading = false;
-          this._loading.next(false);
-        }
-      });
+      // Delegate to the same code path as venn diagram clicks
+      this.onSourceStatClicked(evt as SzCrossSourceSummarySelectionClickEvent);
     }
   }
   /** when user clicks a source stat, change it in the service */
   onSourceStatClicked(evt: SzCrossSourceSummarySelectionClickEvent) {
-    console.log(`SzCrossSourceStatistics.onSourceStatClicked: `, evt);
+    console.warn(`🔷 onSourceStatClicked ENTRY:`, JSON.stringify(evt));
     this._isLoading = true;
     this._loading.next(true);
     this.cd.detectChanges();
@@ -318,6 +305,7 @@ export class SzCrossSourceStatistics implements OnInit, AfterViewInit, OnDestroy
     setTimeout(this._onSourceStatClicked.bind(this, _parametersEvt), 500);
   }
   _onSourceStatClicked(evt: SzCrossSourceSummarySelectionClickEvent) {
+    console.warn(`🟢 _onSourceStatClicked ENTRY (after 500ms):`, JSON.stringify(evt));
     /*
     First part here moved to the "onSourceStatClicked" to immediately provide
     user feedback
@@ -403,6 +391,7 @@ export class SzCrossSourceStatistics implements OnInit, AfterViewInit, OnDestroy
 
   private getNewSampleSet(parameters: SzCrossSourceSummarySelectionEvent) {
     // set loading emitter(s)
+    console.warn(`🟣 getNewSampleSet ENTRY:`, JSON.stringify({statType: parameters.statType, ds1: parameters.dataSource1, ds2: parameters.dataSource2}));
     this._onNewSampleSetRequested.next(true);
     this._loading.next(true);
 
@@ -417,6 +406,7 @@ export class SzCrossSourceStatistics implements OnInit, AfterViewInit, OnDestroy
         take(1),
         tap({
           next: (data) => {
+            console.warn(`🟣 getNewSampleSet GOT DATA:`, data ? 'has data' : 'undefined/null');
             this._loading.next(false);
             this._onNewSampleSet.next(data);
           },

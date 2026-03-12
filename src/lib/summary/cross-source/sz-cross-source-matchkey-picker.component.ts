@@ -63,10 +63,8 @@ import { SzSampleSetEntity, SzSampleSetRelation } from '../../models/data-sampli
         let selectedCount = this._selectedCount ? this._selectedCount : this.getSelectedCount(this._data, undefined, this._statType);
 
         if(this.hasSelectedMatchKey) {
-            // filter selected
-            retVal = selectedCount + (selectedCount > 1 ? ' Matching Items' : ' Matching Item');
+            retVal = 'Choose Match Key (' + selectedCount + (selectedCount > 1 ? ' matching items)' : ' matching item)');
         } else {
-            // no filter selected
             retVal  = 'Choose Match Key';
         }
         return retVal;
