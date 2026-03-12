@@ -16,11 +16,11 @@ import { SzSampleSetEntity, SzSampleSetRelation } from '../../models/data-sampli
  * @internal
  */
 @Component({
-    selector: 'sz-css-matchkeys-dialog',
-    templateUrl: 'sz-cross-source-matchkey-picker.component.html',
+    selector: 'sz-css-principle-dialog',
+    templateUrl: 'sz-cross-source-principle-picker.component.html',
     styleUrls: ['sz-cross-source-matchkey-picker.component.scss'],
     imports: [
-        CommonModule, 
+        CommonModule,
         FormsModule,
         MatInputModule,
         MatRadioModule,
@@ -28,26 +28,26 @@ import { SzSampleSetEntity, SzSampleSetRelation } from '../../models/data-sampli
     ],
     standalone: true
 })
-  export class SzCrossSourceSummaryMatchKeyPickerDialog implements OnInit, OnDestroy {
+  export class SzCrossSourceSummaryPrinciplePickerDialog implements OnInit, OnDestroy {
     /** subscription to notify subscribers to unbind */
     public unsubscribe$ = new Subject<void>();
 
     private _showOkButton = true;
-    public _title: string = 'Filter by Match Key';
+    public _title: string = 'Filter by ER Code';
     public text: string;
     public buttonText: string = "Ok";
     private _data: Array<SzCrossSourceCount>;
     private _statType: SzCrossSourceSummaryCategoryType;
     private _selectedCount = 0;
 
-    public get selectedMatchKey(): string {
-        if(this.hasSelectedMatchKey) {
-            return this.dataMartService.sampleSetMatchKey;
+    public get selectedPrinciple(): string {
+        if(this.hasSelectedPrinciple) {
+            return this.dataMartService.sampleSetPrinciple;
         }
         return undefined;
     }
-    public set selectedMatchKey(value: string) {
-        this.dataMartService.sampleSetMatchKey = value;
+    public set selectedPrinciple(value: string) {
+        this.dataMartService.sampleSetPrinciple = value;
     }
 
     public get showDialogActions(): boolean {
@@ -62,40 +62,38 @@ import { SzSampleSetEntity, SzSampleSetRelation } from '../../models/data-sampli
         let retVal = '';
         let selectedCount = this._selectedCount ? this._selectedCount : this.getSelectedCount(this._data, undefined, this._statType);
 
-        if(this.hasSelectedMatchKey) {
+        if(this.hasSelectedPrinciple) {
             // filter selected
             retVal = selectedCount + (selectedCount > 1 ? ' Matching Items' : ' Matching Item');
         } else {
             // no filter selected
-            retVal  = 'Choose Match Key';
+            retVal  = 'Choose ER Code';
         }
         return retVal;
     }
-    public get hasSelectedMatchKey(): boolean {
+    public get hasSelectedPrinciple(): boolean {
         if(this._statType !== this.dataMartService.sampleStatType) {
             return false;
         }
-        return this.dataMartService.sampleSetMatchKey && this.dataMartService.sampleSetMatchKey !== '';
+        return this.dataMartService.sampleSetPrinciple && this.dataMartService.sampleSetPrinciple !== '';
     }
 
-    public onMatchKeyFilterChange(value) {
+    public onPrincipleFilterChange(value) {
         if(value && value.value) {
             this.dataMartService.doNotFetchSampleSetOnParameterChange = true;
-            this.dataMartService.sampleSetMatchKey  = value;
+            this.dataMartService.sampleSetPrinciple  = value;
             this._updateSampleData(value.value);
-            // set debounce timer so that if no new value shows up before the timer
-            // expires then we assume that's the request they want
         }
     }
 
     /** we use this on click to immediately close the dialog on mouse click */
-    public setMatchKey(value: string) {
+    public setPrinciple(value: string) {
         this._updateSampleData(value);
         this.dialogRef.close(true);
     }
 
-    private _updateSampleData(matchKey: string) {
-        console.log(`_updateSampleData: ${matchKey}`, matchKey);
+    private _updateSampleData(principle: string) {
+        console.log(`_updateSampleData: ${principle}`, principle);
         this.dataMartService.doNotFetchSampleSetOnParameterChange = true;
         let changeWholeSampleSet = false; // we don't want to fetch new requests 4 times while we change parameters
         if(this.dataMartService.sampleStatType !== this._statType) {
@@ -110,13 +108,13 @@ import { SzSampleSetEntity, SzSampleSetRelation } from '../../models/data-sampli
             changeWholeSampleSet = true;
             this.dataMartService.sampleDataSource2 = this.dataMartService.dataSource2;
         }
-        this.dataMartService.sampleSetMatchKey  = matchKey;
-        this.dataMartService.sampleSetPage      = 0;
-        this.dataMartService.matchKeyCounts     = this._data;
+        this.dataMartService.sampleSetPrinciple  = principle;
+        this.dataMartService.sampleSetPage       = 0;
+        this.dataMartService.principleCounts      = this._data;
 
-        if(isNotNull(this.dataMartService.sampleSetMatchKey)) {
-            // get null matchkey count
-            let totalItem = this._data.find((item)=>{ return !item.matchKey });
+        if(isNotNull(this.dataMartService.sampleSetPrinciple)) {
+            // get null principle count (total row)
+            let totalItem = this._data.find((item)=>{ return !item.principle && !item.matchKey });
             let countKey = this._statType === SzCrossSourceSummaryCategoryType.MATCHES ? 'entityCount' : 'relationCount';
 
             console.info(`!!! totalItem: ${totalItem ? totalItem[countKey] : undefined}`, totalItem);
@@ -146,8 +144,6 @@ import { SzSampleSetEntity, SzSampleSetRelation } from '../../models/data-sampli
                   takeUntil(this.unsubscribe$),
                   take(1),
                   tap((data: Array<SzSampleSetEntity | SzSampleSetRelation>) => {
-                    //this._loading.next(false);
-                    //this._onNewSampleSet.next(data);
                     this.dataMartService.doNotFetchSampleSetOnParameterChange = false;
                   })
             )
@@ -159,26 +155,26 @@ import { SzSampleSetEntity, SzSampleSetRelation } from '../../models/data-sampli
     }
 
     public isTotalRow(row: SzCrossSourceCount) {
-        return row && !row.matchKey ? true : false;
+        return row && !row.principle && !row.matchKey ? true : false;
     }
 
-    public getSelectedCount(data?: Array<SzCrossSourceCount>, matchKey?: string, statType?: SzCrossSourceSummaryCategoryType) {
+    public getSelectedCount(data?: Array<SzCrossSourceCount>, principle?: string, statType?: SzCrossSourceSummaryCategoryType) {
         let _tConnections = 0;
         let countKey = this._statType === SzCrossSourceSummaryCategoryType.MATCHES ? 'entityCount' : 'relationCount';
         data        = data ? data : this._data;
-        matchKey    = matchKey ? matchKey : (this.dataMartService && this.dataMartService.sampleSetMatchKey ? this.dataMartService && this.dataMartService.sampleSetMatchKey : undefined);
+        principle   = principle ? principle : (this.dataMartService && this.dataMartService.sampleSetPrinciple ? this.dataMartService && this.dataMartService.sampleSetPrinciple : undefined);
         statType    = statType ? statType : this._statType;
 
-        if(data && data.length && this.dataMartService.sampleSetMatchKey) {
+        if(data && data.length && this.dataMartService.sampleSetPrinciple) {
             data.forEach((item)=> {
-                if(item.matchKey === matchKey){
+                if(item.principle === principle){
                     _tConnections = _tConnections + item[countKey];
                 }
             });
             return _tConnections;
-        } else if(!this.dataMartService.sampleSetMatchKey) {
+        } else if(!this.dataMartService.sampleSetPrinciple) {
             // just get the total
-            let totalItem = data.find((item)=>{ return !item.matchKey });
+            let totalItem = data.find((item)=>{ return !item.principle && !item.matchKey });
 
             if(totalItem) {
                 _tConnections = totalItem[countKey];
@@ -193,22 +189,14 @@ import { SzSampleSetEntity, SzSampleSetRelation } from '../../models/data-sampli
         return retVal;
     }
 
-    public clearMatchKey() {
-        this.dataMartService.sampleSetMatchKey = undefined;
+    public clearPrinciple() {
+        this.dataMartService.sampleSetPrinciple = undefined;
         this.dialogRef.close(true);
     }
 
     public getCount(row: SzCrossSourceCount) {
         let countKey = this._statType === SzCrossSourceSummaryCategoryType.MATCHES ? 'entityCount' : 'relationCount';
         return row && row[countKey] ? row[countKey] : 0;
-    }
-
-    public get showMatchKeyFiltersOnSelect() {
-        return this.prefs.dataMart.showMatchKeyFiltersOnSelect;
-    }
-
-    public toggleShowMatchKeyFiltersOnSelect() {
-        this.prefs.dataMart.showMatchKeyFiltersOnSelect = !this.prefs.dataMart.showMatchKeyFiltersOnSelect;
     }
 
     @HostBinding("class.sample-type-ambiguous-matches") get classAmbiguousMatches() {
@@ -227,7 +215,7 @@ import { SzSampleSetEntity, SzSampleSetRelation } from '../../models/data-sampli
       return this._statType === SzCrossSourceSummaryCategoryType.DISCLOSED_RELATIONS;
     }
 
-    constructor(public dialogRef: MatDialogRef<SzCrossSourceSummaryMatchKeyPickerDialog>,
+    constructor(public dialogRef: MatDialogRef<SzCrossSourceSummaryPrinciplePickerDialog>,
         @Inject(MAT_DIALOG_DATA) public data: {
         data: Array<SzCrossSourceCount>,
         statType: SzCrossSourceSummaryCategoryType
@@ -236,7 +224,7 @@ import { SzSampleSetEntity, SzSampleSetRelation } from '../../models/data-sampli
         if(data) {
           this._data        = data.data;
           this._statType    = data.statType;
-          console.info(`SzCrossSourceSummaryMatchKeyPickerDialog: `, this._data);
+          console.info(`SzCrossSourceSummaryPrinciplePickerDialog: `, this._data);
         }
       }
     }

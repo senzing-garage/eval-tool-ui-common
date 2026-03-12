@@ -24,6 +24,14 @@
     }
     .body {
         padding: 5px 10px;
+        max-height: 60vh;
+        overflow-y: auto;
+    }
+
+    button[mat-button] {
+        mat-icon, .mat-icon {
+            vertical-align: middle;
+        }
     }
 
     table {

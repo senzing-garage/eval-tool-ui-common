@@ -1,0 +1,26 @@
+<h1 mat-dialog-title cdkDrag class="title" cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle>{{title}}</h1>
+<div mat-dialog-content class="body">
+    <div *ngIf="hasSelectedPrinciple">
+        <button mat-button
+            (click)="clearPrinciple()">
+            <mat-icon>close</mat-icon>
+            Clear ER Code Filter</button>
+    </div>
+    <mat-radio-group
+        aria-labelledby="filter-by-principle"
+        class="matchkey-radio-group"
+        (change)="onPrincipleFilterChange($event)"
+        [(ngModel)]="selectedPrinciple">
+            <div class="match-key-row" *ngFor="let statRow of dataRows">
+                <ng-container *ngIf="!isTotalRow(statRow)">
+                <mat-radio-button class="match-key-radio-button"
+                    disableRipple
+                    (click)="setPrinciple(statRow.principle)"
+                    [value]="statRow.principle">
+                    {{statRow.principle}}
+                </mat-radio-button>
+                ({{getCount(statRow)}})
+                </ng-container>
+            </div>
+    </mat-radio-group>
+</div>

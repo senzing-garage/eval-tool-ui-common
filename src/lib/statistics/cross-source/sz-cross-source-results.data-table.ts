@@ -19,6 +19,7 @@ import { camelToKebabCase, getMapKeyByValue, interpolateTemplate, parseBool, und
 import { ConnectionPositionPair, Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { SzCrossSourcePagingComponent } from './sz-cross-source-results.pager';
 import { SzCrossSourceSummaryMatchKeyPickerDialog } from '../../summary/cross-source/sz-cross-source-matchkey-picker.component';
+import { SzCrossSourceSummaryPrinciplePickerDialog } from '../../summary/cross-source/sz-cross-source-principle-picker.component';
 import { SzOrderedMapEntries } from '../../pipes/mapentries.pipe';
 /** deprecate ? */
 /*
@@ -837,23 +838,86 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
       console.log(`open entity: `, value);
       this._onEntityIdClick.next(value as number);
     }
+    /** Ensures full cross-source counts are fetched and cached, then calls the callback with stat-type-specific data */
+    private _ensureCrossSourceData(callback: (statTypeData: any, statType: any) => void) {
+      let _statType = this.dataMartService.sampleStatType;
+      let fullData = this.dataMartService.fullCrossSourceCounts;
+      if(fullData) {
+        callback(fullData, _statType);
+      } else {
+        const ds1 = this.dataMartService.sampleDataSource1 || this.dataMartService.sampleDataSource2;
+        const ds2 = this.dataMartService.sampleDataSource1 && this.dataMartService.sampleDataSource2
+          && this.dataMartService.sampleDataSource1 !== this.dataMartService.sampleDataSource2
+          ? this.dataMartService.sampleDataSource2 : undefined;
+        if (ds1) {
+          this.dataMartService.getCrossSourceStatistics(ds1, ds2, '*', '*').pipe(
+            take(1)
+          ).subscribe((summary) => {
+            const data = this.dataMartService.getCrossSourceStatisticsByStatTypeFromData(_statType, summary);
+            if (data) {
+              this.dataMartService.fullCrossSourceCounts = data;
+              this.dataMartService.matchKeyCounts = data;
+              callback(data, _statType);
+            }
+          });
+        }
+      }
+    }
     /** open the matchKey filtering dialog */
     public openFilterDialog() {
-      let _matchKeyCountsData = this.dataMartService.matchKeyCounts;
-      let _statType = this.dataMartService.sampleStatType;
-      console.log(`openFilterDialog: `, _matchKeyCountsData, _statType);
-      if(_matchKeyCountsData) {
-
-        this.dialog.open(SzCrossSourceSummaryMatchKeyPickerDialog, {
-          panelClass: 'sz-css-matchkey-picker-dialog-panel',
-          minWidth: 200,
-          height: 'var(--sz-css-matchkey-picker-dialog-default-height)',
-          data: {
-            data: _matchKeyCountsData,
-            statType: _statType
-          }
-        });
-      }
+      this._ensureCrossSourceData((fullData, statType) => {
+        let filteredData = fullData;
+        // If a principle filter is active, only show match keys that co-occur with that principle
+        const selectedPrinciple = this.dataMartService.sampleSetPrinciple;
+        if(selectedPrinciple) {
+          filteredData = fullData.filter((item) => item.principle === selectedPrinciple || (!item.matchKey && !item.principle));
+        }
+        // Deduplicate match keys (aggregate counts across principles)
+        const deduped = this.dataMartService.getCrossSourceStatisticsByMatchKeyFromData(filteredData);
+        if(deduped) {
+          this.dataMartService.matchKeyCounts = deduped;
+          this._openMatchKeyDialog(deduped, statType);
+        }
+      });
+    }
+    private _openMatchKeyDialog(data: any, statType: any) {
+      this.dialog.open(SzCrossSourceSummaryMatchKeyPickerDialog, {
+        panelClass: 'sz-css-matchkey-picker-dialog-panel',
+        minWidth: 200,
+        height: 'var(--sz-css-matchkey-picker-dialog-default-height)',
+        data: {
+          data: data,
+          statType: statType
+        }
+      });
+    }
+    /** open the principle (ER Code) filtering dialog */
+    public openPrincipleFilterDialog() {
+      this._ensureCrossSourceData((fullData, statType) => {
+        let filteredData = fullData;
+        // If a match key filter is active, only show principles that co-occur with that match key
+        const selectedMatchKey = this.dataMartService.sampleSetMatchKey;
+        if(selectedMatchKey) {
+          filteredData = fullData.filter((item) => item.matchKey === selectedMatchKey || (!item.matchKey && !item.principle));
+        }
+        // Deduplicate principles (aggregate counts across match keys)
+        const principleData = this.dataMartService.getCrossSourceStatisticsByPrincipleFromData(filteredData);
+        if(principleData) {
+          this.dataMartService.principleCounts = principleData;
+          this._openPrincipleDialog(principleData, statType);
+        }
+      });
+    }
+    private _openPrincipleDialog(data: any, statType: any) {
+      this.dialog.open(SzCrossSourceSummaryPrinciplePickerDialog, {
+        panelClass: 'sz-css-principle-picker-dialog-panel',
+        minWidth: 200,
+        height: 'var(--sz-css-matchkey-picker-dialog-default-height)',
+        data: {
+          data: data,
+          statType: statType
+        }
+      });
     }
     /** reset the row and cell count indexes generated by the UI loop
      * @internal

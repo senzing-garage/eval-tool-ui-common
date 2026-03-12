@@ -3,6 +3,7 @@
 <ng-template #sz_dt_header_context_menu let-col>
     <div class="sz-dt-header-context-menu" cdkMenu>
         <button class="header-context-menu-item" *ngIf="col.key === 'MATCH_KEY'" cdkMenuItem (click)="openFilterDialog()">Filter By Match Key</button>
+        <button class="header-context-menu-item" *ngIf="col.key === 'ERRULE_CODE'" cdkMenuItem (click)="openPrincipleFilterDialog()">Filter By ER Code</button>
         <button class="header-context-menu-item" cdkMenuItem *ngIf="!isColumnHidden(col.key)" (click)="selectColumn(col.key, false)">Hide Column</button>
         <button class="header-context-menu-item" cdkMenuItem *ngIf="isColumnHidden(col.key)" (click)="selectColumn(col.key, true)">Show Column</button>
         <button class="header-context-menu-item" cdkMenuItem
@@ -34,6 +35,7 @@
     <div class="sz-dt-header-context-menu" cdkMenu>
 
         <button class="header-context-menu-item" *ngIf="data.col.key === 'MATCH_KEY'" cdkMenuItem (click)="openFilterDialog()">Filter By Match Key</button>
+        <button class="header-context-menu-item" *ngIf="data.col.key === 'ERRULE_CODE'" cdkMenuItem (click)="openPrincipleFilterDialog()">Filter By ER Code</button>
         <!--<button class="header-context-menu-item" *ngIf="data.col.key === 'ENTITY_ID'" cdkMenuItem (click)="copyCellValue(data.entityData && data.entityData['entityId'] ? data.entityData['entityId'] : data.rowData['entityId'], data)">Copy Entity ID</button>
         <button class="header-context-menu-item" *ngIf="data.col.key === 'ENTITY_ID'" cdkMenuItem (click)="openEntityById(data.entityData && data.entityData['entityId'] ? data.entityData['entityId'] : data.rowData['entityId'])">Open Entity in new tab</button>-->
         <button class="header-context-menu-item" *ngIf="data.col.key === 'ENTITY_ID' || data.col.key === 'relatedEntityId'" cdkMenuItem 
@@ -41,7 +43,7 @@
         [cdkMenuTriggerData]="{$implicit: data}">Entity</button>
         <!--<button class="header-context-menu-item" *ngIf="data.col.key === 'relatedEntityId'" cdkMenuItem (click)="copyCellValue(data.rowData['relatedEntityId'])">Copy Related Entity ID</button>
         <button class="header-context-menu-item" *ngIf="data.col.key === 'relatedEntityId'" cdkMenuItem (click)="openEntityById(data.rowData['relatedEntityId'])">Open Entity in new tab</button>-->
-        <div class="separator" *ngIf="data.col.key === 'ENTITY_ID' || data.col.key === 'relatedEntityId' || data.col.key === 'MATCH_KEY'"></div>
+        <div class="separator" *ngIf="data.col.key === 'ENTITY_ID' || data.col.key === 'relatedEntityId' || data.col.key === 'MATCH_KEY' || data.col.key === 'ERRULE_CODE'"></div>
         <!--<button class="header-context-menu-item" *ngIf="data.col.key !== 'ENTITY_ID'" cdkMenuItem (click)="copyCellContent(data.cell, data.cellData)">Copy Cell As JSON</button>
         <button class="header-context-menu-item" cdkMenuItem (click)="copyRowContent(data.row, data.rowData)">Copy Row As JSON</button>-->
         <button class="header-context-menu-item" cdkMenuItem
@@ -192,6 +194,7 @@ sz-tooltip="Tooltip text">Get Grid Column Sizes</button>-->
                 (mousedown)="onResizeMouseDown(col.key, $event)"
                 (mouseup)="onResizeMouseUp(col.key, $event)"></div>
                 <span *ngIf="col.key === 'MATCH_KEY'" class="icon-filter descending mdi--filter" (click)="openFilterDialog()"></span>
+                <span *ngIf="col.key === 'ERRULE_CODE'" class="icon-filter descending mdi--filter" (click)="openPrincipleFilterDialog()"></span>
             </th>
             <!--<div class="leftdragbar" onmousedown="startColResize(col.key)" onmouseup="endColResize(col.key)"></div>-->
         <!--</ng-container>-->

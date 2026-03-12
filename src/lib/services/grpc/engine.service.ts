@@ -103,22 +103,21 @@ export class SzGrpcEngineService {
     }
 
     public getEntitiesByEntityId(entityIds: Array<string | number>, flags: BigInt | number = SzEngineFlags.SZ_ENTITY_DEFAULT_FLAGS): Observable<SzSdkEntityResponse[] | SzError> {
-      let retVal    = new Subject<SzSdkEntityResponse[] | SzError>();
-      let requests  = [];
+      let retVal = new Subject<SzSdkEntityResponse[] | SzError>();
       console.log(`getting entities by id from grpc...`);
       if(this.szEnvironment && this.szEnvironment.engine) {
-        requests = entityIds.map((entityId) => {
-          return this.szEnvironment?.engine?.getEntityByEntityId(entityId as number, flags)
-        });
-        Promise.all(requests).then((resp: string[]) => {
-          let _retResp = resp.map((_r) => {
-            return JSON.parse(_r as string);
-          });
-          console.log(`\t\tgetEntitiesByEntityId(${(entityIds as Array<number | string>).join(',')}): all promises resolved`, _retResp);
+        // Single findNetworkByEntityId call with maxDegrees=0 returns only
+        // the requested entities without network traversal.
+        this.szEnvironment.engine.findNetworkByEntityId(entityIds, 0, 0, 0, flags).then((resp) => {
+          const network = JSON.parse(resp as string);
+          const _retResp = (network.ENTITIES || []).map((e: any) => ({
+            RESOLVED_ENTITY: e.RESOLVED_ENTITY
+          }));
+          console.log(`\t\tgetEntitiesByEntityId(${entityIds.join(',')}): resolved via findNetworkByEntityId`, _retResp);
           retVal.next(_retResp);
         }).catch((error) => {
-          throw error;
-        })
+          retVal.error(error);
+        });
       }
       return retVal.asObservable();
     }

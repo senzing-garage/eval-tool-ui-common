@@ -887,6 +887,10 @@ export class SzDataMartService {
     /** @internal */
     private _matchKeyCounts: SzCrossSourceCount[];
     /** @internal */
+    private _principleCounts: SzCrossSourceCount[];
+    /** @internal */
+    private _fullCrossSourceCounts: SzCrossSourceCount[];
+    /** @internal */
     private _onlyShowLoadedSummaryStatistics                = true;
     /** @internal */
     private _sampleSet: SzStatSampleSet;
@@ -966,6 +970,22 @@ export class SzDataMartService {
     /** we store the last known match key counts for present selection for filtering menu */
     public set matchKeyCounts(value: SzCrossSourceCount[]) {
         this._matchKeyCounts = value;
+    }
+    /** we store the last known principle counts for present selection for filtering menu */
+    public get principleCounts() {
+        return this._principleCounts;
+    }
+    /** we store the last known principle counts for present selection for filtering menu */
+    public set principleCounts(value: SzCrossSourceCount[]) {
+        this._principleCounts = value;
+    }
+    /** we store the full unfiltered cross-source counts (matchKey=*) for cross-filter interdependency */
+    public get fullCrossSourceCounts() {
+        return this._fullCrossSourceCounts;
+    }
+    /** we store the full unfiltered cross-source counts (matchKey=*) for cross-filter interdependency */
+    public set fullCrossSourceCounts(value: SzCrossSourceCount[]) {
+        this._fullCrossSourceCounts = value;
     }
 
         // ----------------------- sample set instance getters/setters -----------------------
@@ -1372,9 +1392,9 @@ export class SzDataMartService {
         }
     }
     /** get cross source summary statistics for datasource vs datasource from the api surface. */
-    public getCrossSourceStatistics(dataSource1?: string | undefined, dataSource2?: string | undefined, matchKey?: string) {
+    public getCrossSourceStatistics(dataSource1?: string | undefined, dataSource2?: string | undefined, matchKey?: string, principle?: string) {
         if(dataSource1 && dataSource2) {
-            return this.statsService.getCrossSourceSummaryStatistics(dataSource1, dataSource2, matchKey).pipe(
+            return this.statsService.getCrossSourceSummaryStatistics(dataSource1, dataSource2, matchKey, principle).pipe(
                 tap((response) => {
                     if(response) {
                         this.onCrossSourceSummaryStats.next(response);
@@ -1387,7 +1407,7 @@ export class SzDataMartService {
                 map((response: SzCrossSourceSummary)=> response as SzCrossSourceSummary)
             );
         } else if(dataSource1) {
-            return this.statsService.getCrossSourceSummaryStatistics(dataSource1, dataSource1, matchKey).pipe(
+            return this.statsService.getCrossSourceSummaryStatistics(dataSource1, dataSource1, matchKey, principle).pipe(
                 tap((response) => {
                     if(response && response) {
                         this.onCrossSourceSummaryStats.next(response);
@@ -1443,6 +1463,72 @@ export class SzDataMartService {
             return data[_statKey]
         }
         return undefined;
+    }
+    /** Extract principle-specific counts from a flat array of SzCrossSourceCount items.
+     *  Groups entries by principle, summing entityCount and relationCount for each unique principle.
+     *  Also produces a total row (with no principle or matchKey) summing all non-null-principle entries.
+     */
+    /** Deduplicate match key rows, aggregating counts across principles.
+     *  Only sums rows where both matchKey AND principle are set to avoid
+     *  double-counting with per-match-key total rows. */
+    public getCrossSourceStatisticsByMatchKeyFromData(data: Array<SzCrossSourceCount>): Array<SzCrossSourceCount> {
+        if(!data || !data.length) return undefined;
+        const matchKeyMap = new Map<string, SzCrossSourceCount>();
+        for(const item of data) {
+            if(!item.matchKey) continue; // skip overall total rows
+            if(!item.principle) continue; // skip per-match-key total rows (already aggregated)
+            if(matchKeyMap.has(item.matchKey)) {
+                const existing = matchKeyMap.get(item.matchKey);
+                existing.entityCount = (existing.entityCount || 0) + (item.entityCount || 0);
+                existing.relationCount = (existing.relationCount || 0) + (item.relationCount || 0);
+                existing.recordCount = (existing.recordCount || 0) + (item.recordCount || 0);
+            } else {
+                matchKeyMap.set(item.matchKey, {
+                    matchKey: item.matchKey,
+                    entityCount: item.entityCount || 0,
+                    relationCount: item.relationCount || 0,
+                    recordCount: item.recordCount || 0
+                });
+            }
+        }
+        if(matchKeyMap.size === 0) return undefined;
+        const result: Array<SzCrossSourceCount> = [];
+        const existingTotal = data.find((item) => !item.principle && !item.matchKey);
+        if(existingTotal) {
+            result.push(existingTotal);
+        }
+        matchKeyMap.forEach((value) => result.push(value));
+        return result;
+    }
+    /** Deduplicate principle rows, aggregating counts across match keys. */
+    public getCrossSourceStatisticsByPrincipleFromData(data: Array<SzCrossSourceCount>): Array<SzCrossSourceCount> {
+        if(!data || !data.length) return undefined;
+        const principleMap = new Map<string, SzCrossSourceCount>();
+        for(const item of data) {
+            if(!item.principle) continue; // skip total/summary rows
+            if(!item.matchKey) continue; // skip per-principle total rows (already aggregated)
+            if(principleMap.has(item.principle)) {
+                const existing = principleMap.get(item.principle);
+                existing.entityCount = (existing.entityCount || 0) + (item.entityCount || 0);
+                existing.relationCount = (existing.relationCount || 0) + (item.relationCount || 0);
+                existing.recordCount = (existing.recordCount || 0) + (item.recordCount || 0);
+            } else {
+                principleMap.set(item.principle, {
+                    principle: item.principle,
+                    entityCount: item.entityCount || 0,
+                    relationCount: item.relationCount || 0,
+                    recordCount: item.recordCount || 0
+                });
+            }
+        }
+        if(principleMap.size === 0) return undefined;
+        const result: Array<SzCrossSourceCount> = [];
+        const existingTotal = data.find((item) => !item.principle && !item.matchKey);
+        if(existingTotal) {
+            result.push(existingTotal);
+        }
+        principleMap.forEach((value) => result.push(value));
+        return result;
     }
     /** get the list of datasources with their datasource code and id's from the api surface */
     /*public getDataSourceDetails() {

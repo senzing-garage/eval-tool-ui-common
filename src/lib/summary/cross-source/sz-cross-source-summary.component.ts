@@ -235,11 +235,11 @@ export class SzCrossSourceSummaryComponent implements OnInit, OnDestroy {
 
     // stat requests
     let dataRequests = forkJoin({
-      fromDataSource: this.dataMartService.dataSource1 ? this.dataMartService.getCrossSourceStatistics(this.dataMartService.dataSource1, undefined, '*') : of(false),
+      fromDataSource: this.dataMartService.dataSource1 ? this.dataMartService.getCrossSourceStatistics(this.dataMartService.dataSource1) : of(false),
       overlapDataSource: this.dataMartService.dataSource1 && this.dataMartService.dataSource2 && this.dataMartService.dataSource1 !== this.dataMartService.dataSource2 ? this.dataMartService.getCrossSourceStatistics(
         this.dataMartService.dataSource1,
-        this.dataMartService.dataSource2, '*'): of(false),
-      toDataSource: this.dataMartService.dataSource2 ? this.dataMartService.getCrossSourceStatistics(this.dataMartService.dataSource2, undefined, '*') : of(false)
+        this.dataMartService.dataSource2): of(false),
+      toDataSource: this.dataMartService.dataSource2 ? this.dataMartService.getCrossSourceStatistics(this.dataMartService.dataSource2) : of(false)
       });
 
     dataRequests.pipe(
@@ -339,9 +339,9 @@ export class SzCrossSourceSummaryComponent implements OnInit, OnDestroy {
       statType: statType
     });
 
-    if(_statTypeData) {
-      this.dataMartService.matchKeyCounts = this.dataMartService.getCrossSourceStatisticsByStatTypeFromData(statType, _statTypeData);
-    }
+    // Match key counts are now fetched lazily with matchKey=* when the
+    // results table loads (in _onSourceStatClicked), not from the cached
+    // venn diagram data which no longer includes per-match-key breakdown.
     /*if(_statTypeData) {
       let dialogData = this.dataMartService.getCrossSourceStatisticsByStatTypeFromData(statType, _statTypeData)
       // store the match key counts so we have them even if the user doesn't select

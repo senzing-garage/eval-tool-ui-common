@@ -252,7 +252,7 @@ export class SzCrossSourceStatistics implements OnInit, AfterViewInit, OnDestroy
       this.dataMartService.getCrossSourceStatistics(
         this.dataMartService.dataSource1 ? this.dataMartService.dataSource1 : (this.dataMartService.dataSource2 ? this.dataMartService.dataSource2 : undefined),
         this.dataMartService.dataSource1 && this.dataMartService.dataSource2 && this.dataMartService.dataSource1 !== this.dataMartService.dataSource2 ? this.dataMartService.dataSource2 : undefined,
-        '*'
+        '*', '*'
       ).pipe(
         takeUntil(this.unsubscribe$),
         take(1)
@@ -354,6 +354,20 @@ export class SzCrossSourceStatistics implements OnInit, AfterViewInit, OnDestroy
 
     this.sampleParametersChange.emit(evt);
     this.sourceStatisticClick.emit(evt);  // emit the raw event jic someone needs to use stopPropagation or access to the DOM node
+
+    // fetch match key counts for filter (in parallel with sample set)
+    const ds1 = evt.dataSource1 || evt.dataSource2;
+    const ds2 = evt.dataSource1 && evt.dataSource2 && evt.dataSource1 !== evt.dataSource2 ? evt.dataSource2 : undefined;
+    this.dataMartService.getCrossSourceStatistics(ds1, ds2, '*', '*').pipe(
+      takeUntil(this.unsubscribe$),
+      take(1)
+    ).subscribe((crossSourceData) => {
+      let _statTypeData = this.dataMartService.getCrossSourceStatisticsByStatTypeFromData(this.dataMartService.sampleStatType, crossSourceData);
+      if (_statTypeData) {
+        this.dataMartService.fullCrossSourceCounts = _statTypeData;
+        this.dataMartService.matchKeyCounts = _statTypeData;
+      }
+    });
 
     // get new sample set
     console.log(`\t\tgetting new sample set: `, evt);
