@@ -210,6 +210,8 @@
     ::ng-deep .mat-mdc-icon-button {
       --mdc-icon-button-state-layer-size: 25px;
       --mdc-icon-button-icon-size: 18px;
+      --mdc-icon-button-icon-color: var(--sz-graph-filter-icon-color);
+      color: var(--sz-graph-filter-icon-color);
       width: 25px;
       height: 25px;
       padding: 0;

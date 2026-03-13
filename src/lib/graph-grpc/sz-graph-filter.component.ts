@@ -938,19 +938,10 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
       });
   }
 
-  /** Opens a confirm dialog and, on confirm, deletes the saved graph from the server. */
+  /** Emits deleteRequested so the parent can show its own confirm dialog and handle deletion. */
   onDeleteClick(): void {
     if (!this.isExistingGraph || !this.savedGraphRecord?.id) return;
-    const name = this.savedGraphRecord.name || 'this graph';
-    if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
-    const record = this.savedGraphRecord;
-    this.graphStorageService.deleteGraph(record.id!)
-      .then(() => {
-        this.graphDeleted.emit(record);
-      })
-      .catch((err) => {
-        console.error('SzGraphFilterComponent: failed to delete graph', err);
-      });
+    this.graphDeleted.emit(this.savedGraphRecord);
   }
 
   /** Whether there is a pending server-save (save dialog was confirmed). */
