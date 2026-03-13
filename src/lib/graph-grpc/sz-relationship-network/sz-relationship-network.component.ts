@@ -260,6 +260,11 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
   /** observable stream for when the canvas zoom level is changed */
   public onZoom: Observable<number> = this._onZoom.asObservable();
 
+  /** Fires whenever the graph state changes (node drag, hide, expand/collapse, zoom/pan). */
+  private _stateChanged: Subject<void> = new Subject<void>();
+  /** Observable that emits when the graph visual state has been mutated. */
+  public stateChanged: Observable<void> = this._stateChanged.asObservable();
+
   /** Event emitter for the event that occurs when a network request is initiated*/
   @Output() onRequestStarted: EventEmitter<boolean> = new EventEmitter<boolean>();
   /** Event emitter for the event that occurs when a network api request is completed */
@@ -1177,6 +1182,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
         this._applyModifierFn(this._filterFn);
       }
     }
+    this._stateChanged.next();
   }
 
   /**
@@ -1399,6 +1405,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
     if(this.linkLabel && this.linkLabel.attr) {
       this.linkLabel.attr('class', this.getEntityLinkLabelClass);
     }
+    this._stateChanged.next();
   }
 
   /**
@@ -3328,6 +3335,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
 
       this._onZoom.next(this._scalePerc);
     }
+    this._stateChanged.next();
   }
 
   /**
@@ -3400,6 +3408,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
       });
     
     lnk.attr('d', this.onLinkEntityPositionChange.bind(this));
+    this._stateChanged.next();
   }
 
   //////////////////

@@ -415,6 +415,8 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
   @Output() public importGraph = new EventEmitter<SzGraphExport>();
   /** emitted after a graph is successfully saved to the server */
   @Output() public graphSaved = new EventEmitter<SzGraphExportRecord>();
+  /** emitted after a graph is successfully deleted from the server */
+  @Output() public graphDeleted = new EventEmitter<SzGraphExportRecord>();
 
   // ------------------------------ forms, form groups, and handlers ---------------------
   /** the form group for the filters by datasource list */
@@ -933,6 +935,21 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
       .catch((err) => {
         console.error('SzGraphFilterComponent: failed to save graph to server', err);
         return null;
+      });
+  }
+
+  /** Opens a confirm dialog and, on confirm, deletes the saved graph from the server. */
+  onDeleteClick(): void {
+    if (!this.isExistingGraph || !this.savedGraphRecord?.id) return;
+    const name = this.savedGraphRecord.name || 'this graph';
+    if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+    const record = this.savedGraphRecord;
+    this.graphStorageService.deleteGraph(record.id!)
+      .then(() => {
+        this.graphDeleted.emit(record);
+      })
+      .catch((err) => {
+        console.error('SzGraphFilterComponent: failed to delete graph', err);
       });
   }
 

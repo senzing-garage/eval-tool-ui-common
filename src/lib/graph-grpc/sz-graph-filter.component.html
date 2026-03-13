@@ -15,6 +15,9 @@
           <button mat-icon-button *ngIf="isExistingGraph; else newSaveBtn" (click)="onSaveClick()" aria-label="Edit graph" matTooltip="Update saved graph">
             <mat-icon>edit</mat-icon>
           </button>
+          <button mat-icon-button *ngIf="isExistingGraph" (click)="onDeleteClick()" aria-label="Delete graph" matTooltip="Delete saved graph">
+            <mat-icon>delete</mat-icon>
+          </button>
           <ng-template #newSaveBtn>
             <button mat-icon-button (click)="onSaveClick()" aria-label="Save graph" matTooltip="Save graph to project">
               <mat-icon>save</mat-icon>
