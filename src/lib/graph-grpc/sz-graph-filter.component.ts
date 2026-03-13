@@ -11,7 +11,9 @@ import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 import { SzDataSourceComposite } from '../models/data-sources';
 import { SzMatchKeyComposite, SzMatchKeyTokenComposite, SzMatchKeyTokenFilterScope } from '../models/graph';
-import { SzGraphExport } from '../models/SzNetworkGraph';
+import { SzGraphExport, SzGraphExportRecord } from '../models/SzNetworkGraph';
+import { SzGraphStorageService } from '../services/sz-graph-storage.service';
+import { SzGraphSaveDialog, SzGraphSaveDialogResult } from '../shared/graph-save-dialog/sz-graph-save-dialog.component';
 import { sortDataSourcesByIndex, parseBool, sortMatchKeysByIndex, sortMatchKeyTokensByIndex } from '../common/utils';
 import { isBoolean } from '../common/utils';
 import { CommonModule } from '@angular/common';
@@ -23,6 +25,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog } from '@angular/material/dialog';
 import { CdkAccordionModule } from '@angular/cdk/accordion';
 import { CdkMenuModule } from '@angular/cdk/menu';
 import { SzSdkDataSource } from '../models/grpc/config';
@@ -410,6 +413,8 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
   @Output() public exportGraph = new EventEmitter<void>();
   /** emitted when the user picks a file via the import button */
   @Output() public importGraph = new EventEmitter<SzGraphExport>();
+  /** emitted after a graph is successfully saved to the server */
+  @Output() public graphSaved = new EventEmitter<SzGraphExportRecord>();
 
   // ------------------------------ forms, form groups, and handlers ---------------------
   /** the form group for the filters by datasource list */
@@ -423,6 +428,19 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
   /** the form group for colors by other characteristics */
   colorsMiscForm: UntypedFormGroup;
 
+  /** whether the server-backed graph storage is available */
+  public get graphStorageAvailable(): boolean {
+    return this.graphStorageService.isAvailable;
+  }
+
+  /** When set, indicates this graph has been saved/loaded and has a server record */
+  @Input() public savedGraphRecord: SzGraphExportRecord | null = null;
+
+  /** Whether we're working with an already-saved graph */
+  public get isExistingGraph(): boolean {
+    return this.savedGraphRecord !== null && this.savedGraphRecord.id !== undefined;
+  }
+
   constructor(
     public prefs: SzPrefsService,
     public dataSourcesService: SzDataSourcesService,
@@ -430,6 +448,8 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
     private cd: ChangeDetectorRef,
     public overlay: Overlay,
     public viewContainerRef: ViewContainerRef,
+    public graphStorageService: SzGraphStorageService,
+    private dialog: MatDialog,
   ) {
     // ----- initialize form control groups ------
     // sliders
@@ -856,6 +876,69 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
   /** triggers the exportGraph output so the parent can build and download the file */
   onExportClick(): void {
     this.exportGraph.emit();
+  }
+
+  /**
+   * Opens the save dialog and, on confirm, tells the parent to build
+   * the export payload. The parent should call {@link saveGraphToServer}
+   * with the constructed SzGraphExport.
+   */
+  onSaveClick(): void {
+    const dialogRef = this.dialog.open(SzGraphSaveDialog, {
+      width: '440px',
+      data: {
+        name: this.savedGraphRecord?.name || '',
+        description: this.savedGraphRecord?.description || '',
+        title: this.isExistingGraph ? 'Update Graph' : 'Save Graph'
+      }
+    });
+    dialogRef.afterClosed().subscribe((result: SzGraphSaveDialogResult | null) => {
+      if (result) {
+        this._pendingSaveName = result.name;
+        this._pendingSaveDescription = result.description;
+        // emit exportGraph so the parent builds the SzGraphExport payload
+        // then the parent calls saveGraphToServer() with it
+        this.exportGraph.emit();
+      }
+    });
+  }
+
+  /** @internal */
+  private _pendingSaveName: string | null = null;
+  /** @internal */
+  private _pendingSaveDescription: string | null = null;
+
+  /**
+   * Called by the parent after building the SzGraphExport payload in
+   * response to the exportGraph event triggered by onSaveClick().
+   * If there's a pending save (name/description from dialog), saves
+   * to server. Otherwise this is a no-op (normal file export flow).
+   */
+  saveGraphToServer(graphExport: SzGraphExport): Promise<SzGraphExportRecord | null> {
+    if (!this._pendingSaveName) return Promise.resolve(null);
+    const name = this._pendingSaveName;
+    const description = this._pendingSaveDescription;
+    this._pendingSaveName = null;
+    this._pendingSaveDescription = null;
+
+    const promise = this.isExistingGraph
+      ? this.graphStorageService.updateGraph(this.savedGraphRecord!.id!, { name, description, graphExport })
+      : this.graphStorageService.saveGraph(name, description, graphExport);
+
+    return promise
+      .then((record) => {
+        this.graphSaved.emit(record);
+        return record;
+      })
+      .catch((err) => {
+        console.error('SzGraphFilterComponent: failed to save graph to server', err);
+        return null;
+      });
+  }
+
+  /** Whether there is a pending server-save (save dialog was confirmed). */
+  get hasPendingSave(): boolean {
+    return this._pendingSaveName !== null;
   }
 
   /** opens the hidden file input to let the user pick a JSON file */

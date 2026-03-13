@@ -10,9 +10,11 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog } from '@angular/material/dialog';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { SzPrefsService } from '../../../services/sz-prefs.service';
 import { SzDataSourcesService } from '../../../services/sz-datasources.service';
+import { SzGraphStorageService } from '../../../services/sz-graph-storage.service';
 import { SzGraphFilterComponent } from '../../../graph-grpc/sz-graph-filter.component';
 
 /**
@@ -54,14 +56,18 @@ export class SzEntityDetailGraphFilterComponent extends SzGraphFilterComponent {
     _p_cd: ChangeDetectorRef,
     _p_overlay: Overlay,
     _p_viewContainerRef: ViewContainerRef,
+    _p_graphStorageService: SzGraphStorageService,
+    _p_dialog: MatDialog,
   ) {
     super(
-      _p_prefs, 
-      _p_dataSourcesService, 
-      _p_formBuilder, 
+      _p_prefs,
+      _p_dataSourcesService,
+      _p_formBuilder,
       _p_cd,
       _p_overlay,
-      _p_viewContainerRef
+      _p_viewContainerRef,
+      _p_graphStorageService,
+      _p_dialog
     );
   }
 }

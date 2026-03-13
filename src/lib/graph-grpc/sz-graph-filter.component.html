@@ -7,12 +7,26 @@
   <ng-container *ngIf="showImportExportSection">
     <div class="import-export-actions">
       <input #importFileInput type="file" accept=".json" hidden (change)="onImportFileSelected($event)">
-      <button mat-icon-button *ngIf="showImportButton" (click)="onImportClick(importFileInput)" aria-label="Import graph" matTooltip="Import graph from file">
+      <button mat-icon-button *ngIf="showImportButton && !graphStorageAvailable" (click)="onImportClick(importFileInput)" aria-label="Import graph" matTooltip="Import graph from file">
         <mat-icon>file_upload</mat-icon>
       </button>
-      <button mat-icon-button *ngIf="showExportButton" (click)="onExportClick()" aria-label="Export graph" matTooltip="Export graph to file">
-        <mat-icon>file_download</mat-icon>
-      </button>
+      <ng-container *ngIf="showExportButton">
+        <ng-container *ngIf="graphStorageAvailable; else fileExportBtn">
+          <button mat-icon-button *ngIf="isExistingGraph; else newSaveBtn" (click)="onSaveClick()" aria-label="Edit graph" matTooltip="Update saved graph">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <ng-template #newSaveBtn>
+            <button mat-icon-button (click)="onSaveClick()" aria-label="Save graph" matTooltip="Save graph to project">
+              <mat-icon>save</mat-icon>
+            </button>
+          </ng-template>
+        </ng-container>
+        <ng-template #fileExportBtn>
+          <button mat-icon-button (click)="onExportClick()" aria-label="Export graph" matTooltip="Export graph to file">
+            <mat-icon>file_download</mat-icon>
+          </button>
+        </ng-template>
+      </ng-container>
     </div>
   </ng-container>
   <h3>{{ sectionTitles[0] }}</h3>
