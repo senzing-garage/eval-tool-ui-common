@@ -462,6 +462,10 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
       this.dataMartService.onSampleMatchLevelChange.pipe(
         takeUntil(this.unsubscribe$)
       ).subscribe(this.onSampleMatchLevelChange.bind(this));
+      // listen for stat type change (ERRULE_CODE column visibility depends on stat type)
+      this.dataMartService.onSampleTypeChange.pipe(
+        takeUntil(this.unsubscribe$)
+      ).subscribe(this.onSampleTypeChange.bind(this));
       // listen for new sample set requests
       this.dataMartService.onSampleRequest.pipe(
         takeUntil(this.unsubscribe$)
@@ -1149,23 +1153,50 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
         return this._selectableColumns.includes(_col[0]);
       }));
       this._selectedColumns     = _colsForMatchLevel;
+      this.cd.markForCheck();
+    }
+
+    /**
+     * When the stat type changes, recalculate columns to add/remove ERRULE_CODE.
+     * This handles the case where match level stays the same (e.g., switching between
+     * DISCLOSED_RELATIONS, POSSIBLE_RELATIONS, and AMBIGUOUS_MATCHES — all level 3).
+     */
+    private onSampleTypeChange(statType: SzCrossSourceSummaryCategoryType) {
+      if (!statType) return;
+      const matchLevel = this.dataMartService.sampleMatchLevel;
+      if (this._matchLevelToColumnsMap.has(matchLevel)) {
+        this._selectableColumns = [...this._matchLevelToColumnsMap.get(matchLevel)];
+      }
+      if (statType === SzCrossSourceSummaryCategoryType.DISCLOSED_RELATIONS) {
+        this._selectableColumns = this._selectableColumns.filter(c => c !== 'ERRULE_CODE');
+      }
+      this.generateSelectableColumnsMap();
+      let _colsForMatchLevel = new Map<string, string>([...this._cols].filter((_col) => {
+        return this._selectableColumns.includes(_col[0]);
+      }));
+      this._selectedColumns = _colsForMatchLevel;
+      this.cd.markForCheck();
     }
 
     /** when new sample set data has changed the data is transformed, indexes reset,
      * and counts generated. */
     private onSampleSetDataChange(data: SzSampleSetRelation[] | SzSampleSetEntity[] | undefined) {
-      // Re-evaluate columns now that stat type is finalized
-      // (onSampleMatchLevelChange may fire before stat type is updated)
-      if (this.dataMartService.sampleStatType === SzCrossSourceSummaryCategoryType.DISCLOSED_RELATIONS) {
-        if (this._selectableColumns.includes('ERRULE_CODE')) {
-          this._selectableColumns = this._selectableColumns.filter(c => c !== 'ERRULE_CODE');
-          this.generateSelectableColumnsMap();
-          let _colsForMatchLevel = new Map<string, string>([...this._cols].filter((_col) => {
-            return this._selectableColumns.includes(_col[0]);
-          }));
-          this._selectedColumns = _colsForMatchLevel;
-        }
+      // Always recalculate columns based on current match level and stat type.
+      // This is the authoritative column reset — it handles both adding and
+      // removing ERRULE_CODE regardless of what onSampleMatchLevelChange did.
+      const matchLevel = this.dataMartService.sampleMatchLevel;
+      if (this._matchLevelToColumnsMap.has(matchLevel)) {
+        this._selectableColumns = [...this._matchLevelToColumnsMap.get(matchLevel)];
       }
+      if (this.dataMartService.sampleStatType === SzCrossSourceSummaryCategoryType.DISCLOSED_RELATIONS) {
+        this._selectableColumns = this._selectableColumns.filter(c => c !== 'ERRULE_CODE');
+      }
+      this.generateSelectableColumnsMap();
+      let _colsForMatchLevel = new Map<string, string>([...this._cols].filter((_col) => {
+        return this._selectableColumns.includes(_col[0]);
+      }));
+      this._selectedColumns = _colsForMatchLevel;
+      this.cd.markForCheck();
       if(data === undefined) {
         this.data = [];
         this._noData = true;
