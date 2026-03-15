@@ -28,11 +28,16 @@ body {
       }
     }
     &.sz-graph-focused-node {
-      //fill: var(--sz-graph-focused-entity-color);
       .sz-graph-node-icon {
         .sz-graph-node-icon-colored {
-          fill: var(--sz-graph-primary-entity-color);
+          fill: var(--sz-graph-focused-entity-color, var(--sz-graph-primary-entity-color));
         }
+      }
+      .sz-graph-icon-enclosure {
+        stroke: var(--sz-graph-focused-entity-color, #465BA8);
+        stroke-width: 4px;
+        filter: drop-shadow(0 0 6px var(--sz-graph-focused-entity-color, #465BA8))
+                drop-shadow(0 0 12px var(--sz-graph-focused-entity-color, #465BA8));
       }
     }
   }
@@ -136,6 +141,15 @@ body {
       }
     }
 
+    &.sz-graph-focused-node {
+      .sz-graph-icon-enclosure {
+        stroke: var(--sz-graph-focused-entity-color, #465BA8);
+        stroke-width: 4px;
+        filter: drop-shadow(0 0 6px var(--sz-graph-focused-entity-color, #465BA8))
+                drop-shadow(0 0 12px var(--sz-graph-focused-entity-color, #465BA8));
+      }
+    }
+
     &.graph-node-rel-primary {
       .sz-graph-node-icon-colored {
         fill: var(--sz-graph-node-icon-color);
@@ -156,6 +170,14 @@ body {
       .sz-graph-node-icon-colored {
         fill: var(--sz-color-disclosed);
       }
+    }
+  }
+
+  // Match key dimming: applied to nodes/links not matching the active focal match key filter
+  .match-key-dimmed {
+    opacity: var(--sz-graph-match-key-dimmed-opacity, 0.15) !important;
+    &.sz-graph-focused-node {
+      opacity: 1 !important;
     }
   }
 

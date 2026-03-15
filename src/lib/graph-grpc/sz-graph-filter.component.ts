@@ -500,9 +500,8 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
     const includedMatchKeyNames = this.filterByMatchKeysForm.value.matchkeys
       .map((v, i) => v ? this.matchKeys[i].name :  null)
       .filter(v => v !== null);
-    // update filters pref    
-    this.prefs.graph.matchKeysIncluded = includedMatchKeyNames;
-    //console.log('@senzing/eval-tool-ui-common/sz-entity-detail-graph-filter.onMkFilterChange',this.prefs.graph.matchKeysIncluded);
+    // Emit locally — don't persist in prefs (avoids cross-graph leakage)
+    this.optionChanged.emit({ name: 'matchKeysIncluded', value: includedMatchKeyNames });
   }
   onMkTagFilterToggle( mkName: string ) {
     let _matchKeyTokensIncludedMemCopy: string[] = [];
@@ -744,7 +743,7 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
     this.buildOut               = prefs.buildOut;
     this.dataSourceColors       = prefs.dataSourceColors;
     this.dataSourcesFiltered    = prefs.dataSourcesFiltered;
-    this.matchKeysIncluded      = prefs.matchKeysIncluded;
+    // matchKeysIncluded is intentionally NOT read from prefs — it's session-local state
     this.matchKeyTokensIncluded = prefs.matchKeyTokensIncluded;
     this.matchKeyCoreTokensIncluded = prefs.matchKeyCoreTokensIncluded;
     this.queriedEntitiesColor   = prefs.queriedEntitiesColor;

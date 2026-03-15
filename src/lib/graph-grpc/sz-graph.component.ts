@@ -265,6 +265,8 @@ export class SzGraphComponentGrpc implements OnInit, OnDestroy {
   private neverFilterQueriedEntityIds: boolean = true;
   public filterShowDataSources: string[];
   public filterShowMatchKeys: string[];
+  /** All match keys from the full graph (unfiltered). Used to restore when focus is cleared. */
+  private _allMatchKeys: string[];
   public filterShowMatchKeyTokens: Array<SzMatchKeyTokenComposite>;
   private _showMatchKeysFilters: boolean      = true;
   private _showMatchKeyTokenFilters: boolean  = false;
@@ -554,6 +556,8 @@ export class SzGraphComponentGrpc implements OnInit, OnDestroy {
   /** event is emitted when a graph pre-flight request is performed */
   @Output() preflightRequestComplete: EventEmitter<any> = new EventEmitter<any>();
   @Output() totalRelationshipsCountUpdated: EventEmitter<number> = new EventEmitter<number>();
+  /** emitted when the visible match keys change due to focal entity selection */
+  @Output() focalMatchKeysChange: EventEmitter<string[]> = new EventEmitter<string[]>();
   /** emitted once when the component's initial data has loaded (or errored) */
   @Output() initialized: EventEmitter<boolean> = new EventEmitter<boolean>();
   private _initialized = false;
@@ -667,6 +671,36 @@ export class SzGraphComponentGrpc implements OnInit, OnDestroy {
     }
   }
 
+  /** When focal entities change, filter match keys to only those on links touching focal entities. */
+  public onFocalEntitiesChange(focalEntities: SzEntityIdentifier[]) {
+    if (!focalEntities || focalEntities.length === 0) {
+      // No focus — show all match keys, remove dimming
+      this.filterShowMatchKeys = this._allMatchKeys ? [...this._allMatchKeys] : this.filterShowMatchKeys;
+      this.focalMatchKeysChange.emit(this.filterShowMatchKeys);
+      if (this.graphNetworkComponent) {
+        this.graphNetworkComponent.applyMatchKeyDimming([], []);
+      }
+      return;
+    }
+    // Collect match keys from links that touch any focal entity
+    const network = this.graphNetworkComponent;
+    if (!network?.link) {
+      return;
+    }
+    const focalSet = new Set(focalEntities.map(id => parseSzIdentifier(id)));
+    const matchKeys = new Set<string>();
+    network.link.each((d: any) => {
+      if (d.isHidden) return;
+      const src = parseSzIdentifier(d.sourceEntityId);
+      const tgt = parseSzIdentifier(d.targetEntityId);
+      if (focalSet.has(src) || focalSet.has(tgt)) {
+        if (d.matchKey) matchKeys.add(d.matchKey);
+      }
+    });
+    this.filterShowMatchKeys = Array.from(matchKeys);
+    this.focalMatchKeysChange.emit(this.filterShowMatchKeys);
+  }
+
   /** when scale of graph changes, store value for control indicators */
   public onGraphZoom(value) {
     this._graphZoom = value;
@@ -752,6 +786,7 @@ export class SzGraphComponentGrpc implements OnInit, OnDestroy {
    * transfer to filters component list 
    */
   onMatchKeysChange(data: string[]) {
+    this._allMatchKeys = data;
     this.filterShowMatchKeys = data;
   }
 
@@ -974,7 +1009,6 @@ export class SzGraphComponentGrpc implements OnInit, OnDestroy {
       }
       if(prefs.focusedEntitiesColor) {
         this.graphContainerEle.nativeElement.style.setProperty('--sz-graph-focused-entity-color', prefs.focusedEntitiesColor);
-        this.graphContainerEle.nativeElement.style.setProperty('--sz-graph-primary-entity-color', prefs.focusedEntitiesColor);
       }
       if(prefs.queriedEntitiesColor) {
         this.graphContainerEle.nativeElement.style.setProperty('--sz-graph-queried-entity-color', prefs.queriedEntitiesColor);
@@ -1015,7 +1049,7 @@ export class SzGraphComponentGrpc implements OnInit, OnDestroy {
     this.unlimitedMaxScope            = prefs.unlimitedMaxScope;
     this.dataSourceColors             = prefs.dataSourceColors;
     this.dataSourcesFiltered          = prefs.dataSourcesFiltered;
-    this.matchKeysIncluded            = prefs.matchKeysIncluded;
+    // matchKeysIncluded is intentionally NOT read from prefs — it's session-local state
     this.matchKeyTokensIncluded       = prefs.matchKeyTokensIncluded;
     this.matchKeyCoreTokensIncluded   = prefs.matchKeyCoreTokensIncluded
     this.neverFilterQueriedEntityIds  = prefs.neverFilterQueriedEntityIds;

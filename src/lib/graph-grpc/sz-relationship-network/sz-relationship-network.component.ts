@@ -483,11 +483,8 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
       this._entityIds = value.toString().split(',');
       //console.log(`entityIds = ${value}(number[])`, value, value.toString().split(','), ((value as unknown as string[]) && (value as unknown as string[]).map));
     }
-    // copy over new entity id's to "focalEntities"
-    let uniqueEntityIds = this._entityIds && this._entityIds.filter ? this._entityIds.filter((eId) => {
-      return this._focalEntities.indexOf(parseSzIdentifier(eId)) <= -1;
-    }).map(parseSzIdentifier) : [];
-    this._focalEntities = this._focalEntities.concat(uniqueEntityIds);
+    // Clear focal entities on load — focus is user-driven (click to focus)
+    this._focalEntities = [];
     if(this.reloadOnIdChange && _changed && this._entityIds && this._entityIds.some( (eId) => { return _oldIds && _oldIds.indexOf(eId) < 0; })) {
       this.reload( this._entityIds.map((eId) => { return parseInt(eId); }) );
     }
@@ -690,6 +687,9 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
    * emitted when the user expands or collapses a entity nodes related nodes.
    */
   @Output() onHideRelatedEntities: EventEmitter<any> = new EventEmitter<any>();
+
+  /** Emitted when the focal entities change (user click / ctrl+click). */
+  @Output() focalEntitiesChange: EventEmitter<SzEntityIdentifier[]> = new EventEmitter<SzEntityIdentifier[]>();
 
   /** @internal */
   @Input() public captureMouseWheel: boolean = false;
@@ -986,6 +986,62 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
    */
   public get includes(): SzGraphNodeFilterPair | undefined {
     return this._includesFn;
+  }
+
+  /** Stored match keys for re-application after render */
+  private _dimmingMatchKeys: string[] = [];
+
+  /**
+   * Apply dimming to nodes and links not matching the selected match keys.
+   * With focal entities: only links touching a focal entity with a selected match key are active.
+   * Without focal entities: any link with a selected match key is active.
+   * When no match keys are selected, all dimming is removed.
+   */
+  public applyMatchKeyDimming(focalEntities: SzEntityIdentifier[], matchKeysIncluded: string[]) {
+    this._dimmingMatchKeys = matchKeysIncluded || [];
+    const hasFilter = matchKeysIncluded && matchKeysIncluded.length > 0;
+
+    if (!hasFilter) {
+      // Remove all dimming
+      if (this.link) this.link.classed('match-key-dimmed', false);
+      if (this.linkLabel) this.linkLabel.classed('match-key-dimmed', false);
+      if (this.node) this.node.classed('match-key-dimmed', false);
+      return;
+    }
+
+    const hasFocus = focalEntities && focalEntities.length > 0;
+    const focalSet = hasFocus ? new Set(focalEntities.map(id => parseSzIdentifier(id))) : null;
+    const matchKeySet = new Set(matchKeysIncluded);
+    const activeNodeIds = new Set<number>(focalSet || []);
+
+    const isLinkActive = (d: any): boolean => {
+      if (d.isHidden) return true; // don't dim hidden links
+      if (!matchKeySet.has(d.matchKey)) return false;
+      // With focal entities, link must also touch a focal entity
+      if (focalSet) {
+        const src = parseSzIdentifier(d.sourceEntityId);
+        const tgt = parseSzIdentifier(d.targetEntityId);
+        return focalSet.has(src) || focalSet.has(tgt);
+      }
+      return true;
+    };
+
+    // First pass: collect active node IDs from active links
+    if (this.link) {
+      this.link.each((d: any) => {
+        if (isLinkActive(d)) {
+          activeNodeIds.add(parseSzIdentifier(d.sourceEntityId));
+          activeNodeIds.add(parseSzIdentifier(d.targetEntityId));
+        }
+      });
+      this.link.classed('match-key-dimmed', (d: any) => !isLinkActive(d));
+    }
+    if (this.linkLabel) {
+      this.linkLabel.classed('match-key-dimmed', (d: any) => !isLinkActive(d));
+    }
+    if (this.node) {
+      this.node.classed('match-key-dimmed', (d: any) => !activeNodeIds.has(parseSzIdentifier(d.entityId)));
+    }
   }
   /** only settable through "highlight" setter */
   private _highlightFn: SzGraphNodeFilterPair[] | undefined;
@@ -3131,7 +3187,7 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
   }
 
   static nodeTooltipText(d: any) {
-    console.log('nodeTooltipText: ', d);
+    //console.log('nodeTooltipText: ', d);
     let retVal = "<strong>Entity ID</strong>: " + d.entityId +
       "<br/><strong>Name</strong>: " + d.name;
     if(d.address && d.address !== null && d.address.FEAT_DESC) {
@@ -3250,6 +3306,35 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
       evtData.eventPageX = (ptrEvent.pageX);
       evtData.eventPageY = (ptrEvent.pageY);
     }
+
+    // Update focal entities based on click modifier
+    const entityId = parseSzIdentifier(evtData.entityId);
+    if (ptrEvent.ctrlKey || ptrEvent.metaKey) {
+      // Ctrl/Cmd+click: toggle in focus group
+      if (this._focalEntities.indexOf(entityId) >= 0) {
+        this._removeFromFocalEntities(entityId);
+      } else {
+        this._addToFocalEntities(entityId);
+      }
+    } else {
+      // Plain click: toggle if already sole focus, otherwise set as sole focus
+      if (this._focalEntities.length === 1 && this._focalEntities[0] === entityId) {
+        this._focalEntities.length = 0;
+      } else {
+        this._focalEntities.length = 0;
+        this._addToFocalEntities(entityId);
+      }
+    }
+
+    // Re-apply node classes and link styles
+    if (this.node) {
+      this.node.attr('class', this.getEntityNodeClass.bind(this));
+    }
+    if (this.link && this.linkLabel) {
+      this.updateIsRelatedToFocalEntitiesForLinks(this.link, this.linkLabel);
+    }
+
+    this.focalEntitiesChange.emit([...this._focalEntities]);
     this.entityClick.emit(evtData);
   }
   /**
