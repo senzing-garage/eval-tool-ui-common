@@ -7,12 +7,29 @@
   <ng-container *ngIf="showImportExportSection">
     <div class="import-export-actions">
       <input #importFileInput type="file" accept=".json" hidden (change)="onImportFileSelected($event)">
-      <button mat-icon-button *ngIf="showImportButton" (click)="onImportClick(importFileInput)" aria-label="Import graph" matTooltip="Import graph from file">
+      <button mat-icon-button *ngIf="showImportButton && !graphStorageAvailable" (click)="onImportClick(importFileInput)" aria-label="Import graph" matTooltip="Import graph from file">
         <mat-icon>file_upload</mat-icon>
       </button>
-      <button mat-icon-button *ngIf="showExportButton" (click)="onExportClick()" aria-label="Export graph" matTooltip="Export graph to file">
-        <mat-icon>file_download</mat-icon>
-      </button>
+      <ng-container *ngIf="showExportButton">
+        <ng-container *ngIf="graphStorageAvailable; else fileExportBtn">
+          <button mat-icon-button *ngIf="isExistingGraph; else newSaveBtn" (click)="onSaveClick()" aria-label="Edit graph" matTooltip="Update saved graph">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button *ngIf="isExistingGraph" (click)="onDeleteClick()" aria-label="Delete graph" matTooltip="Delete saved graph">
+            <mat-icon>delete</mat-icon>
+          </button>
+          <ng-template #newSaveBtn>
+            <button mat-icon-button (click)="onSaveClick()" aria-label="Save graph" matTooltip="Save graph to project">
+              <mat-icon>save</mat-icon>
+            </button>
+          </ng-template>
+        </ng-container>
+        <ng-template #fileExportBtn>
+          <button mat-icon-button (click)="onExportClick()" aria-label="Export graph" matTooltip="Export graph to file">
+            <mat-icon>file_download</mat-icon>
+          </button>
+        </ng-template>
+      </ng-container>
     </div>
   </ng-container>
   <h3>{{ sectionTitles[0] }}</h3>
@@ -111,22 +128,6 @@
   </form>
 
   <hr>
-  <h3 (mouseenter)="onShowTooltip('Only display entities that are in the selected datasource(s)', $event)" (mouseleave)="hideTooltip()">{{ sectionTitles[1] }}</h3>
-  <form [formGroup]="filterByDataSourcesForm">
-  <ul class="filters-list">
-    <ng-container *ngFor="let ds of filterByDataSourcesData.controls; let i = index">
-        <ng-container *ngIf="shouldDataSourceBeDisplayed(dataSources[i].name)">
-            <li formArrayName="datasources">
-              <label>
-                <input type="checkbox" [formControlName]="i"
-                  (change)="onDsFilterChange(dataSources[i].name, $event)">{{dataSources[i].name}}
-              </label>
-            </li>
-        </ng-container>
-    </ng-container>
-  </ul>
-  </form>
-  <hr>
   <h3>{{ sectionTitles[2] }}</h3>
   <ul class="colors-list">
     <li class="color-box" (mouseenter)="onShowTooltip('select color(s) for relationship lines that are directly related to the focal entity', $event)" (mouseleave)="hideTooltip()">
@@ -178,24 +179,50 @@
     </li>
   </ul>
   </form>
-  <div *ngIf="showMatchKeys && showMatchKeyFilters">
-    <hr>
-    <h3>
-      {{ sectionTitles[5] }}
-    </h3>
-    <form [formGroup]="filterByMatchKeysForm">
+  <hr>
+  <div [matTooltip]="hasActiveMatchKeyFilter ? 'Disabled while match key filters are selected' : ''"
+       [matTooltipDisabled]="!hasActiveMatchKeyFilter">
+    <h3 [class.disabled]="hasActiveMatchKeyFilter">{{ sectionTitles[1] }}</h3>
+    <form [formGroup]="filterByDataSourcesForm" [class.disabled]="hasActiveMatchKeyFilter">
     <ul class="filters-list">
-      <ng-container *ngFor="let ds of filterByMatchKeysData.controls; let i = index">
-          <ng-container *ngIf="shouldMatchKeyBeDisplayed(matchKeys[i].name)">
-              <li formArrayName="matchkeys">
+      <ng-container *ngFor="let ds of filterByDataSourcesData.controls; let i = index">
+          <ng-container *ngIf="shouldDataSourceBeDisplayed(dataSources[i].name)">
+              <li formArrayName="datasources">
                 <label>
-                  <input type="checkbox" [formControlName]="i" (change)="onMkFilterChange(matchKeys[i].name, $event)">{{matchKeys[i].name}}
+                  <input type="checkbox" [formControlName]="i"
+                    [attr.disabled]="hasActiveMatchKeyFilter ? true : null"
+                    (change)="onDsFilterChange(dataSources[i].name, $event)">{{dataSources[i].name}}
                 </label>
               </li>
           </ng-container>
       </ng-container>
     </ul>
     </form>
+  </div>
+
+  <div *ngIf="showMatchKeys && showMatchKeyFilters">
+    <hr>
+    <div [matTooltip]="hasActiveDataSourceFilter ? 'Disabled while data source filters are selected' : ''"
+         [matTooltipDisabled]="!hasActiveDataSourceFilter">
+      <h3 [class.disabled]="hasActiveDataSourceFilter">
+        {{ sectionTitles[5] }}
+      </h3>
+      <form [formGroup]="filterByMatchKeysForm" [class.disabled]="hasActiveDataSourceFilter">
+      <ul class="filters-list">
+        <ng-container *ngFor="let ds of filterByMatchKeysData.controls; let i = index">
+            <ng-container *ngIf="shouldMatchKeyBeDisplayed(matchKeys[i].name)">
+                <li formArrayName="matchkeys">
+                  <label>
+                    <input type="checkbox" [formControlName]="i"
+                      [attr.disabled]="hasActiveDataSourceFilter ? true : null"
+                      (change)="onMkFilterChange(matchKeys[i].name, $event)">{{matchKeys[i].name}}
+                  </label>
+                </li>
+            </ng-container>
+        </ng-container>
+      </ul>
+      </form>
+    </div>
   </div>
   <!--
   showMatchKeyTokens: {{showMatchKeyTokens}}<br/>

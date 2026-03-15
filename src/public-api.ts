@@ -58,6 +58,7 @@ export * from './lib/entity-grpc/detail/sz-entity-detail-graph/sz-entity-detail-
 export { SzRecordStatsDonutChart } from './lib/charts/records-by-datasources/sz-donut.component'
 /** shared */
 export { SzAlertMessageDialog } from './lib/shared/alert-dialog/sz-alert-dialog.component';
+export { SzGraphSaveDialog, SzGraphSaveDialogData, SzGraphSaveDialogResult } from './lib/shared/graph-save-dialog/sz-graph-save-dialog.component';
 export { SzDataTable } from './lib/shared/data-table/sz-data-table.component';
 export { SzVennDiagramsComponent } from './lib/charts/versus/sz-venn-diagram.component';
 /** statistics */
@@ -83,7 +84,7 @@ export { SzEntityDetailSectionData } from './lib/models/entity-detail-section-da
 export { SzSearchResultEntityData } from './lib/models/responses/search-results/sz-search-result-entity-data';
 export { SzDataSourceRecordAnalysis, SzDataSourceComposite } from './lib/models/data-sources';
 export { SzGraphTooltipEntityModel, SzGraphTooltipLinkModel, SzGraphNodeFilterPair, SzMatchKeyComposite, SzMatchKeyTokenComposite, SzEntityNetworkMatchKeyTokens, SzMatchKeyTokenFilterScope } from './lib/models/graph';
-export { SzNetworkGraphInputs } from './lib/models/SzNetworkGraph'
+export { SzNetworkGraphInputs, SzGraphExport, SzGraphExportRecord } from './lib/models/SzNetworkGraph'
 export { SzDataSourceRecordsSelection, SzDataSourceRecordSelection, SzWhySelectionModeBehavior, SzWhySelectionMode } from './lib/models/data-source-record-selection';
 export {
   SzCrossSourceSummaryCategoryType,
@@ -145,6 +146,7 @@ export { SzGrpcConfigManagerService } from './lib/services/grpc/configManager.se
 export { SzGrpcEngineService }  from './lib/services/grpc/engine.service';
 export { SzGrpcProductService }  from './lib/services/grpc/product.service';
 export { SzStatisticsService } from './lib/services/statistics.service';
+export { SzGraphStorageService } from './lib/services/sz-graph-storage.service';
 
 /** local configuration types (replaces REST client Configuration) */
 export { SzRestConfiguration, SzRestConfigurationParameters } from './lib/models/sz-rest-configuration';

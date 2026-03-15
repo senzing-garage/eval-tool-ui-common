@@ -11,7 +11,9 @@ import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 import { SzDataSourceComposite } from '../models/data-sources';
 import { SzMatchKeyComposite, SzMatchKeyTokenComposite, SzMatchKeyTokenFilterScope } from '../models/graph';
-import { SzGraphExport } from '../models/SzNetworkGraph';
+import { SzGraphExport, SzGraphExportRecord } from '../models/SzNetworkGraph';
+import { SzGraphStorageService } from '../services/sz-graph-storage.service';
+import { SzGraphSaveDialog, SzGraphSaveDialogResult } from '../shared/graph-save-dialog/sz-graph-save-dialog.component';
 import { sortDataSourcesByIndex, parseBool, sortMatchKeysByIndex, sortMatchKeyTokensByIndex } from '../common/utils';
 import { isBoolean } from '../common/utils';
 import { CommonModule } from '@angular/common';
@@ -23,6 +25,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog } from '@angular/material/dialog';
 import { CdkAccordionModule } from '@angular/cdk/accordion';
 import { CdkMenuModule } from '@angular/cdk/menu';
 import { SzSdkDataSource } from '../models/grpc/config';
@@ -251,10 +254,20 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
   }
   @Input() public showExtraneousMatchKeyTokenChips: boolean = true;
 
+  /** Data sources that are actively selected for filtering (checked = filter by this source) */
   @Input() dataSourcesFiltered: string[]        = [];
   @Input() matchKeysIncluded: string[]          = [];
   @Input() matchKeyTokensIncluded: string[]     = [];
   @Input() matchKeyCoreTokensIncluded: string[] = [];
+
+  /** True when any match key checkbox is checked (disables data source filter) */
+  get hasActiveMatchKeyFilter(): boolean {
+    return this.matchKeysIncluded && this.matchKeysIncluded.length > 0;
+  }
+  /** True when any data source checkbox is checked (disables match key filter) */
+  get hasActiveDataSourceFilter(): boolean {
+    return this.dataSourcesFiltered && this.dataSourcesFiltered.length > 0;
+  }
   @Input() queriedEntitiesColor: string;
   @Input() linkColor: string;
   @Input() indirectLinkColor: string;
@@ -410,6 +423,10 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
   @Output() public exportGraph = new EventEmitter<void>();
   /** emitted when the user picks a file via the import button */
   @Output() public importGraph = new EventEmitter<SzGraphExport>();
+  /** emitted after a graph is successfully saved to the server */
+  @Output() public graphSaved = new EventEmitter<SzGraphExportRecord>();
+  /** emitted after a graph is successfully deleted from the server */
+  @Output() public graphDeleted = new EventEmitter<SzGraphExportRecord>();
 
   // ------------------------------ forms, form groups, and handlers ---------------------
   /** the form group for the filters by datasource list */
@@ -423,6 +440,19 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
   /** the form group for colors by other characteristics */
   colorsMiscForm: UntypedFormGroup;
 
+  /** whether the server-backed graph storage is available */
+  public get graphStorageAvailable(): boolean {
+    return this.graphStorageService.isAvailable;
+  }
+
+  /** When set, indicates this graph has been saved/loaded and has a server record */
+  @Input() public savedGraphRecord: SzGraphExportRecord | null = null;
+
+  /** Whether we're working with an already-saved graph */
+  public get isExistingGraph(): boolean {
+    return this.savedGraphRecord !== null && this.savedGraphRecord.id !== undefined;
+  }
+
   constructor(
     public prefs: SzPrefsService,
     public dataSourcesService: SzDataSourcesService,
@@ -430,6 +460,8 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
     private cd: ChangeDetectorRef,
     public overlay: Overlay,
     public viewContainerRef: ViewContainerRef,
+    public graphStorageService: SzGraphStorageService,
+    private dialog: MatDialog,
   ) {
     // ----- initialize form control groups ------
     // sliders
@@ -467,20 +499,21 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
 
   /** handler for when a filter by datasource value in the "filterByDataSourcesForm" has changed */
   onDsFilterChange(dsValue: string, evt?) {
-    const filteredDataSourceNames = this.filterByDataSourcesForm.value.datasources
-      .map((v, i) => v ? null : this.dataSources[i].name)
+    const includedDataSourceNames = this.filterByDataSourcesForm.value.datasources
+      .map((v, i) => v ? this.dataSources[i].name : null)
       .filter(v => v !== null);
-    // update filters pref
-    this.prefs.graph.dataSourcesFiltered = filteredDataSourceNames;
+    // update local state immediately (checked = included for filtering)
+    this.dataSourcesFiltered = includedDataSourceNames;
+    // Emit locally — dims nodes/links not in selected data sources
+    this.optionChanged.emit({ name: 'dataSourcesFiltered', value: includedDataSourceNames });
   }
   /** handler for when a filter by match key value in the "filterByMatchKeysForm" has changed */
   onMkFilterChange(mkValue: string, evt?) {
     const includedMatchKeyNames = this.filterByMatchKeysForm.value.matchkeys
       .map((v, i) => v ? this.matchKeys[i].name :  null)
       .filter(v => v !== null);
-    // update filters pref    
-    this.prefs.graph.matchKeysIncluded = includedMatchKeyNames;
-    //console.log('@senzing/eval-tool-ui-common/sz-entity-detail-graph-filter.onMkFilterChange',this.prefs.graph.matchKeysIncluded);
+    // Emit locally — don't persist in prefs (avoids cross-graph leakage)
+    this.optionChanged.emit({ name: 'matchKeysIncluded', value: includedMatchKeyNames });
   }
   onMkTagFilterToggle( mkName: string ) {
     let _matchKeyTokensIncludedMemCopy: string[] = [];
@@ -721,8 +754,8 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
     this.maxEntities            = prefs.maxEntities;
     this.buildOut               = prefs.buildOut;
     this.dataSourceColors       = prefs.dataSourceColors;
-    this.dataSourcesFiltered    = prefs.dataSourcesFiltered;
-    this.matchKeysIncluded      = prefs.matchKeysIncluded;
+    // dataSourcesFiltered is intentionally NOT read from prefs — it's session-local state
+    // matchKeysIncluded is intentionally NOT read from prefs — it's session-local state
     this.matchKeyTokensIncluded = prefs.matchKeyTokensIncluded;
     this.matchKeyCoreTokensIncluded = prefs.matchKeyCoreTokensIncluded;
     this.queriedEntitiesColor   = prefs.queriedEntitiesColor;
@@ -858,6 +891,75 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
     this.exportGraph.emit();
   }
 
+  /**
+   * Opens the save dialog and, on confirm, tells the parent to build
+   * the export payload. The parent should call {@link saveGraphToServer}
+   * with the constructed SzGraphExport.
+   */
+  onSaveClick(): void {
+    const dialogRef = this.dialog.open(SzGraphSaveDialog, {
+      width: '440px',
+      data: {
+        name: this.savedGraphRecord?.name || '',
+        description: this.savedGraphRecord?.description || '',
+        title: this.isExistingGraph ? 'Update Graph' : 'Save Graph'
+      }
+    });
+    dialogRef.afterClosed().subscribe((result: SzGraphSaveDialogResult | null) => {
+      if (result) {
+        this._pendingSaveName = result.name;
+        this._pendingSaveDescription = result.description;
+        // emit exportGraph so the parent builds the SzGraphExport payload
+        // then the parent calls saveGraphToServer() with it
+        this.exportGraph.emit();
+      }
+    });
+  }
+
+  /** @internal */
+  private _pendingSaveName: string | null = null;
+  /** @internal */
+  private _pendingSaveDescription: string | null = null;
+
+  /**
+   * Called by the parent after building the SzGraphExport payload in
+   * response to the exportGraph event triggered by onSaveClick().
+   * If there's a pending save (name/description from dialog), saves
+   * to server. Otherwise this is a no-op (normal file export flow).
+   */
+  saveGraphToServer(graphExport: SzGraphExport): Promise<SzGraphExportRecord | null> {
+    if (!this._pendingSaveName) return Promise.resolve(null);
+    const name = this._pendingSaveName;
+    const description = this._pendingSaveDescription;
+    this._pendingSaveName = null;
+    this._pendingSaveDescription = null;
+
+    const promise = this.isExistingGraph
+      ? this.graphStorageService.updateGraph(this.savedGraphRecord!.id!, { name, description, graphExport })
+      : this.graphStorageService.saveGraph(name, description, graphExport);
+
+    return promise
+      .then((record) => {
+        this.graphSaved.emit(record);
+        return record;
+      })
+      .catch((err) => {
+        console.error('SzGraphFilterComponent: failed to save graph to server', err);
+        return null;
+      });
+  }
+
+  /** Emits deleteRequested so the parent can show its own confirm dialog and handle deletion. */
+  onDeleteClick(): void {
+    if (!this.isExistingGraph || !this.savedGraphRecord?.id) return;
+    this.graphDeleted.emit(this.savedGraphRecord);
+  }
+
+  /** Whether there is a pending server-save (save dialog was confirmed). */
+  get hasPendingSave(): boolean {
+    return this._pendingSaveName !== null;
+  }
+
   /** opens the hidden file input to let the user pick a JSON file */
   onImportClick(fileInput: HTMLInputElement): void {
     fileInput.click();
@@ -942,10 +1044,10 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
         }
         return retVal;
       });
-      // init form controls for filter by datasource      
+      // init form controls for filter by datasource (checked = actively filtering by this source)
       this.dataSources.forEach((o, i) => {
-        const dsFilterVal = !(this.dataSourcesFiltered.indexOf(o.name) >= 0);
-        const control1 = new UntypedFormControl(dsFilterVal); // if first item set to true, else false
+        const dsFilterVal = this.dataSourcesFiltered.indexOf(o.name) >= 0;
+        const control1 = new UntypedFormControl(dsFilterVal);
         // add control for filtered by list
         (this.filterByDataSourcesForm.controls['datasources'] as UntypedFormArray).push(control1);
       });

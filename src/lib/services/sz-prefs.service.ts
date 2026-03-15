@@ -1085,7 +1085,7 @@ export class SzGraphPrefs extends SzSdkPrefsBase {
   /** @internal */
   private _unlimitedMaxScope: boolean = false;
   /** @internal */
-  private _suppressL1InterLinks: boolean = true;
+  private _suppressL1InterLinks: boolean = false;
   /** @internal */
   private _matchKeyTokenSelectionScope: SzMatchKeyTokenFilterScope = SzMatchKeyTokenFilterScope.CORE;
 

@@ -1,0 +1,17 @@
+<h1 mat-dialog-title>{{title}}</h1>
+<div mat-dialog-content>
+    <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Name</mat-label>
+        <input matInput [(ngModel)]="name" required placeholder="My saved graph"
+               cdkFocusInitial maxlength="255">
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Description</mat-label>
+        <textarea matInput [(ngModel)]="description" rows="3"
+                  placeholder="Optional description" maxlength="1000"></textarea>
+    </mat-form-field>
+</div>
+<div mat-dialog-actions align="end">
+    <button mat-stroked-button (click)="onCancel()">Cancel</button>
+    <button mat-flat-button color="primary" [disabled]="!name.trim()" (click)="onSave()">Save</button>
+</div>

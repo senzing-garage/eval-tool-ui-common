@@ -47,6 +47,7 @@
       (onDataLoaded)="onGraphDataLoaded($event)"
       (onDataUpdated)="onGraphDataUpdated($event)"
       (scaleChanged)="onGraphZoom($event)"
+      (focalEntitiesChange)="onFocalEntitiesChange($event)"
       [noMaxEntitiesLimit]="unlimitedMaxEntities"
       [noMaxScopeLimit]="unlimitedMaxScope"
       [maxEntities]="maxEntities"></sz-relationship-network>  

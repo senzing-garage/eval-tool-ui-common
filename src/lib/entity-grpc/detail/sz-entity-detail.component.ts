@@ -463,6 +463,8 @@ export class SzEntityDetailGrpcComponent implements OnInit, OnDestroy, AfterView
    * @returns object with various entity and ui properties.
    */
   @Output() graphScrollWheelEvent: EventEmitter<any> = new EventEmitter<any>();
+  /** Fires whenever the embedded graph state changes (node drag, zoom/pan, etc.) */
+  @Output() graphStateChanged: EventEmitter<void> = new EventEmitter<void>();
   /**
    * Allow users to scroll to zoom the graph area
    */

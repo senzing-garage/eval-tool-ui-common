@@ -100,6 +100,25 @@ export interface SzGraphExportLink {
     isHidden: boolean;
 }
 
+// ---------------------------------------------------------------------------
+//  Server-backed graph storage record (eval-tool-server REST API)
+// ---------------------------------------------------------------------------
+
+/** A stored graph record as returned by the eval-tool-server REST API. */
+export interface SzGraphExportRecord {
+    id?: number;
+    name: string;
+    description?: string;
+    entityIds?: string;
+    nodeCount: number;
+    linkCount: number;
+    version?: string;
+    /** JSON-serialised SzGraphExport payload (only present on GET-by-id). */
+    graphData?: string;
+    createdOn?: string;
+    modifiedOn?: string;
+}
+
 /** Serialised graph preferences – mirrors SzGraphPrefs.toJSONObject(). */
 export interface SzGraphExportPrefs {
     openInNewTab: boolean;

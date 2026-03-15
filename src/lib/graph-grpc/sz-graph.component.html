@@ -31,6 +31,7 @@
       (onDataLoaded)="onGraphDataLoaded($event)"
       (onPreflightRequestComplete)="onPreflightRequestComplete($event)"
       (scaleChanged)="onGraphZoom($event)"
+      (focalEntitiesChange)="onFocalEntitiesChange($event)"
       [maxEntities]="maxEntities"></sz-relationship-network>
   
       <sz-graph-control *ngIf="showMatchKeyControl" class="sz-graph-control"
