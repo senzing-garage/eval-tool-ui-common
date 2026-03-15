@@ -2883,6 +2883,8 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
           this.getNodeByIdQuery(d.entityId).attr('class', this.getEntityNodeClass);
           // update any "focal" link properties
           this.updateIsRelatedToFocalEntitiesForLinks(this.link, this.linkLabel);
+          // Notify after all DOM updates so dimming can be re-applied
+          this._stateChanged.next();
           return;
         });
     }

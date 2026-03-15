@@ -52,6 +52,7 @@
     (scrollWheelEvent)="graphScrollWheelEvent.emit($event)"
     (entityClick)="onGraphEntityClick($event)"
     (relationshipClick)="onGraphRelationshipClick($event)"
+    (graphStateChanged)="graphStateChanged.emit()"
   ></sz-entity-detail-graph>
 
 <!--

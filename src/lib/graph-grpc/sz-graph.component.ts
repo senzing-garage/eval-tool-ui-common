@@ -511,6 +511,8 @@ export class SzGraphComponentGrpc implements OnInit, OnDestroy {
    * @returns object with various entity and ui properties.
    */
   @Output() entityDblClick: EventEmitter<any> = new EventEmitter<any>();
+  /** Fires whenever the graph state changes (node drag, hide, expand/collapse, zoom/pan). */
+  @Output() graphStateChanged: EventEmitter<void> = new EventEmitter<void>();
 
   protected _graphIds: SzEntityIdentifier[];
   @Input() public set graphIds(value: Array<SzEntityIdentifier>) {
@@ -921,6 +923,11 @@ export class SzGraphComponentGrpc implements OnInit, OnDestroy {
       ).subscribe( (ren: boolean) => {
         this._graphComponentRendered = true;
         this._graphComponentRenderCompleted.next(true);
+      });
+      this.graphNetworkComponent.stateChanged.pipe(
+        takeUntil(this.unsubscribe$)
+      ).subscribe(() => {
+        this.graphStateChanged.emit();
       });
     }
   }
