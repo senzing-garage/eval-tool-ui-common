@@ -254,10 +254,20 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
   }
   @Input() public showExtraneousMatchKeyTokenChips: boolean = true;
 
+  /** Data sources that are actively selected for filtering (checked = filter by this source) */
   @Input() dataSourcesFiltered: string[]        = [];
   @Input() matchKeysIncluded: string[]          = [];
   @Input() matchKeyTokensIncluded: string[]     = [];
   @Input() matchKeyCoreTokensIncluded: string[] = [];
+
+  /** True when any match key checkbox is checked (disables data source filter) */
+  get hasActiveMatchKeyFilter(): boolean {
+    return this.matchKeysIncluded && this.matchKeysIncluded.length > 0;
+  }
+  /** True when any data source checkbox is checked (disables match key filter) */
+  get hasActiveDataSourceFilter(): boolean {
+    return this.dataSourcesFiltered && this.dataSourcesFiltered.length > 0;
+  }
   @Input() queriedEntitiesColor: string;
   @Input() linkColor: string;
   @Input() indirectLinkColor: string;
@@ -489,11 +499,13 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
 
   /** handler for when a filter by datasource value in the "filterByDataSourcesForm" has changed */
   onDsFilterChange(dsValue: string, evt?) {
-    const filteredDataSourceNames = this.filterByDataSourcesForm.value.datasources
-      .map((v, i) => v ? null : this.dataSources[i].name)
+    const includedDataSourceNames = this.filterByDataSourcesForm.value.datasources
+      .map((v, i) => v ? this.dataSources[i].name : null)
       .filter(v => v !== null);
-    // update filters pref
-    this.prefs.graph.dataSourcesFiltered = filteredDataSourceNames;
+    // update local state immediately (checked = included for filtering)
+    this.dataSourcesFiltered = includedDataSourceNames;
+    // Emit locally — dims nodes/links not in selected data sources
+    this.optionChanged.emit({ name: 'dataSourcesFiltered', value: includedDataSourceNames });
   }
   /** handler for when a filter by match key value in the "filterByMatchKeysForm" has changed */
   onMkFilterChange(mkValue: string, evt?) {
@@ -742,7 +754,7 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
     this.maxEntities            = prefs.maxEntities;
     this.buildOut               = prefs.buildOut;
     this.dataSourceColors       = prefs.dataSourceColors;
-    this.dataSourcesFiltered    = prefs.dataSourcesFiltered;
+    // dataSourcesFiltered is intentionally NOT read from prefs — it's session-local state
     // matchKeysIncluded is intentionally NOT read from prefs — it's session-local state
     this.matchKeyTokensIncluded = prefs.matchKeyTokensIncluded;
     this.matchKeyCoreTokensIncluded = prefs.matchKeyCoreTokensIncluded;
@@ -1032,10 +1044,10 @@ export class SzGraphFilterComponent implements OnInit, AfterViewInit, OnDestroy 
         }
         return retVal;
       });
-      // init form controls for filter by datasource      
+      // init form controls for filter by datasource (checked = actively filtering by this source)
       this.dataSources.forEach((o, i) => {
-        const dsFilterVal = !(this.dataSourcesFiltered.indexOf(o.name) >= 0);
-        const control1 = new UntypedFormControl(dsFilterVal); // if first item set to true, else false
+        const dsFilterVal = this.dataSourcesFiltered.indexOf(o.name) >= 0;
+        const control1 = new UntypedFormControl(dsFilterVal);
         // add control for filtered by list
         (this.filterByDataSourcesForm.controls['datasources'] as UntypedFormArray).push(control1);
       });

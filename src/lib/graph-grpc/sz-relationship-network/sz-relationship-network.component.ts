@@ -1043,6 +1043,84 @@ export class SzRelationshipNetworkComponent implements AfterViewInit, OnDestroy 
       this.node.classed('match-key-dimmed', (d: any) => !activeNodeIds.has(parseSzIdentifier(d.entityId)));
     }
   }
+
+  /** @internal tracks which data sources are currently being filtered for dimming */
+  private _dimmingDataSources: string[] = [];
+
+  /**
+   * Apply dimming to nodes not in any of the selected data sources.
+   * Without focal entities: nodes with the data source are active.
+   * With focal entities: nodes must also be directly connected to a focal entity.
+   * Links where either endpoint is dimmed are also dimmed.
+   * When no data sources are selected, all dimming is removed.
+   */
+  public applyDataSourceDimming(dataSourcesIncluded: string[]) {
+    this._dimmingDataSources = dataSourcesIncluded || [];
+    const hasFilter = dataSourcesIncluded && dataSourcesIncluded.length > 0;
+
+    if (!hasFilter) {
+      if (this.node) this.node.classed('match-key-dimmed', false);
+      if (this.link) this.link.classed('match-key-dimmed', false);
+      if (this.linkLabel) this.linkLabel.classed('match-key-dimmed', false);
+      return;
+    }
+
+    const dsSet = new Set(dataSourcesIncluded);
+    const hasFocus = this._focalEntities && this._focalEntities.length > 0;
+    const focalSet = hasFocus ? new Set(this._focalEntities.map(id => parseSzIdentifier(id))) : null;
+
+    // Find nodes that have the selected data source
+    const nodesWithDs = new Set<number>();
+    if (this.node) {
+      this.node.each((d: any) => {
+        if (d.dataSources && d.dataSources.some((ds: string) => dsSet.has(ds))) {
+          nodesWithDs.add(parseSzIdentifier(d.entityId));
+        }
+      });
+    }
+
+    // Determine active nodes
+    const activeNodeIds = new Set<number>();
+    if (!hasFocus) {
+      // No focus: all nodes with the data source are active
+      nodesWithDs.forEach(id => activeNodeIds.add(id));
+    } else {
+      // With focus: focal entities are always active, plus nodes with the data source
+      // that are directly connected to a focal entity
+      focalSet.forEach(id => { if (nodesWithDs.has(id)) activeNodeIds.add(id); });
+      if (this.link) {
+        this.link.each((d: any) => {
+          if (d.isHidden) return;
+          const src = parseSzIdentifier(d.sourceEntityId);
+          const tgt = parseSzIdentifier(d.targetEntityId);
+          // If one end is focal and the other has the data source, the other is active
+          if (focalSet.has(src) && nodesWithDs.has(tgt)) activeNodeIds.add(tgt);
+          if (focalSet.has(tgt) && nodesWithDs.has(src)) activeNodeIds.add(src);
+        });
+        // Also keep focal nodes active even if they don't have the data source
+        focalSet.forEach(id => activeNodeIds.add(id));
+      }
+    }
+
+    if (this.node) {
+      this.node.classed('match-key-dimmed', (d: any) => !activeNodeIds.has(parseSzIdentifier(d.entityId)));
+    }
+
+    // Dim links where either endpoint is not active
+    const isLinkDimmed = (d: any): boolean => {
+      if (d.isHidden) return false;
+      const src = parseSzIdentifier(d.sourceEntityId);
+      const tgt = parseSzIdentifier(d.targetEntityId);
+      return !activeNodeIds.has(src) || !activeNodeIds.has(tgt);
+    };
+    if (this.link) {
+      this.link.classed('match-key-dimmed', isLinkDimmed);
+    }
+    if (this.linkLabel) {
+      this.linkLabel.classed('match-key-dimmed', isLinkDimmed);
+    }
+  }
+
   /** only settable through "highlight" setter */
   private _highlightFn: SzGraphNodeFilterPair[] | undefined;
   /**
