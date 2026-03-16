@@ -84,6 +84,11 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      .detail-header-why-button,
+      .detail-header-how-button,
+      .detail-header-reevaluate-button {
+        margin-top: 10px;
+      }
       .detail-header-why-button {
         width: 145px;
         margin-right: 10px;
