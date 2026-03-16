@@ -144,7 +144,7 @@ export class SzGrpcEngineService {
           console.log(`\t\tgetEntitiesByEntityId(${(entityIds as Array<number | string>).join(',')}): all promises resolved`, _retResp);
           retVal.next(_retResp);
         }).catch((error) => {
-          throw error;
+          retVal.error(error);
         })
       }
       return retVal.asObservable();

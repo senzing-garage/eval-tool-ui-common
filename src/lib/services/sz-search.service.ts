@@ -178,9 +178,14 @@ export class SzSearchService {
         return res.map((res: SzSdkEntityResponse) => (res as SzSdkEntityResponse))
       })
     )
-    .subscribe((results: SzSdkEntityResponse[]) => {
-      console.warn('@senzing/sdk/services/sz-search[getEntitiesByIds RESULT: ', results);
-      _retSubject.next(results);
+    .subscribe({
+      next: (results: SzSdkEntityResponse[]) => {
+        console.warn('@senzing/sdk/services/sz-search[getEntitiesByIds RESULT: ', results);
+        _retSubject.next(results);
+      },
+      error: (err) => {
+        _retSubject.error(err);
+      }
     })
 
     return _retVal;
@@ -261,57 +266,62 @@ export class SzSearchService {
           console.timeEnd('graph data')
         }catch(err){}
       }) 
-    ).subscribe((resp) => {
-      let originalData = Object.assign({}, (resp as SzNetworkGraphCompositeResponse));
-      let _data = Object.assign({ modified: true }, (resp as SzNetworkGraphCompositeResponse));
-      let primaryEntitiesById         = new Map<string | number, SzSdkResolvedEntity>();
-      let relatedEntitiesById         = new Map<string | number, SzSdkRelatedEntity>();
-      let relatedEntitiesByPrimaryId  = new Map<string | number, Map<string | number, SzSdkRelatedEntity>>();
-      
-      if(_data.ENTITY_RESPONSES && _data.ENTITY_RESPONSES.forEach) {
-        _data.ENTITY_RESPONSES.forEach((_eResp)=>{
-          if(_eResp.RESOLVED_ENTITY) {
-            primaryEntitiesById.set(_eResp.RESOLVED_ENTITY.ENTITY_ID, _eResp.RESOLVED_ENTITY);
-          }
-          if(_eResp.RELATED_ENTITIES && _eResp.RELATED_ENTITIES.forEach) {
-            let _relatedEntitiesByPrimaryId = new Map<string | number, SzSdkRelatedEntity>();
-            _eResp.RELATED_ENTITIES.forEach((relEntity)=>{
-              relatedEntitiesById.set(relEntity.ENTITY_ID, relEntity);
-              _relatedEntitiesByPrimaryId.set(relEntity.ENTITY_ID, relEntity);
-            })
-            if(_relatedEntitiesByPrimaryId && _relatedEntitiesByPrimaryId.size > 0) {
-              relatedEntitiesByPrimaryId.set(_eResp.RESOLVED_ENTITY.ENTITY_ID, _relatedEntitiesByPrimaryId);
+    ).subscribe({
+      next: (resp) => {
+        let originalData = Object.assign({}, (resp as SzNetworkGraphCompositeResponse));
+        let _data = Object.assign({ modified: true }, (resp as SzNetworkGraphCompositeResponse));
+        let primaryEntitiesById         = new Map<string | number, SzSdkResolvedEntity>();
+        let relatedEntitiesById         = new Map<string | number, SzSdkRelatedEntity>();
+        let relatedEntitiesByPrimaryId  = new Map<string | number, Map<string | number, SzSdkRelatedEntity>>();
+
+        if(_data.ENTITY_RESPONSES && _data.ENTITY_RESPONSES.forEach) {
+          _data.ENTITY_RESPONSES.forEach((_eResp)=>{
+            if(_eResp.RESOLVED_ENTITY) {
+              primaryEntitiesById.set(_eResp.RESOLVED_ENTITY.ENTITY_ID, _eResp.RESOLVED_ENTITY);
             }
-          }
-        });
-      }
-      if(_data.NETWORK_RESPONSES && _data.NETWORK_RESPONSES.forEach) {
-        _data.NETWORK_RESPONSES.forEach((_nResp)=>{
-          if(_nResp.ENTITIES && _nResp.ENTITIES.forEach) {
-            _nResp.ENTITIES = _nResp.ENTITIES.map((netEntity) => {
-              if(primaryEntitiesById.has(netEntity.RESOLVED_ENTITY.ENTITY_ID)) {
-                // this is a primary entity
-                // SUPERSIZE IT!
-                netEntity.RESOLVED_ENTITY   = Object.assign(netEntity.RESOLVED_ENTITY, primaryEntitiesById.get(netEntity.RESOLVED_ENTITY.ENTITY_ID));
-                if(relatedEntitiesByPrimaryId.has(netEntity.RESOLVED_ENTITY.ENTITY_ID)) {
-                  netEntity.RELATED_ENTITIES = netEntity.RELATED_ENTITIES ? 
-                  netEntity.RELATED_ENTITIES : 
-                  [...relatedEntitiesByPrimaryId.get(netEntity.RESOLVED_ENTITY.ENTITY_ID)]
-                  .map(_relEntityByPrimary => { return _relEntityByPrimary[1] })
+            if(_eResp.RELATED_ENTITIES && _eResp.RELATED_ENTITIES.forEach) {
+              let _relatedEntitiesByPrimaryId = new Map<string | number, SzSdkRelatedEntity>();
+              _eResp.RELATED_ENTITIES.forEach((relEntity)=>{
+                relatedEntitiesById.set(relEntity.ENTITY_ID, relEntity);
+                _relatedEntitiesByPrimaryId.set(relEntity.ENTITY_ID, relEntity);
+              })
+              if(_relatedEntitiesByPrimaryId && _relatedEntitiesByPrimaryId.size > 0) {
+                relatedEntitiesByPrimaryId.set(_eResp.RESOLVED_ENTITY.ENTITY_ID, _relatedEntitiesByPrimaryId);
+              }
+            }
+          });
+        }
+        if(_data.NETWORK_RESPONSES && _data.NETWORK_RESPONSES.forEach) {
+          _data.NETWORK_RESPONSES.forEach((_nResp)=>{
+            if(_nResp.ENTITIES && _nResp.ENTITIES.forEach) {
+              _nResp.ENTITIES = _nResp.ENTITIES.map((netEntity) => {
+                if(primaryEntitiesById.has(netEntity.RESOLVED_ENTITY.ENTITY_ID)) {
+                  // this is a primary entity
+                  // SUPERSIZE IT!
+                  netEntity.RESOLVED_ENTITY   = Object.assign(netEntity.RESOLVED_ENTITY, primaryEntitiesById.get(netEntity.RESOLVED_ENTITY.ENTITY_ID));
+                  if(relatedEntitiesByPrimaryId.has(netEntity.RESOLVED_ENTITY.ENTITY_ID)) {
+                    netEntity.RELATED_ENTITIES = netEntity.RELATED_ENTITIES ?
+                    netEntity.RELATED_ENTITIES :
+                    [...relatedEntitiesByPrimaryId.get(netEntity.RESOLVED_ENTITY.ENTITY_ID)]
+                    .map(_relEntityByPrimary => { return _relEntityByPrimary[1] })
+                  }
                 }
-              }
-              if(relatedEntitiesById.has(netEntity.RESOLVED_ENTITY.ENTITY_ID)) {
-                netEntity.RESOLVED_ENTITY = Object.assign(netEntity.RESOLVED_ENTITY, relatedEntitiesById.get(netEntity.RESOLVED_ENTITY.ENTITY_ID));
-              }
+                if(relatedEntitiesById.has(netEntity.RESOLVED_ENTITY.ENTITY_ID)) {
+                  netEntity.RESOLVED_ENTITY = Object.assign(netEntity.RESOLVED_ENTITY, relatedEntitiesById.get(netEntity.RESOLVED_ENTITY.ENTITY_ID));
+                }
 
-              return netEntity;
-            });
-          }
-        });
+                return netEntity;
+              });
+            }
+          });
+        }
+
+        console.log(`!!!!!!!!!!!!!! getGraphEntityNetwork: SWEET !!!!!!!!!!!!!!`, originalData, _data );
+        returnSubject.next(_data);
+      },
+      error: (err) => {
+        returnSubject.error(err);
       }
-
-      console.log(`!!!!!!!!!!!!!! getGraphEntityNetwork: SWEET !!!!!!!!!!!!!!`, originalData, _data );
-      returnSubject.next(_data);
     });
     return returnObservable;
   }
