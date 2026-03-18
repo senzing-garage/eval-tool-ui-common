@@ -84,6 +84,8 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
      * @internal
     */
     private _alwaysVisibleColumns: string[] = ['ENTITY_ID'];
+    /** Columns hidden by default but available in the column selector dropdown. */
+    private _defaultHiddenColumns: string[] = ['ERRULE_CODE'];
     
     /** 
      * Stores how many times a column has data available to be displayed. Used to automatically 
@@ -879,8 +881,14 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
         // Deduplicate match keys (aggregate counts across principles)
         const deduped = this.dataMartService.getCrossSourceStatisticsByMatchKeyFromData(filteredData);
         if(deduped) {
-          this.dataMartService.matchKeyCounts = deduped;
-          this._openMatchKeyDialog(deduped, statType);
+          // Sort match keys by frequency (descending), keeping the total row first
+          const countKey = statType === SzCrossSourceSummaryCategoryType.MATCHES ? 'entityCount' : 'relationCount';
+          const totalRow = deduped.find((item) => !item.matchKey);
+          const matchKeyRows = deduped.filter((item) => !!item.matchKey)
+            .sort((a, b) => (b[countKey] || 0) - (a[countKey] || 0));
+          const sorted = totalRow ? [totalRow, ...matchKeyRows] : matchKeyRows;
+          this.dataMartService.matchKeyCounts = sorted;
+          this._openMatchKeyDialog(sorted, statType);
         }
       });
     }
@@ -1152,6 +1160,8 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
       let _colsForMatchLevel    = new Map<string, string>([...this._cols].filter((_col)=>{
         return this._selectableColumns.includes(_col[0]);
       }));
+      // Hide default-hidden columns
+      for (const col of this._defaultHiddenColumns) _colsForMatchLevel.delete(col);
       this._selectedColumns     = _colsForMatchLevel;
       this.cd.markForCheck();
     }
@@ -1174,6 +1184,8 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
       let _colsForMatchLevel = new Map<string, string>([...this._cols].filter((_col) => {
         return this._selectableColumns.includes(_col[0]);
       }));
+      // Hide default-hidden columns
+      for (const col of this._defaultHiddenColumns) _colsForMatchLevel.delete(col);
       this._selectedColumns = _colsForMatchLevel;
       this.cd.markForCheck();
     }
@@ -1195,6 +1207,8 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
       let _colsForMatchLevel = new Map<string, string>([...this._cols].filter((_col) => {
         return this._selectableColumns.includes(_col[0]);
       }));
+      // Hide default-hidden columns
+      for (const col of this._defaultHiddenColumns) _colsForMatchLevel.delete(col);
       this._selectedColumns = _colsForMatchLevel;
       this.cd.markForCheck();
       if(data === undefined) {
