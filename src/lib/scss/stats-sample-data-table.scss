@@ -339,9 +339,13 @@ sz-cross-source-results {
                 }
             }
 
-            // expand icon — shown when cell has truncatable content
+            // Hide expando toggle by default
+            td .cell-expando-toggle { display: none; }
+
+            // Show expand icon when cell has overflowing content
             td.has-hidden-items {
                 .cell-expando-toggle {
+                    display: block;
                     position: absolute;
                     bottom: 1px;
                     right: 2px;
@@ -372,7 +376,7 @@ sz-cross-source-results {
             // Non-expanded sibling cells in a row with an expanded cell:
             // Use the CSS variable set by JS to constrain siblings to the
             // expanded cell's content height, not their own full height.
-            &:has(td.expanded) td:not(.expanded) .cell-content {
+            &:has(td.expanded) td.has-hidden-items:not(.expanded) .cell-content {
                 max-height: var(--expanded-cell-height, calc(var(--truncate-line-count, 1) * 14px));
             }
 

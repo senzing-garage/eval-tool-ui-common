@@ -1,6 +1,6 @@
 import { Component, ChangeDetectorRef, OnInit, Input, Inject, OnDestroy, Output, EventEmitter, ViewChild, HostBinding, ChangeDetectionStrategy, TemplateRef, ViewContainerRef, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Observable, Subject, Subscription, filter, fromEvent, take, takeUntil, throwError, zip } from 'rxjs';
+import { Observable, Subject, Subscription, debounceTime, filter, fromEvent, take, takeUntil, throwError, zip } from 'rxjs';
 import { CdkMenuModule} from '@angular/cdk/menu';
 import { TemplatePortal } from '@angular/cdk/portal';
 import { CdkTableModule } from '@angular/cdk/table';
@@ -480,6 +480,12 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
       this.dataMartService.onSampleNoResults.pipe(
         takeUntil(this.unsubscribe$)
       ).subscribe(this.onNoResults.bind(this));
+
+      // re-check overflow indicators when window resizes (column widths change)
+      fromEvent(window, 'resize').pipe(
+        debounceTime(200),
+        takeUntil(this.unsubscribe$)
+      ).subscribe(() => this.updateOverflowIndicators());
 
       // listen for "loading" event
       this.loading.subscribe((isLoading) =>{
@@ -1002,6 +1008,25 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
         this.cd.markForCheck();
       }
     }
+    /**
+     * Scan all table cells after render and add/remove `has-hidden-items`
+     * based on whether .cell-content is actually overflowing (scrollHeight > offsetHeight).
+     * This catches both multi-item truncation AND single-value text wrapping.
+     */
+    private updateOverflowIndicators() {
+      setTimeout(() => {
+        if (!this.tableRef?.nativeElement) return;
+        const cells = this.tableRef.nativeElement.querySelectorAll('td.sz-dt-cell');
+        cells.forEach((td: Element) => {
+          const content = td.querySelector('.cell-content') as HTMLElement;
+          if (content && content.scrollHeight > content.offsetHeight + 1) {
+            td.classList.add('has-hidden-items');
+          } else {
+            td.classList.remove('has-hidden-items');
+          }
+        });
+      }, 50);
+    }
     /** toggle the visibility of the column picker menu */
     public toggleColumnPicker(event: MouseEvent) {
       this._columnPickerShowing = !this._columnPickerShowing;
@@ -1434,6 +1459,7 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
       this._loading.next({inflight: false, source: 'SzCrossSourceResultsDataTable.onSampleSetDataChange'});
       this.cd.markForCheck();
       this.autoExpandFilteredRowGroups();
+      this.updateOverflowIndicators();
     }
     /**
      * When a match key or ER code filter is active (match level 1 only), auto-expand
@@ -1604,6 +1630,6 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
       this._isResizing              = false;
       this._resizeElement           = undefined;
       this._resizeCellClientXOffset  = undefined;
-
+      this.updateOverflowIndicators();
     }
 }

@@ -278,7 +278,7 @@ sz-tooltip="Tooltip text">Get Grid Column Sizes</button>-->
                         </button>
                     </div>
                     <!--<button (click)="debugTruncatedItemCount(rowQ[col.key])">truncated lines {{truncatedItemCount(rowQ[col.key])}}</button>-->
-                    <div class="cell-expando-toggle" *ngIf="col.key !== 'ENTITY_ID' && hasTruncatedItems(rowQ[col.key])"
+                    <div class="cell-expando-toggle" *ngIf="col.key !== 'ENTITY_ID' && col.key !== 'relatedEntityId'"
                     (click)="toggleCellExpando(cellRef, $event)">
                         <mat-icon class="expand-icon">expand_circle_down</mat-icon>
                     </div>
@@ -374,7 +374,7 @@ sz-tooltip="Tooltip text">Get Grid Column Sizes</button>-->
                                 {{getTotalRowCount(row) - getRowCountInSelectedDataSources(row)}} More
                             </button>
                         </div>
-                        <div class="cell-expando-toggle" *ngIf="col.key !== 'ENTITY_ID' && hasTruncatedItems(rowY[col.key])"
+                        <div class="cell-expando-toggle" *ngIf="col.key !== 'ENTITY_ID' && col.key !== 'relatedEntityId'"
                             (click)="toggleCellExpando(cellRef, $event)">
                             <mat-icon class="expand-icon">expand_circle_down</mat-icon>
                         </div>
