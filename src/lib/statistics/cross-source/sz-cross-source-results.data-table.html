@@ -278,13 +278,9 @@ sz-tooltip="Tooltip text">Get Grid Column Sizes</button>-->
                         </button>
                     </div>
                     <!--<button (click)="debugTruncatedItemCount(rowQ[col.key])">truncated lines {{truncatedItemCount(rowQ[col.key])}}</button>-->
-                    <div class="toggle-expansion" *ngIf="col.key !== 'ENTITY_ID' && hasTruncatedItems(rowQ[col.key])"
+                    <div class="cell-expando-toggle" *ngIf="col.key !== 'ENTITY_ID' && hasTruncatedItems(rowQ[col.key])"
                     (click)="toggleCellExpando(cellRef, $event)">
-                        <button class="more-link">
-                            {{truncatedItemCount(rowQ[col.key])}} more items</button>
-                        <button class="less-link">
-                            hide last {{truncatedItemCount(rowQ[col.key])}} items</button>
-                        <mat-icon>transit_enterexit</mat-icon>
+                        <mat-icon class="expand-icon">expand_circle_down</mat-icon>
                     </div>
                 </td>
             </tr>
@@ -378,11 +374,9 @@ sz-tooltip="Tooltip text">Get Grid Column Sizes</button>-->
                                 {{getTotalRowCount(row) - getRowCountInSelectedDataSources(row)}} More
                             </button>
                         </div>
-                        <div class="toggle-expansion" *ngIf="col.key !== 'ENTITY_ID' && hasTruncatedItems(rowY[col.key])"
+                        <div class="cell-expando-toggle" *ngIf="col.key !== 'ENTITY_ID' && hasTruncatedItems(rowY[col.key])"
                             (click)="toggleCellExpando(cellRef, $event)">
-                            <button class="more-link">show {{truncatedItemCount(rowY[col.key])}} more</button>
-                            <button class="less-link">hide last {{truncatedItemCount(rowY[col.key])}}</button>
-                            <mat-icon>transit_enterexit</mat-icon>
+                            <mat-icon class="expand-icon">expand_circle_down</mat-icon>
                         </div>
                     </td>
             </tr>

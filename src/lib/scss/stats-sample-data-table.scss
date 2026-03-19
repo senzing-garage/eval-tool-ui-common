@@ -318,63 +318,80 @@ sz-cross-source-results {
         }
     }
 
-    // truncate lines
+    // truncate lines — overflow-based approach
+    // All data items are rendered in the DOM. The <tr> has a fixed height and
+    // each <td> clips via overflow: hidden. When a cell is expanded we remove
+    // the row height constraint so the table row grows to fit. Sibling cells
+    // passively reveal more content because they share the new row height.
     &.truncate-cell-data {
-        .data-table tbody tr td {
-            // hide elements past value found in "" css var
-            .cell-content .data-item.hidden {
-                display: none;
-            }
-            &.has-hidden-items {
-                padding-bottom: 17px !important;
-                .toggle-expansion {
-                    display: block;
-                    position: absolute;
-                    bottom: 0;
-                    left: 0;
-                    width: 100%;
-                }
-                button {
-                    display: block;
-                    border: none;
-                    font-size: 8px;
-                    color: var(--sz-sample-table-cell-color);
-                    background-color: rgb(255 255 255 / 30%);
-                    /*border-top: 1px solid #bdbdbd;*/
-                    width: 100%;
-                    /*text-align: left;*/
+        .data-table tbody tr {
+            td {
+                position: relative;
+                vertical-align: top;
+                overflow: hidden;
 
-                    cursor: pointer;
+                .cell-content {
+                    // Use line-height * count with no extra space to prevent
+                    // the top of the next line peeking through.
+                    max-height: calc(var(--truncate-line-count, 1) * 14px);
+                    overflow: hidden;
+                    line-height: 14px;
                 }
-                .more-link { display: block; }
-                .less-link { display: none;  }
-                mat-icon {
-                    display: inline-block;
-                    width: 14px;
-                    height: 14px;
-                    font-size: 14px;
+            }
+
+            // expand icon — shown when cell has truncatable content
+            td.has-hidden-items {
+                .cell-expando-toggle {
                     position: absolute;
-                    right: -2px;
-                    bottom: -1px;
-                    opacity: 0;
-                    transition: 440ms ease-out opacity, 100ms linear transform;
-                    transform: rotate(270deg);
-                }
-                &:hover {
-                    mat-icon { opacity: 1; }
-                }
-                &.expanded {
-                    mat-icon { 
-                        opacity: 1; 
-                        transform: rotate(90deg);
+                    bottom: 1px;
+                    right: 2px;
+                    cursor: pointer;
+                    line-height: 1;
+                    z-index: 1;
+
+                    mat-icon {
+                        font-size: 16px;
+                        width: 16px;
+                        height: 16px;
+                        color: #0E2863;
+                        opacity: 1;
                     }
-                    .more-link { display: none;  }
-                    .less-link { display: block; }
+                    .expand-icon  {
+                        display: block;
+                        transition: transform 350ms ease;
+                    }
+                    .collapse-icon { display: none; }
+
+                    &:hover .expand-icon {
+                        transform: scale(1.15);
+                    }
+
                 }
             }
-            &.expanded .cell-content .data-item.hidden {
-                display: block;
+
+            // Non-expanded sibling cells in a row with an expanded cell:
+            // Use the CSS variable set by JS to constrain siblings to the
+            // expanded cell's content height, not their own full height.
+            &:has(td.expanded) td:not(.expanded) .cell-content {
+                max-height: var(--expanded-cell-height, calc(var(--truncate-line-count, 1) * 14px));
             }
+
+            // Expanded cell — remove all clipping so it dictates row height.
+            td.expanded {
+                overflow: visible;
+                .cell-content {
+                    max-height: none;
+                    overflow: visible;
+                }
+                .cell-expando-toggle {
+                    .expand-icon  { transform: rotate(180deg); color: #0c9bf4 !important; }
+                    .collapse-icon { display: none; }
+                    &:hover .expand-icon {
+                        transform: rotate(180deg) scale(1.2);
+                    }
+                }
+            }
+
         }
     }
 

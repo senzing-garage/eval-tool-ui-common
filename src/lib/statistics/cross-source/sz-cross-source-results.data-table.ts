@@ -321,13 +321,8 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
       let dataFieldRenderer = (data: string[]) => {
         let retVal = '';
         if(data && data.length > 0) {
-          let truncateAfter = this.truncatedLinesGreaterThan > 0 ? this.truncatedLinesGreaterThan : undefined;
-          retVal = data.map((strVal: string, lineIndex) => {
-            if(truncateAfter && (lineIndex+1) > truncateAfter) {
-              return `<span class="data-item hidden">${strVal}</span>`;
-            } else {
-              return `<span class="data-item">${strVal}</span>`;
-            }
+          retVal = data.map((strVal: string) => {
+            return `<span class="data-item">${strVal}</span>`;
           }).join('');
         }
         return retVal;
@@ -983,13 +978,26 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
     }
     /** expand or collapse cell when contents of cell contain items past truncation limit */
     public toggleCellExpando(cellElement?: HTMLElement, event?: MouseEvent) {
-      console.log(`toggleCellExpando: `, cellElement, cellElement ? cellElement.classList.contains('expanded') : false);
       if(event && event.stopPropagation) { event.stopPropagation(); }
       if(cellElement) {
+        const row = cellElement.closest('tr');
         if(cellElement.classList.contains('expanded')) {
           cellElement.classList.remove('expanded');
+          // Remove sibling height constraint
+          if(row) {
+            row.style.removeProperty('--expanded-cell-height');
+          }
         } else {
           cellElement.classList.add('expanded');
+          // Measure expanded cell content height and set as CSS var on the row
+          // so sibling cells can clip to it.
+          if(row) {
+            const cellContent = cellElement.querySelector('.cell-content') as HTMLElement;
+            if(cellContent) {
+              const height = cellContent.scrollHeight;
+              row.style.setProperty('--expanded-cell-height', `${height}px`);
+            }
+          }
         }
         this.cd.markForCheck();
       }
