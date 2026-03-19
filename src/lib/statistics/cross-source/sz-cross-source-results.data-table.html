@@ -69,6 +69,8 @@
         [disabled]="!hasAdditionalDataSources(data.row)"
         [cdkMenuItemChecked]="isShowingAdditionalDataSources(data.row)"
         (click)="toggleRowExpansion(data.row)">Show other Data Sources</button>
+        <button class="header-context-menu-item" cdkMenuItem
+        (click)="expandAllCellsInRow(data.cell)">Expand All</button>
     </div>
 </ng-template>
 <ng-template #sz_dt_cell_entity_context_menu let-data>
