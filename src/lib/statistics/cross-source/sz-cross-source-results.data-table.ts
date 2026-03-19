@@ -1018,6 +1018,11 @@ export class SzCrossSourceResultsDataTable extends SzDataTable implements OnInit
         if (!this.tableRef?.nativeElement) return;
         const cells = this.tableRef.nativeElement.querySelectorAll('td.sz-dt-cell');
         cells.forEach((td: Element) => {
+          // Never remove indicator from expanded cells — they need it to collapse
+          if (td.classList.contains('expanded')) {
+            td.classList.add('has-hidden-items');
+            return;
+          }
           const content = td.querySelector('.cell-content') as HTMLElement;
           if (content && content.scrollHeight > content.offsetHeight + 1) {
             td.classList.add('has-hidden-items');
